@@ -1,7 +1,7 @@
 'use client'
 export default function ComunidadeSection() {
   const items = [
-    { label: 'TikTok', desc: 'Lives diárias de eFootball', url: 'https://www.tiktok.com/@fskategames', color: '#ff0050', bg: 'rgba(255,0,80,0.08)',
+    { label: 'TikTok', desc: 'Lives diárias de eFootball', url: 'https://www.tiktok.com/@fskate.efootball', color: '#ff0050', bg: 'rgba(255,0,80,0.08)',
       svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.79 1.54V6.78a4.85 4.85 0 01-1.02-.09z"/></svg>` },
     { label: 'YouTube', desc: 'Gameplay e highlights', url: 'https://www.youtube.com/@FSKATEGAMES', color: '#ff0000', bg: 'rgba(255,0,0,0.08)',
       svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 00-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 00.5 6.19C0 8.04 0 12 0 12s0 3.96.5 5.81a3.02 3.02 0 002.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 002.12-2.14C24 15.96 24 12 24 12s0-3.96-.5-5.81zM9.75 15.52V8.48L15.5 12l-5.75 3.52z"/></svg>` },
