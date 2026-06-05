@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import FloatingButtons from '@/components/FloatingButtons'
 
 export const metadata: Metadata = {
   title: 'eFootball Diário — Notícias, Eventos e Torneios',
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        {children}
+        <FloatingButtons />
+      </body>
     </html>
   )
 }
