@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import PostCard from '@/components/PostCard'
+import Footer from '@/components/Footer'
+import ComunidadeSection from '@/components/ComunidadeSection'
 import Link from 'next/link'
 import type { Post } from '@/lib/supabase'
 import { timeAgo } from '@/lib/utils'
@@ -36,13 +38,14 @@ export default async function Home() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '1rem' }}>
-              {/* Hero principal */}
               {hero && (
                 <Link href={`/post/${hero.slug}`} style={{ textDecoration: 'none' }}>
                   <div className="card" style={{
                     minHeight: 240, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
                     padding: '1.5rem', cursor: 'pointer', position: 'relative', overflow: 'hidden',
-                    background: hero.cover_image ? `linear-gradient(to top, #000 0%, transparent 60%), url(${hero.cover_image}) center/cover` : 'linear-gradient(135deg, #1a2744, #0f1a35)'
+                    background: hero.cover_image
+                      ? `linear-gradient(to top, #000 0%, transparent 60%), url(${hero.cover_image}) center/cover`
+                      : 'linear-gradient(135deg, #1a2744, #0f1a35)'
                   }}>
                     {hero.categories && (
                       <span className="badge" style={{ background: hero.categories.color, color: '#fff', marginBottom: 8, width: 'fit-content' }}>
@@ -58,7 +61,6 @@ export default async function Home() {
                   </div>
                 </Link>
               )}
-              {/* Side cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {sideItems.map(post => (
                   <Link key={post.id} href={`/post/${post.slug}`} style={{ textDecoration: 'none' }}>
@@ -95,7 +97,7 @@ export default async function Home() {
       )}
 
       {/* Banner Torneios */}
-      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem 2rem' }}>
+      <section style={{ maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem 1.5rem' }}>
         <Link href="/torneios" style={{ textDecoration: 'none' }}>
           <div style={{
             background: 'linear-gradient(135deg, #1e3a5f, #0f2640)',
@@ -112,6 +114,11 @@ export default async function Home() {
           </div>
         </Link>
       </section>
+
+      {/* Comunidade */}
+      <ComunidadeSection />
+
+      <Footer />
     </div>
   )
 }
