@@ -59,17 +59,40 @@ export default function InscreverPage() {
 
     const disponibilidade = `Dias: ${dias.join(', ')} | Horários: ${horarios.join(', ')} | Time: ${time}`
 
-    const { error } = await supabase.from('tournament_participants').insert({
+    // 1. Salvar inscrição no Supabase
+    const { data: participante, error } = await supabase.from('tournament_participants').insert({
       tournament_id: torneio.id,
       player_name: nome,
       contact: contato || null,
       payment_status: 'pending',
       notes: disponibilidade,
-    })
+    }).select().single()
+
+    if (error) { setEnviando(false); alert('Erro ao inscrever: ' + error.message); return }
+
+    // 2. Se tem taxa de inscrição, redirecionar para LivePix
+    if (torneio.entry_fee > 0) {
+      const res = await fetch('/api/livepix/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participante_id: participante.id,
+          torneio_id: torneio.id,
+          valor: torneio.entry_fee,
+          nome,
+        }),
+      })
+      const data = await res.json()
+      setEnviando(false)
+
+      if (data.checkoutUrl) {
+        // Redirecionar para checkout LivePix
+        window.location.href = data.checkoutUrl
+        return
+      }
+    }
 
     setEnviando(false)
-
-    if (error) { alert('Erro ao inscrever: ' + error.message); return }
     setSucesso(true)
   }
 
