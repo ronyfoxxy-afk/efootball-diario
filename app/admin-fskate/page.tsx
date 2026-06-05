@@ -3,293 +3,336 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
 const CATS = [
-  { slug: 'noticias', name: 'Notícias' },
-  { slug: 'eventos', name: 'Eventos' },
-  { slug: 'atualizacoes', name: 'Atualizações' },
-  { slug: 'campanhas', name: 'Campanhas' },
-  { slug: 'guias', name: 'Guias' },
-  { slug: 'vazamentos-rumores', name: 'Vazamentos' },
-  { slug: 'analises', name: 'Análises' },
+  { slug: 'noticias', name: 'Notícias', color: '#6b7280' },
+  { slug: 'eventos', name: 'Eventos', color: '#10b981' },
+  { slug: 'atualizacoes', name: 'Atualizações', color: '#4f7ef8' },
+  { slug: 'campanhas', name: 'Campanhas', color: '#e8b84b' },
+  { slug: 'guias', name: 'Guias', color: '#8b5cf6' },
+  { slug: 'vazamentos-rumores', name: 'Vazamentos', color: '#ef4444' },
+  { slug: 'analises', name: 'Análises', color: '#ec4899' },
 ]
 
-function gerarSlug(titulo: string) {
-  return titulo.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '').trim()
-    .replace(/\s+/g, '-').substring(0, 80) + '-' + Date.now()
+function slug(t: string) {
+  return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 80) + '-' + Date.now()
 }
 
-export default function AdminFskate() {
-  const [tab, setTab] = useState<'home' | 'novo-post' | 'rascunhos' | 'posts' | 'torneio'>('home')
-  const [posts, setPosts] = useState<any[]>([])
-  const [drafts, setDrafts] = useState<any[]>([])
-  const [stats, setStats] = useState({ total: 0, drafts: 0, hoje: 0 })
-  const [loading, setLoading] = useState(false)
-  const [msg, setMsg] = useState('')
+const css = {
+  page: { minHeight: '100vh', background: '#08090c', color: '#e8eaf0', fontFamily: "'Inter', sans-serif" },
+  header: { background: '#0e1014', borderBottom: '1px solid #1c1f26', padding: '0 1.25rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky' as const, top: 0, zIndex: 50 },
+  main: { maxWidth: 900, margin: '0 auto', padding: '1.25rem 1rem 5rem' },
+  card: { background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 14, overflow: 'hidden', marginBottom: '1rem' },
+  cardHead: { padding: '14px 18px', borderBottom: '1px solid #1c1f26', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  cardBody: { padding: '18px' },
+  stat: { background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '16px', textAlign: 'center' as const },
+  inp: { width: '100%', background: '#14161b', border: '1px solid #1c1f26', borderRadius: 10, padding: '11px 14px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter',sans-serif", outline: 'none', boxSizing: 'border-box' as const, marginBottom: 12 },
+  lbl: { fontSize: 11, color: '#4b5060', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase' as const, marginBottom: 6, display: 'block' },
+  btn: (color = '#4f7ef8') => ({ background: color, color: color === '#e8b84b' ? '#000' : '#fff', border: 'none', borderRadius: 10, padding: '11px 18px', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }),
+  btnSm: (color = '#14161b', textColor = '#8b909e') => ({ background: color, color: textColor, border: '1px solid #1c1f26', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }),
+  nav: { position: 'fixed' as const, bottom: 0, left: 0, right: 0, background: '#0e1014', borderTop: '1px solid #1c1f26', display: 'flex', zIndex: 100 },
+  navBtn: (active: boolean) => ({ flex: 1, display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: '10px 4px', color: active ? '#4f7ef8' : '#4b5060', fontFamily: "'Inter',sans-serif", borderTop: active ? '2px solid #4f7ef8' : '2px solid transparent' }),
+  toast: { position: 'fixed' as const, top: 66, left: '50%', transform: 'translateX(-50%)', background: '#0e1014', border: '1px solid #3ecf8e', borderRadius: 10, padding: '10px 20px', fontSize: 13, color: '#3ecf8e', zIndex: 300, whiteSpace: 'nowrap' as const, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' },
+}
 
-  // Form novo post
+type Tab = 'home' | 'post' | 'rascunhos' | 'posts' | 'torneio'
+
+export default function Admin() {
+  const [tab, setTab] = useState<Tab>('home')
+  const [stats, setStats] = useState({ pub: 0, draft: 0, hoje: 0, torneios: 0 })
+  const [drafts, setDrafts] = useState<any[]>([])
+  const [posts, setPosts] = useState<any[]>([])
+  const [toast, setToast] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  // Form post
   const [titulo, setTitulo] = useState('')
   const [resumo, setResumo] = useState('')
   const [conteudo, setConteudo] = useState('')
   const [imagem, setImagem] = useState('')
-  const [categoria, setCategoria] = useState('noticias')
   const [fonte, setFonte] = useState('')
-  const [status, setStatus] = useState<'published' | 'draft'>('published')
+  const [categoria, setCategoria] = useState('noticias')
+  const [postStatus, setPostStatus] = useState<'published' | 'draft'>('published')
 
-  useEffect(() => { carregarDados() }, [])
+  function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
-  async function carregarDados() {
-    const { count: total } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'published')
-    const { count: draftsCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'draft')
-    const hoje = new Date().toISOString().split('T')[0]
-    const { count: hojeCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).gte('published_at', hoje)
-    setStats({ total: total || 0, drafts: draftsCount || 0, hoje: hojeCount || 0 })
+  useEffect(() => { loadStats() }, [])
 
-    const { data: d } = await supabase.from('posts').select('id, title, status, published_at, categories(name, color)').eq('status', 'draft').order('created_at', { ascending: false }).limit(20)
-    setDrafts(d || [])
+  async function loadStats() {
+    const [{ count: pub }, { count: draft }, { count: hoje }, { count: torneios }] = await Promise.all([
+      supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'published'),
+      supabase.from('posts').select('*', { count: 'exact', head: true }).eq('status', 'draft'),
+      supabase.from('posts').select('*', { count: 'exact', head: true }).gte('published_at', new Date().toISOString().split('T')[0]),
+      supabase.from('tournaments').select('*', { count: 'exact', head: true }),
+    ])
+    setStats({ pub: pub || 0, draft: draft || 0, hoje: hoje || 0, torneios: torneios || 0 })
+    const { data } = await supabase.from('posts').select('id,title,categories(name,color)').eq('status', 'draft').order('created_at', { ascending: false }).limit(20)
+    setDrafts(data || [])
   }
 
-  async function carregarPosts() {
-    const { data } = await supabase.from('posts').select('id, title, status, published_at, auto_published, categories(name, color)').order('created_at', { ascending: false }).limit(30)
+  async function loadPosts() {
+    const { data } = await supabase.from('posts').select('id,title,status,auto_published,published_at,categories(name,color)').order('created_at', { ascending: false }).limit(40)
     setPosts(data || [])
   }
 
   async function publicarPost() {
-    if (!titulo.trim()) { setMsg('⚠️ Título obrigatório'); return }
+    if (!titulo.trim()) { showToast('⚠️ Título obrigatório'); return }
     setLoading(true)
     const { data: cat } = await supabase.from('categories').select('id').eq('slug', categoria).single()
     const { error } = await supabase.from('posts').insert({
-      title: titulo, slug: gerarSlug(titulo),
+      title: titulo, slug: slug(titulo),
       summary: resumo || null, content: conteudo || null,
       cover_image: imagem || null, category_id: cat?.id || null,
       source_url: fonte || null, tags: ['efootball'],
-      status, source_type: 'manual', auto_published: false,
-      published_at: status === 'published' ? new Date().toISOString() : null
+      status: postStatus, source_type: 'manual', auto_published: false,
+      published_at: postStatus === 'published' ? new Date().toISOString() : null
     })
     setLoading(false)
-    if (error) { setMsg('❌ Erro: ' + error.message); return }
-    setMsg(status === 'published' ? '✅ Publicado!' : '✅ Salvo como rascunho!')
+    if (error) { showToast('❌ ' + error.message); return }
+    showToast(postStatus === 'published' ? '✅ Publicado!' : '📋 Rascunho salvo!')
     setTitulo(''); setResumo(''); setConteudo(''); setImagem(''); setFonte('')
-    setTimeout(() => { setMsg(''); setTab('home'); carregarDados() }, 1500)
+    loadStats(); setTab('home')
   }
 
   async function publicarRascunho(id: string) {
     await supabase.from('posts').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', id)
-    setMsg('✅ Publicado!')
-    setTimeout(() => { setMsg(''); carregarDados() }, 1200)
+    showToast('✅ Publicado!'); loadStats()
+    setDrafts(d => d.filter(p => p.id !== id))
   }
 
   async function apagarPost(id: string) {
-    if (!confirm('Apagar este post?')) return
+    if (!confirm('Apagar?')) return
     await supabase.from('posts').delete().eq('id', id)
-    setMsg('🗑️ Apagado')
-    setTimeout(() => { setMsg(''); carregarDados(); carregarPosts() }, 1000)
+    showToast('🗑️ Apagado'); loadStats()
+    setPosts(p => p.filter(x => x.id !== id))
+    setDrafts(d => d.filter(x => x.id !== id))
   }
 
-  const s: Record<string, any> = {
-    page: { minHeight: '100vh', background: '#08090c', color: '#e8eaf0', fontFamily: "'Inter', sans-serif", paddingBottom: 80 },
-    header: { background: '#0e1014', borderBottom: '1px solid #1c1f26', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky' as const, top: 0, zIndex: 50 },
-    logo: { display: 'flex', alignItems: 'center', gap: 8 },
-    logoIcon: { width: 30, height: 30, background: '#4f7ef8', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 },
-    logoText: { fontWeight: 700, fontSize: 15, color: '#fff' },
-    logoSub: { fontSize: 10, color: '#4b5060', letterSpacing: '1px' },
-    content: { padding: '16px' },
-    stat: { background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '14px', textAlign: 'center' as const },
-    statNum: { fontSize: 28, fontWeight: 700 },
-    statLbl: { fontSize: 11, color: '#4b5060', marginTop: 2 },
-    btn: { background: '#4f7ef8', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: 10, fontFamily: "'Inter', sans-serif" },
-    btnGold: { background: '#e8b84b', color: '#000', border: 'none', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: 10, fontFamily: "'Inter', sans-serif" },
-    btnGray: { background: '#14161b', color: '#8b909e', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px 20px', fontSize: 14, fontWeight: 500, cursor: 'pointer', width: '100%', marginBottom: 10, fontFamily: "'Inter', sans-serif" },
-    btnSmall: { background: '#14161b', border: '1px solid #1c1f26', color: '#8b909e', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer', fontFamily: "'Inter', sans-serif" },
-    btnPub: { background: 'rgba(62,207,142,0.1)', border: '1px solid rgba(62,207,142,0.3)', color: '#3ecf8e', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer', fontFamily: "'Inter', sans-serif" },
-    btnDel: { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer', fontFamily: "'Inter', sans-serif" },
-    input: { width: '100%', background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 10, outline: 'none', boxSizing: 'border-box' as const },
-    textarea: { width: '100%', background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 10, outline: 'none', resize: 'vertical' as const, minHeight: 90, boxSizing: 'border-box' as const },
-    select: { width: '100%', background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 10, outline: 'none', boxSizing: 'border-box' as const },
-    label: { fontSize: 12, color: '#4b5060', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, marginBottom: 5, display: 'block' },
-    card: { background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '14px', marginBottom: 10 },
-    sec: { fontSize: 13, fontWeight: 600, color: '#8b909e', marginBottom: 12, textTransform: 'uppercase' as const, letterSpacing: '1px' },
-    nav: { position: 'fixed' as const, bottom: 0, left: 0, right: 0, background: '#0e1014', borderTop: '1px solid #1c1f26', display: 'flex', justifyContent: 'space-around', padding: '8px 0', zIndex: 100 },
-    navBtn: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontFamily: "'Inter', sans-serif" },
-    navIcon: { fontSize: 20 },
-    navLbl: { fontSize: 10, fontWeight: 500 },
-    msgBox: { position: 'fixed' as const, top: 70, left: 16, right: 16, background: '#0e1014', border: '1px solid #3ecf8e', borderRadius: 10, padding: '12px 16px', fontSize: 14, color: '#3ecf8e', zIndex: 200, textAlign: 'center' as const },
-  }
+  const TABS = [
+    { id: 'home', icon: '⊞', label: 'Início' },
+    { id: 'post', icon: '✏️', label: 'Novo Post' },
+    { id: 'rascunhos', icon: '📋', label: 'Rascunhos' },
+    { id: 'posts', icon: '📰', label: 'Posts' },
+    { id: 'torneio', icon: '🏆', label: 'Torneio' },
+  ]
 
   return (
-    <div style={s.page}>
+    <div style={css.page}>
+
       {/* Header */}
-      <div style={s.header}>
-        <div style={s.logo}>
-          <div style={s.logoIcon}>⚽</div>
+      <header style={css.header}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 32, height: 32, background: '#4f7ef8', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚽</div>
           <div>
-            <div style={s.logoText}>eFootball Diário</div>
-            <div style={s.logoSub}>PAINEL ADMIN</div>
+            <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 15, color: '#fff', lineHeight: 1 }}>eFootball Diário</div>
+            <div style={{ fontSize: 10, color: '#4b5060', letterSpacing: '1px', lineHeight: 1, marginTop: 1 }}>PAINEL ADMIN</div>
           </div>
         </div>
         <a href="/" style={{ fontSize: 12, color: '#4b5060', textDecoration: 'none' }}>Ver site →</a>
-      </div>
+      </header>
 
-      {/* Toast */}
-      {msg && <div style={s.msgBox}>{msg}</div>}
+      {toast && <div style={css.toast}>{toast}</div>}
 
-      <div style={s.content}>
+      <div style={css.main}>
 
-        {/* HOME */}
+        {/* ── HOME ── */}
         {tab === 'home' && (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-              <div style={s.stat}><div style={{ ...s.statNum, color: '#4f7ef8' }}>{stats.total}</div><div style={s.statLbl}>Publicados</div></div>
-              <div style={s.stat}><div style={{ ...s.statNum, color: '#e8b84b' }}>{stats.drafts}</div><div style={s.statLbl}>Rascunhos</div></div>
-              <div style={s.stat}><div style={{ ...s.statNum, color: '#3ecf8e' }}>{stats.hoje}</div><div style={s.statLbl}>Hoje</div></div>
-            </div>
-
-            <button style={s.btn} onClick={() => setTab('novo-post')}>✏️ Novo Post</button>
-            {stats.drafts > 0 && (
-              <button style={{ ...s.btnGold }} onClick={() => setTab('rascunhos')}>
-                📋 Aprovar Rascunhos ({stats.drafts})
-              </button>
-            )}
-            <button style={s.btnGray} onClick={() => { setTab('posts'); carregarPosts() }}>📰 Ver todos os posts</button>
-            <button style={s.btnGray} onClick={() => setTab('torneio')}>🏆 Criar Torneio</button>
-
-            <div style={{ marginTop: 20 }}>
-              <div style={s.sec}>Acesso rápido</div>
-              <a href="/torneios" style={{ textDecoration: 'none' }}>
-                <div style={{ ...s.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 14, color: '#e8eaf0' }}>🏆 Página de Torneios</span>
-                  <span style={{ color: '#4b5060', fontSize: 13 }}>→</span>
+            {/* Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: '1.25rem' }}>
+              {[
+                { label: 'Publicados', value: stats.pub, color: '#4f7ef8' },
+                { label: 'Rascunhos', value: stats.draft, color: '#e8b84b' },
+                { label: 'Hoje', value: stats.hoje, color: '#3ecf8e' },
+                { label: 'Torneios', value: stats.torneios, color: '#8b5cf6' },
+              ].map(s => (
+                <div key={s.label} style={css.stat}>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: s.color, fontFamily: "'Syne',sans-serif" }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: '#4b5060', marginTop: 2 }}>{s.label}</div>
                 </div>
-              </a>
+              ))}
+            </div>
+
+            {/* Ações rápidas */}
+            <div style={css.card}>
+              <div style={css.cardHead}>
+                <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15 }}>Ações rápidas</span>
+              </div>
+              <div style={{ ...css.cardBody, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {[
+                  { icon: '✏️', label: 'Novo Post', sub: 'Criar manualmente', tab: 'post', color: '#4f7ef8' },
+                  { icon: '🏆', label: 'Novo Torneio', sub: 'Criar competição', tab: 'torneio', color: '#e8b84b' },
+                  { icon: '📋', label: `Rascunhos (${stats.draft})`, sub: 'Aprovar do n8n', tab: 'rascunhos', color: '#8b5cf6' },
+                  { icon: '📰', label: 'Todos os Posts', sub: 'Gerenciar conteúdo', tab: 'posts', color: '#3ecf8e' },
+                ].map(a => (
+                  <button key={a.tab} onClick={() => { setTab(a.tab as Tab); if (a.tab === 'posts') loadPosts() }}
+                    style={{ background: '#14161b', border: `1px solid ${a.color}22`, borderRadius: 12, padding: '14px', textAlign: 'left' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 38, height: 38, background: a.color + '18', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{a.icon}</div>
+                    <div>
+                      <div style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 14, color: '#e8eaf0' }}>{a.label}</div>
+                      <div style={{ fontSize: 12, color: '#4b5060', marginTop: 1 }}>{a.sub}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Links rápidos */}
+            <div style={css.card}>
+              <div style={css.cardHead}>
+                <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15 }}>Links</span>
+              </div>
+              <div style={{ padding: '8px' }}>
+                {[
+                  { href: '/', label: '🌐 Portal público' },
+                  { href: '/torneios', label: '🏆 Página de torneios' },
+                  { href: '/admin', label: '⚙️ Admin completo' },
+                ].map(l => (
+                  <a key={l.href} href={l.href}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 8, textDecoration: 'none', color: '#8b909e', fontSize: 14 }}>
+                    {l.label}
+                    <span style={{ color: '#4b5060' }}>→</span>
+                  </a>
+                ))}
+              </div>
             </div>
           </>
         )}
 
-        {/* NOVO POST */}
-        {tab === 'novo-post' && (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', fontSize: 18, cursor: 'pointer', padding: 0 }}>←</button>
-              <span style={{ fontWeight: 700, fontSize: 17, color: '#fff' }}>Novo Post</span>
+        {/* ── NOVO POST ── */}
+        {tab === 'post' && (
+          <div style={css.card}>
+            <div style={css.cardHead}>
+              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 15 }}>✏️ Novo Post</span>
+              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', cursor: 'pointer', fontSize: 20 }}>←</button>
             </div>
+            <div style={css.cardBody}>
+              <label style={css.lbl}>Título *</label>
+              <input style={css.inp} placeholder="Título da notícia..." value={titulo} onChange={e => setTitulo(e.target.value)} />
 
-            <label style={s.label}>Título *</label>
-            <input style={s.input} placeholder="Título da notícia..." value={titulo} onChange={e => setTitulo(e.target.value)} />
+              <label style={css.lbl}>Categoria</label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                {CATS.map(c => (
+                  <button key={c.slug} onClick={() => setCategoria(c.slug)}
+                    style={{ padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 600, background: categoria === c.slug ? c.color + '22' : '#14161b', color: categoria === c.slug ? c.color : '#4b5060', outline: categoria === c.slug ? `1px solid ${c.color}44` : '1px solid #1c1f26' }}>
+                    {c.name}
+                  </button>
+                ))}
+              </div>
 
-            <label style={s.label}>Categoria</label>
-            <select style={s.select} value={categoria} onChange={e => setCategoria(e.target.value)}>
-              {CATS.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
-            </select>
+              <label style={css.lbl}>Resumo</label>
+              <textarea style={{ ...css.inp, minHeight: 72, resize: 'vertical' as const }} placeholder="Resumo curto..." value={resumo} onChange={e => setResumo(e.target.value)} />
 
-            <label style={s.label}>Resumo</label>
-            <textarea style={s.textarea} placeholder="Resumo curto..." value={resumo} onChange={e => setResumo(e.target.value)} rows={3} />
+              <label style={css.lbl}>Conteúdo</label>
+              <textarea style={{ ...css.inp, minHeight: 110, resize: 'vertical' as const }} placeholder="Texto completo..." value={conteudo} onChange={e => setConteudo(e.target.value)} />
 
-            <label style={s.label}>Conteúdo</label>
-            <textarea style={s.textarea} placeholder="Texto completo..." value={conteudo} onChange={e => setConteudo(e.target.value)} rows={5} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div>
+                  <label style={css.lbl}>URL da Imagem</label>
+                  <input style={css.inp} placeholder="https://..." value={imagem} onChange={e => setImagem(e.target.value)} />
+                </div>
+                <div>
+                  <label style={css.lbl}>Link da Fonte</label>
+                  <input style={css.inp} placeholder="https://..." value={fonte} onChange={e => setFonte(e.target.value)} />
+                </div>
+              </div>
 
-            <label style={s.label}>URL da Imagem</label>
-            <input style={s.input} placeholder="https://..." value={imagem} onChange={e => setImagem(e.target.value)} />
+              <label style={css.lbl}>Status</label>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+                {(['published', 'draft'] as const).map(s => (
+                  <button key={s} onClick={() => setPostStatus(s)}
+                    style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600, fontSize: 13,
+                      background: postStatus === s ? (s === 'published' ? '#3ecf8e' : '#e8b84b') : '#14161b',
+                      color: postStatus === s ? '#000' : '#4b5060' }}>
+                    {s === 'published' ? '✅ Publicar' : '📋 Rascunho'}
+                  </button>
+                ))}
+              </div>
 
-            <label style={s.label}>Fonte (link)</label>
-            <input style={s.input} placeholder="https://..." value={fonte} onChange={e => setFonte(e.target.value)} />
-
-            <label style={s.label}>Status</label>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-              <button onClick={() => setStatus('published')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13, background: status === 'published' ? '#3ecf8e' : '#14161b', color: status === 'published' ? '#000' : '#8b909e' }}>
-                ✅ Publicar agora
-              </button>
-              <button onClick={() => setStatus('draft')} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: "'Inter', sans-serif", fontWeight: 600, fontSize: 13, background: status === 'draft' ? '#e8b84b' : '#14161b', color: status === 'draft' ? '#000' : '#8b909e' }}>
-                📋 Rascunho
+              <button style={{ ...css.btn(), width: '100%', opacity: loading ? 0.6 : 1 }} onClick={publicarPost} disabled={loading}>
+                {loading ? 'Salvando...' : postStatus === 'published' ? '🚀 Publicar agora' : '💾 Salvar rascunho'}
               </button>
             </div>
-
-            <button style={{ ...s.btn, opacity: loading ? 0.6 : 1 }} onClick={publicarPost} disabled={loading}>
-              {loading ? 'Salvando...' : status === 'published' ? '🚀 Publicar' : '💾 Salvar rascunho'}
-            </button>
-          </>
+          </div>
         )}
 
-        {/* RASCUNHOS */}
+        {/* ── RASCUNHOS ── */}
         {tab === 'rascunhos' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', fontSize: 18, cursor: 'pointer', padding: 0 }}>←</button>
-              <span style={{ fontWeight: 700, fontSize: 17, color: '#fff' }}>Rascunhos ({drafts.length})</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
+              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', cursor: 'pointer', fontSize: 20 }}>←</button>
+              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>Rascunhos ({drafts.length})</span>
             </div>
-            {drafts.length === 0 && <p style={{ color: '#4b5060', textAlign: 'center', padding: '2rem' }}>Nenhum rascunho pendente</p>}
+            {drafts.length === 0 && (
+              <div style={{ ...css.card, padding: '2.5rem', textAlign: 'center' as const }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>
+                <p style={{ color: '#4b5060' }}>Nenhum rascunho pendente</p>
+              </div>
+            )}
             {drafts.map(post => (
-              <div key={post.id} style={s.card}>
-                {post.categories && (
-                  <span style={{ fontSize: 10, fontWeight: 700, background: post.categories.color + '22', color: post.categories.color, padding: '2px 8px', borderRadius: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    {post.categories.name}
-                  </span>
-                )}
-                <p style={{ fontSize: 14, fontWeight: 500, color: '#e8eaf0', margin: '8px 0 12px', lineHeight: 1.4 }}>{post.title}</p>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button style={s.btnPub} onClick={() => publicarRascunho(post.id)}>✅ Publicar</button>
-                  <button style={s.btnDel} onClick={() => apagarPost(post.id)}>🗑️ Apagar</button>
+              <div key={post.id} style={css.card}>
+                <div style={{ padding: '14px 16px' }}>
+                  {post.categories && (
+                    <span style={{ fontSize: 10, fontWeight: 700, background: post.categories.color + '22', color: post.categories.color, padding: '2px 8px', borderRadius: 5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      {post.categories.name}
+                    </span>
+                  )}
+                  <p style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, fontWeight: 700, color: '#e8eaf0', margin: '8px 0 12px', lineHeight: 1.35 }}>{post.title}</p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button style={{ ...css.btnSm('rgba(62,207,142,0.1)', '#3ecf8e'), border: '1px solid rgba(62,207,142,0.2)' }} onClick={() => publicarRascunho(post.id)}>✅ Publicar</button>
+                    <button style={{ ...css.btnSm('rgba(239,68,68,0.08)', '#ef4444'), border: '1px solid rgba(239,68,68,0.15)' }} onClick={() => apagarPost(post.id)}>🗑️ Apagar</button>
+                  </div>
                 </div>
               </div>
             ))}
           </>
         )}
 
-        {/* TODOS OS POSTS */}
+        {/* ── TODOS OS POSTS ── */}
         {tab === 'posts' && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', fontSize: 18, cursor: 'pointer', padding: 0 }}>←</button>
-              <span style={{ fontWeight: 700, fontSize: 17, color: '#fff' }}>Todos os posts</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
+              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', cursor: 'pointer', fontSize: 20 }}>←</button>
+              <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>Todos os posts</span>
             </div>
             {posts.map(post => (
-              <div key={post.id} style={s.card}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                  <div style={{ flex: 1 }}>
+              <div key={post.id} style={{ ...css.card, marginBottom: 8 }}>
+                <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     {post.categories && (
-                      <span style={{ fontSize: 10, fontWeight: 700, background: post.categories.color + '22', color: post.categories.color, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, background: post.categories.color + '22', color: post.categories.color, padding: '1px 7px', borderRadius: 4, textTransform: 'uppercase' }}>
                         {post.categories.name}
                       </span>
                     )}
-                    <p style={{ fontSize: 13, fontWeight: 500, color: '#e8eaf0', margin: '6px 0 0', lineHeight: 1.35 }}>{post.title}</p>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: '#e8eaf0', margin: '5px 0 2px', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{post.title}</p>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, color: post.status === 'published' ? '#3ecf8e' : '#e8b84b' }}>
+                        {post.status === 'published' ? '✅ Publicado' : '📋 Rascunho'}
+                      </span>
+                      {post.auto_published && <span style={{ fontSize: 10, color: '#4b5060' }}>· AUTO</span>}
+                    </div>
                   </div>
-                  {post.auto_published && <span style={{ fontSize: 10, color: '#3ecf8e', fontWeight: 700, marginLeft: 8 }}>AUTO</span>}
-                </div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: '#4b5060', flex: 1 }}>
-                    {post.status === 'published' ? '✅ Publicado' : '📋 Rascunho'}
-                  </span>
-                  {post.status === 'draft' && <button style={s.btnPub} onClick={() => publicarRascunho(post.id)}>Publicar</button>}
-                  <button style={s.btnDel} onClick={() => apagarPost(post.id)}>🗑️</button>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    {post.status === 'draft' && (
+                      <button style={{ ...css.btnSm('rgba(62,207,142,0.1)', '#3ecf8e'), border: '1px solid rgba(62,207,142,0.2)', padding: '5px 10px' }} onClick={() => publicarRascunho(post.id)}>Pub</button>
+                    )}
+                    <button style={{ ...css.btnSm('rgba(239,68,68,0.08)', '#ef4444'), border: '1px solid rgba(239,68,68,0.15)', padding: '5px 10px' }} onClick={() => apagarPost(post.id)}>🗑️</button>
+                  </div>
                 </div>
               </div>
             ))}
           </>
         )}
 
-        {/* CRIAR TORNEIO */}
-        {tab === 'torneio' && (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: '#4b5060', fontSize: 18, cursor: 'pointer', padding: 0 }}>←</button>
-              <span style={{ fontWeight: 700, fontSize: 17, color: '#fff' }}>Criar Torneio</span>
-            </div>
-            <TorneioForm setMsg={setMsg} voltarHome={() => { setTab('home'); carregarDados() }} />
-          </>
-        )}
+        {/* ── TORNEIO ── */}
+        {tab === 'torneio' && <TorneioForm showToast={showToast} goHome={() => { setTab('home'); loadStats() }} />}
       </div>
 
       {/* Bottom nav */}
-      <nav style={s.nav}>
-        {[
-          { id: 'home', icon: '🏠', label: 'Início' },
-          { id: 'novo-post', icon: '✏️', label: 'Novo Post' },
-          { id: 'rascunhos', icon: '📋', label: 'Rascunhos' },
-          { id: 'torneio', icon: '🏆', label: 'Torneio' },
-        ].map(n => (
-          <button key={n.id} style={{ ...s.navBtn, color: tab === n.id ? '#4f7ef8' : '#4b5060' }}
-            onClick={() => { setTab(n.id as any); if (n.id === 'rascunhos') carregarDados(); if (n.id === 'posts') { setTab('posts'); carregarPosts() } }}>
-            <span style={s.navIcon}>{n.icon}</span>
-            <span style={s.navLbl}>{n.label}</span>
+      <nav style={css.nav}>
+        {TABS.map(t => (
+          <button key={t.id} style={css.navBtn(tab === t.id)}
+            onClick={() => { setTab(t.id as Tab); if (t.id === 'posts') loadPosts(); if (t.id === 'rascunhos') loadStats() }}>
+            <span style={{ fontSize: 18 }}>{t.icon}</span>
+            <span style={{ fontSize: 10, fontWeight: 500 }}>{t.label}</span>
           </button>
         ))}
       </nav>
@@ -297,119 +340,98 @@ export default function AdminFskate() {
   )
 }
 
-function TorneioForm({ setMsg, voltarHome }: { setMsg: (m: string) => void, voltarHome: () => void }) {
+function TorneioForm({ showToast, goHome }: { showToast: (m: string) => void, goHome: () => void }) {
   const [nome, setNome] = useState('')
   const [modelo, setModelo] = useState('liga')
-  const [descricao, setDescricao] = useState('')
+  const [desc, setDesc] = useState('')
   const [taxa, setTaxa] = useState('20')
   const [premio, setPremio] = useState('50')
   const [pix, setPix] = useState('')
   const [inicio, setInicio] = useState('')
   const [fim, setFim] = useState('')
   const [regras, setRegras] = useState('')
-  const [whatsapp, setWhatsapp] = useState('https://chat.whatsapp.com/LWhqROJ5fyf3WTOFjMPXGp')
   const [loading, setLoading] = useState(false)
 
-  const s: Record<string, any> = {
-    input: { width: '100%', background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 10, outline: 'none', boxSizing: 'border-box' as const },
-    textarea: { width: '100%', background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 10, outline: 'none', resize: 'vertical' as const, minHeight: 80, boxSizing: 'border-box' as const },
-    select: { width: '100%', background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter', sans-serif", marginBottom: 10, outline: 'none', boxSizing: 'border-box' as const },
-    label: { fontSize: 12, color: '#4b5060', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const, marginBottom: 5, display: 'block' },
-    btn: { background: '#e8b84b', color: '#000', border: 'none', borderRadius: 10, padding: '14px', fontSize: 15, fontWeight: 700, cursor: 'pointer', width: '100%', fontFamily: "'Inter', sans-serif" },
-    row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
-  }
+  const inp: any = { width: '100%', background: '#14161b', border: '1px solid #1c1f26', borderRadius: 10, padding: '11px 14px', color: '#e8eaf0', fontSize: 14, fontFamily: "'Inter',sans-serif", outline: 'none', boxSizing: 'border-box', marginBottom: 12 }
+  const lbl: any = { fontSize: 11, color: '#4b5060', fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', marginBottom: 6, display: 'block' }
 
-  async function criarTorneio() {
-    if (!nome.trim()) { setMsg('⚠️ Nome obrigatório'); return }
-    if (!pix.trim()) { setMsg('⚠️ Chave Pix obrigatória'); return }
+  async function criar() {
+    if (!nome.trim()) { showToast('⚠️ Nome obrigatório'); return }
+    if (!pix.trim()) { showToast('⚠️ Chave Pix obrigatória'); return }
     setLoading(true)
-
-    const slug = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-') + '-' + Date.now()
-
-    const { data: torneio, error } = await supabase.from('tournaments').insert({
-      name: nome, slug, model: modelo, status: 'open',
-      description: descricao || null,
-      entry_fee: parseFloat(taxa) || 0,
-      prize: parseFloat(premio) || 0,
-      pix_key: pix,
-      start_date: inicio || null,
-      end_date: fim || null,
-      rules: regras || null,
+    const sl = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-') + '-' + Date.now()
+    const { data: t, error } = await supabase.from('tournaments').insert({
+      name: nome, slug: sl, model: modelo, status: 'open',
+      description: desc || null, entry_fee: parseFloat(taxa) || 0,
+      prize: parseFloat(premio) || 0, pix_key: pix,
+      start_date: inicio || null, end_date: fim || null, rules: regras || null,
     }).select().single()
-
-    if (error) { setMsg('❌ Erro: ' + error.message); setLoading(false); return }
-
-    // Criar post de evento automaticamente
+    if (error) { showToast('❌ ' + error.message); setLoading(false); return }
     const { data: cat } = await supabase.from('categories').select('id').eq('slug', 'eventos').single()
-    const linkWhatsApp = whatsapp ? `\n\n📲 Entre no grupo: ${whatsapp}` : ''
     await supabase.from('posts').insert({
       title: `🏆 ${nome} — Inscrições abertas!`,
-      slug: 'torneio-' + slug,
-      summary: `${descricao || `Novo torneio ${nome} com inscrição de R$${taxa} e prêmio de R$${premio}!`}`,
-      content: `Inscreva-se no torneio ${nome}!\n\nInscrição: R$${taxa}\nPrêmio: R$${premio}\nChave Pix: ${pix}${inicio ? `\nInício: ${inicio}` : ''}${linkWhatsApp}\n\nAcesse a página do torneio para se inscrever!`,
-      category_id: cat?.id || null,
-      tags: ['efootball', 'torneio'],
-      status: 'published',
-      source_type: 'manual',
-      auto_published: false,
+      slug: 'torneio-' + sl,
+      summary: `Novo torneio ${nome}! Inscrição R$${taxa}, prêmio R$${premio}.`,
+      content: `Inscreva-se em ${nome}!\n\nInscrição: R$${taxa}\nPrêmio: R$${premio}\nChave Pix: ${pix}${inicio ? `\nInício: ${inicio}` : ''}\n\nGrupo WhatsApp: https://chat.whatsapp.com/LWhqROJ5fyf3WTOFjMPXGp`,
+      category_id: cat?.id || null, tags: ['efootball', 'torneio'],
+      status: 'published', source_type: 'manual', auto_published: false,
       published_at: new Date().toISOString(),
     })
-
     setLoading(false)
-    setMsg('🏆 Torneio criado e publicado!')
-    setTimeout(() => { setMsg(''); voltarHome() }, 2000)
+    showToast('🏆 Torneio criado!')
+    setTimeout(goHome, 1500)
   }
 
+  const MODELOS = [
+    { v: 'liga', l: '🏆 Liga (Brasileirão)' },
+    { v: 'copa', l: '🥊 Copa (Eliminatória)' },
+    { v: 'grupos_mata_mata', l: '⚡ Grupos + Mata-mata' },
+    { v: 'livre', l: '🎮 Livre' },
+  ]
+
   return (
-    <>
-      <label style={s.label}>Nome do Torneio *</label>
-      <input style={s.input} placeholder="Ex: Liga eFootball Diário 2026" value={nome} onChange={e => setNome(e.target.value)} />
-
-      <label style={s.label}>Formato</label>
-      <select style={s.select} value={modelo} onChange={e => setModelo(e.target.value)}>
-        <option value="liga">🏆 Liga (Brasileirão)</option>
-        <option value="copa">🥊 Copa (Eliminatória)</option>
-        <option value="grupos_mata_mata">⚡ Grupos + Mata-mata</option>
-        <option value="livre">🎮 Livre</option>
-      </select>
-
-      <label style={s.label}>Descrição</label>
-      <textarea style={s.textarea} placeholder="Descreva o torneio..." value={descricao} onChange={e => setDescricao(e.target.value)} />
-
-      <div style={s.row}>
-        <div>
-          <label style={s.label}>Inscrição (R$)</label>
-          <input style={s.input} type="number" value={taxa} onChange={e => setTaxa(e.target.value)} />
-        </div>
-        <div>
-          <label style={s.label}>Prêmio (R$)</label>
-          <input style={s.input} type="number" value={premio} onChange={e => setPremio(e.target.value)} />
-        </div>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
+        <button onClick={goHome} style={{ background: 'none', border: 'none', color: '#4b5060', cursor: 'pointer', fontSize: 20 }}>←</button>
+        <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 17 }}>🏆 Criar Torneio</span>
       </div>
+      <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 14, padding: 18 }}>
+        <label style={lbl}>Nome *</label>
+        <input style={inp} placeholder="Ex: Liga eFootball Diário 2026" value={nome} onChange={e => setNome(e.target.value)} />
 
-      <label style={s.label}>Chave Pix *</label>
-      <input style={s.input} placeholder="CPF, e-mail ou telefone" value={pix} onChange={e => setPix(e.target.value)} />
+        <label style={lbl}>Formato</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+          {MODELOS.map(m => (
+            <button key={m.v} onClick={() => setModelo(m.v)}
+              style={{ padding: '7px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', fontFamily: "'Inter',sans-serif", fontSize: 12, fontWeight: 500, background: modelo === m.v ? 'rgba(232,184,75,0.15)' : '#14161b', color: modelo === m.v ? '#e8b84b' : '#4b5060', outline: modelo === m.v ? '1px solid rgba(232,184,75,0.3)' : '1px solid #1c1f26' }}>
+              {m.l}
+            </button>
+          ))}
+        </div>
 
-      <div style={s.row}>
-        <div>
-          <label style={s.label}>Data início</label>
-          <input style={s.input} type="date" value={inicio} onChange={e => setInicio(e.target.value)} />
+        <label style={lbl}>Descrição</label>
+        <textarea style={{ ...inp, minHeight: 72, resize: 'vertical' }} placeholder="Descreva o torneio..." value={desc} onChange={e => setDesc(e.target.value)} />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div><label style={lbl}>Inscrição (R$)</label><input style={inp} type="number" value={taxa} onChange={e => setTaxa(e.target.value)} /></div>
+          <div><label style={lbl}>Prêmio (R$)</label><input style={inp} type="number" value={premio} onChange={e => setPremio(e.target.value)} /></div>
         </div>
-        <div>
-          <label style={s.label}>Data fim</label>
-          <input style={s.input} type="date" value={fim} onChange={e => setFim(e.target.value)} />
+
+        <label style={lbl}>Chave Pix *</label>
+        <input style={inp} placeholder="CPF, e-mail ou telefone" value={pix} onChange={e => setPix(e.target.value)} />
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div><label style={lbl}>Data início</label><input style={inp} type="date" value={inicio} onChange={e => setInicio(e.target.value)} /></div>
+          <div><label style={lbl}>Data fim</label><input style={inp} type="date" value={fim} onChange={e => setFim(e.target.value)} /></div>
         </div>
+
+        <label style={lbl}>Regras</label>
+        <textarea style={{ ...inp, minHeight: 72, resize: 'vertical' }} placeholder="Regras do torneio..." value={regras} onChange={e => setRegras(e.target.value)} />
+
+        <button style={{ background: '#e8b84b', color: '#000', border: 'none', borderRadius: 10, padding: '13px', fontSize: 15, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', width: '100%', fontFamily: "'Inter',sans-serif", opacity: loading ? 0.6 : 1 }} onClick={criar} disabled={loading}>
+          {loading ? 'Criando...' : '🏆 Criar e publicar torneio'}
+        </button>
       </div>
-
-      <label style={s.label}>Regras</label>
-      <textarea style={s.textarea} placeholder="Regras do torneio..." value={regras} onChange={e => setRegras(e.target.value)} />
-
-      <label style={s.label}>Link do grupo WhatsApp</label>
-      <input style={s.input} value={whatsapp} onChange={e => setWhatsapp(e.target.value)} />
-
-      <button style={{ ...s.btn, opacity: loading ? 0.6 : 1 }} onClick={criarTorneio} disabled={loading}>
-        {loading ? 'Criando...' : '🏆 Criar e publicar torneio'}
-      </button>
-    </>
+    </div>
   )
 }
