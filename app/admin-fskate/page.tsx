@@ -278,6 +278,8 @@ export default function Admin() {
                   <p style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, fontWeight: 700, color: '#e8eaf0', margin: '8px 0 12px', lineHeight: 1.35 }}>{post.title}</p>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button style={{ ...css.btnSm('rgba(62,207,142,0.1)', '#3ecf8e'), border: '1px solid rgba(62,207,142,0.2)' }} onClick={() => publicarRascunho(post.id)}>✅ Publicar</button>
+                    <a href={`/admin-fskate/editar/${post.id}`}
+                      style={{ ...css.btnSm('#14161b', '#4f7ef8'), border: '1px solid #1c1f26', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>✏️ Editar</a>
                     <button style={{ ...css.btnSm('rgba(239,68,68,0.08)', '#ef4444'), border: '1px solid rgba(239,68,68,0.15)' }} onClick={() => apagarPost(post.id)}>🗑️ Apagar</button>
                   </div>
                 </div>
@@ -314,6 +316,8 @@ export default function Admin() {
                     {post.status === 'draft' && (
                       <button style={{ ...css.btnSm('rgba(62,207,142,0.1)', '#3ecf8e'), border: '1px solid rgba(62,207,142,0.2)', padding: '5px 10px' }} onClick={() => publicarRascunho(post.id)}>Pub</button>
                     )}
+                    <a href={`/admin-fskate/editar/${post.id}`}
+                      style={{ ...css.btnSm('#14161b', '#4f7ef8'), border: '1px solid #1c1f26', padding: '5px 10px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>✏️</a>
                     <button style={{ ...css.btnSm('rgba(239,68,68,0.08)', '#ef4444'), border: '1px solid rgba(239,68,68,0.15)', padding: '5px 10px' }} onClick={() => apagarPost(post.id)}>🗑️</button>
                   </div>
                 </div>
