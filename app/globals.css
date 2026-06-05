@@ -1,18 +1,20 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
 
 :root {
-  --bg: #05080f;
-  --bg-card: #0d1117;
-  --bg-card2: #111827;
-  --border: #1f2937;
-  --border2: #374151;
-  --text: #f1f5f9;
-  --text-muted: #64748b;
-  --text-dim: #374151;
-  --blue: #3b82f6;
-  --blue-dark: #1d4ed8;
-  --gold: #fbbf24;
+  --bg: #08090c;
+  --bg2: #0e1014;
+  --bg3: #14161b;
+  --border: #1c1f26;
+  --border2: #252830;
+  --text: #e8eaf0;
+  --text2: #8b909e;
+  --text3: #4b5060;
+  --blue: #4f7ef8;
+  --blue-dim: rgba(79,126,248,0.12);
+  --gold: #e8b84b;
+  --gold-dim: rgba(232,184,75,0.1);
+  --green: #3ecf8e;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,36 +24,26 @@ body {
   color: var(--text);
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-h1, h2, h3, h4 {
-  font-family: 'Barlow Condensed', sans-serif;
-  letter-spacing: -0.3px;
+h1,h2,h3,h4,h5 {
+  font-family: 'Syne', sans-serif;
+  line-height: 1.15;
 }
 
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.card:hover {
-  border-color: var(--border2);
-}
+a { color: inherit; }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  font-family: 'Inter', sans-serif;
-  text-transform: uppercase;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+  .mobile-full { width: 100% !important; }
+}
+@media (min-width: 769px) {
+  .hide-desktop { display: none !important; }
+}
