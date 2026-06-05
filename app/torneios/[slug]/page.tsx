@@ -43,13 +43,22 @@ export default async function TorneioPage({ params }: { params: Promise<{ slug: 
             <span style={{ color: '#6b7280' }}>👥 {confirmed.length} participantes confirmados</span>
           </div>
 
-          {/* Inscrição via Pix */}
-          {t.status === 'open' && t.pix_key && (
-            <div style={{ marginTop: '1rem', background: 'rgba(37,99,235,0.1)', border: '1px solid #2563eb44', borderRadius: 8, padding: '1rem' }}>
-              <p style={{ color: '#93c5fd', fontWeight: 500, margin: '0 0 4px' }}>📲 Como se inscrever</p>
-              <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>
-                Envie R$ {t.entry_fee.toFixed(2)} via Pix para <strong style={{ color: '#93c5fd' }}>{t.pix_key}</strong> e entre em contato para confirmar sua vaga.
-              </p>
+          {/* Botão de inscrição */}
+          {t.status === 'open' && (
+            <div style={{ marginTop: '1rem', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <a href={`/torneios/${t.slug}/inscrever`} style={{
+                display: 'inline-block', textDecoration: 'none',
+                background: '#4f7ef8', color: '#fff',
+                fontWeight: 700, fontSize: 14, padding: '10px 22px',
+                borderRadius: 10,
+              }}>
+                ✅ Quero me inscrever
+              </a>
+              {t.pix_key && (
+                <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '10px 14px', fontSize: 13, color: '#8b909e' }}>
+                  💰 Inscrição: R$ {Number(t.entry_fee).toFixed(2)} via Pix
+                </div>
+              )}
             </div>
           )}
         </div>
