@@ -106,15 +106,31 @@ export default async function Home() {
           </div>
         )}
 
-        {/* Torneios */}
-        <Link href="/torneios" style={{ textDecoration: 'none', display: 'block', marginBottom: '1.5rem' }}>
-          <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #e8b84b', borderRadius: 12, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', cursor: 'pointer' }}>
-            <div style={{ minWidth: 0 }}>
+        {/* Torneios + Co-op */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+          <Link href="/torneios" style={{ textDecoration: 'none' }}>
+            <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #e8b84b', borderRadius: 12, padding: '1rem', cursor: 'pointer', height: '100%' }}>
               <p style={{ fontSize: 10, color: '#e8b84b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 3 }}>Evento Principal</p>
-              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 17, fontWeight: 800, color: '#fff', marginBottom: 2 }}>🏆 Liga eFootball Diário</h3>
-              <p style={{ fontSize: 12, color: '#4b5060' }}>Inscrição R$20 · Prêmio R$50 · Estilo Brasileirão</p>
+              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 2 }}>🏆 Liga eFootball</h3>
+              <p style={{ fontSize: 12, color: '#4b5060' }}>R$20 · Prêmio R$50</p>
             </div>
-            <span style={{ fontSize: 13, color: '#8b909e', flexShrink: 0 }}>Ver →</span>
+          </Link>
+          <Link href="/coop" style={{ textDecoration: 'none' }}>
+            <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #4f7ef8', borderRadius: 12, padding: '1rem', cursor: 'pointer', height: '100%' }}>
+              <p style={{ fontSize: 10, color: '#4f7ef8', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 3 }}>Ao vivo</p>
+              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 2 }}>🎮 Co-op 3x3</h3>
+              <p style={{ fontSize: 12, color: '#4b5060' }}>Jogue com o FSKATE</p>
+            </div>
+          </Link>
+        </div>
+
+        <Link href="/criar-torneio" style={{ textDecoration: 'none', display: 'block', marginBottom: '1.5rem' }}>
+          <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, fontWeight: 700, color: '#e8eaf0', marginBottom: 2 }}>➕ Criar meu próprio torneio</h3>
+              <p style={{ fontSize: 12, color: '#4b5060' }}>Taxa de criação R$10 · Publicado no site</p>
+            </div>
+            <span style={{ fontSize: 13, color: '#8b909e', flexShrink: 0 }}>→</span>
           </div>
         </Link>
 

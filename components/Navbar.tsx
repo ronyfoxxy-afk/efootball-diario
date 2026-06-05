@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-const CATS = [
+  const CATS = [
   { name: 'Notícias', slug: 'noticias' },
   { name: 'Eventos', slug: 'eventos' },
   { name: 'Atualizações', slug: 'atualizacoes' },
@@ -50,6 +50,9 @@ export default function Navbar() {
               <Link href="/torneios" style={{ marginLeft: 4, fontSize: 13, fontWeight: 600, background: 'rgba(232,184,75,0.1)', color: '#e8b84b', border: '1px solid rgba(232,184,75,0.15)', padding: '5px 12px', borderRadius: 7, textDecoration: 'none' }}>
                 🏆 Torneios
               </Link>
+              <Link href="/coop" style={{ marginLeft: 2, fontSize: 13, fontWeight: 600, background: 'rgba(79,126,248,0.1)', color: '#4f7ef8', border: '1px solid rgba(79,126,248,0.15)', padding: '5px 12px', borderRadius: 7, textDecoration: 'none' }}>
+                🎮 Co-op 3x3
+              </Link>
 
               {/* Redes — dropdown desktop */}
               <div style={{ position: 'relative', marginLeft: 4 }}>
@@ -92,6 +95,14 @@ export default function Navbar() {
             <Link href="/torneios" onClick={() => setMenuOpen(false)}
               style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#e8b84b', padding: '10px 8px', borderRadius: 8, textDecoration: 'none', marginTop: 4 }}>
               🏆 Torneios
+            </Link>
+            <Link href="/coop" onClick={() => setMenuOpen(false)}
+              style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#4f7ef8', padding: '10px 8px', borderRadius: 8, textDecoration: 'none' }}>
+              🎮 Co-op 3x3 ao vivo
+            </Link>
+            <Link href="/criar-torneio" onClick={() => setMenuOpen(false)}
+              style={{ display: 'block', fontSize: 15, fontWeight: 500, color: '#8b909e', padding: '10px 8px', borderRadius: 8, textDecoration: 'none' }}>
+              ➕ Criar meu torneio
             </Link>
             <div style={{ height: 1, background: '#1c1f26', margin: '10px 0' }} />
             <p style={{ fontSize: 11, color: '#4b5060', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 8, padding: '0 8px' }}>Redes sociais</p>

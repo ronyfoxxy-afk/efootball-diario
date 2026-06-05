@@ -184,6 +184,8 @@ export default function Admin() {
                 {[
                   { href: '/', label: '🌐 Portal público' },
                   { href: '/torneios', label: '🏆 Página de torneios' },
+                  { href: '/admin-fskate/coop', label: '🎮 Gerenciar fila Co-op 3x3' },
+                  { href: '/coop', label: '👁️ Ver fila pública' },
                   { href: '/admin', label: '⚙️ Admin completo' },
                 ].map(l => (
                   <a key={l.href} href={l.href}
