@@ -7,17 +7,17 @@ let cachedToken: { token: string; expires: number } | null = null
 export async function getLivePixToken(): Promise<string> {
   if (cachedToken && Date.now() < cachedToken.expires) return cachedToken.token
 
-  const params = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: LIVEPIX_CLIENT_ID,
-    client_secret: LIVEPIX_CLIENT_SECRET,
-    scope: 'payments:read payments:write webhooks',
-  })
+  const body = [
+    `grant_type=client_credentials`,
+    `client_id=${encodeURIComponent(LIVEPIX_CLIENT_ID)}`,
+    `client_secret=${encodeURIComponent(LIVEPIX_CLIENT_SECRET)}`,
+    `scope=${encodeURIComponent('payments:read payments:write webhooks')}`,
+  ].join('&')
 
   const res = await fetch('https://oauth.livepix.gg/oauth2/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString(),
+    body,
   })
 
   const data = await res.json()
