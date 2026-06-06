@@ -413,6 +413,7 @@ export default function Admin() {
                     <div style={{ fontSize: 12, color: G.muted }}>R${Number(t.entry_fee).toFixed(2)} · Prêmio R${Number(t.prize).toFixed(2)} · {t.model}</div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <a href={`/admin-fskate/torneios/${t.id}`} style={{ ...S.btnSm(G.green, 'rgba(0,229,110,0.08)'), border: `1px solid rgba(0,229,110,0.2)`, padding: '5px 10px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>⚙️</a>
                     <button style={{ ...S.btnSm(G.blue, 'rgba(14,165,233,0.08)'), border: `1px solid rgba(14,165,233,0.2)`, padding: '5px 10px' }} onClick={() => setEditTorneio(t)}>✏️</button>
                     <button style={{ ...S.btnSm(G.red, 'rgba(248,113,113,0.08)'), border: `1px solid rgba(248,113,113,0.15)`, padding: '5px 10px' }} onClick={() => apagarTorneio(t.id)}>🗑️</button>
                   </div>

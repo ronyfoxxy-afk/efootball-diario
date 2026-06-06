@@ -8,24 +8,25 @@ const supabase = createClient(
 )
 
 export async function POST(req: NextRequest) {
-  const { participante_id, torneio_id, valor, nome } = await req.json()
+  const body = await req.json()
+  const { tipo, participante_id, torneio_id, valor, nome } = body
 
-  if (!participante_id || !torneio_id || !valor) {
-    return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 })
-  }
+  if (!valor) return NextResponse.json({ error: 'Valor obrigatório' }, { status: 400 })
 
   try {
-    // Referência única para rastrear o pagamento
-    const reference = `torneio_${torneio_id}_${participante_id}_${Date.now()}`
-
+    const reference = `${tipo || 'inscricao'}_${torneio_id}_${participante_id || Date.now()}_${Date.now()}`
     const { checkoutUrl } = await criarPagamentoLivePix(valor, reference)
 
-    // Salvar referência no participante para confirmar depois
-    await supabase.from('tournament_participants')
-      .update({ notes: (await supabase.from('tournament_participants').select('notes').eq('id', participante_id).single()).data?.notes + `|livepix_ref:${reference}` })
-      .eq('id', participante_id)
+    // Salvar referência no participante ou torneio
+    if (tipo === 'criacao_torneio' && torneio_id) {
+      await supabase.from('tournaments').update({ creation_payment_ref: reference, livepix_checkout_url: checkoutUrl }).eq('id', torneio_id)
+    } else if (participante_id) {
+      const { data: p } = await supabase.from('tournament_participants').select('notes').eq('id', participante_id).single()
+      const notesAtual = p?.notes || ''
+      await supabase.from('tournament_participants').update({ notes: notesAtual + `|livepix_ref:${reference}`, livepix_ref: reference }).eq('id', participante_id)
+    }
 
-    return NextResponse.json({ checkoutUrl })
+    return NextResponse.json({ checkoutUrl, reference })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
