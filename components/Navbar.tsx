@@ -1,8 +1,9 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 
-  const CATS = [
+const CATS = [
   { name: 'Notícias', slug: 'noticias' },
   { name: 'Eventos', slug: 'eventos' },
   { name: 'Atualizações', slug: 'atualizacoes' },
@@ -26,15 +27,18 @@ export default function Navbar() {
 
   return (
     <>
-      <header style={{ background: 'rgba(8,9,12,0.97)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #1c1f26', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: 1160, margin: '0 auto', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+      <header style={{ background: 'rgba(0,0,0,0.97)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #1c1f26', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
 
           {/* Logo */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-            <div style={{ width: 32, height: 32, background: '#4f7ef8', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>⚽</div>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <Image src="/logo.png" alt="eFootball News" width={44} height={44} style={{ borderRadius: 8 }} />
             <div>
-              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 15, color: '#fff', lineHeight: 1 }}>eFootball Diário</div>
-              <div style={{ fontSize: 9, color: '#4b5060', lineHeight: 1, marginTop: 1, letterSpacing: '1px' }}>FSKATE GAMES</div>
+              <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 16, lineHeight: 1 }}>
+                <span style={{ color: '#e8b84b' }}>e</span>
+                <span style={{ color: '#fff' }}>FOOTBALL</span>
+              </div>
+              <div style={{ fontSize: 10, color: '#e8b84b', letterSpacing: '3px', fontWeight: 700, lineHeight: 1, marginTop: 1 }}>— NEWS —</div>
             </div>
           </Link>
 
@@ -51,17 +55,16 @@ export default function Navbar() {
                 🏆 Torneios
               </Link>
               <Link href="/coop" style={{ marginLeft: 2, fontSize: 13, fontWeight: 600, background: 'rgba(79,126,248,0.1)', color: '#4f7ef8', border: '1px solid rgba(79,126,248,0.15)', padding: '5px 12px', borderRadius: 7, textDecoration: 'none' }}>
-                🎮 Co-op 3x3
+                🎮 Co-op
               </Link>
-
-              {/* Redes — dropdown desktop */}
+              {/* Redes dropdown */}
               <div style={{ position: 'relative', marginLeft: 4 }}>
                 <button onClick={() => setRedesOpen(!redesOpen)}
                   style={{ fontSize: 13, color: '#8b909e', padding: '5px 10px', borderRadius: 7, background: redesOpen ? '#14161b' : 'none', border: redesOpen ? '1px solid #1c1f26' : '1px solid transparent', cursor: 'pointer', fontFamily: "'Inter',sans-serif", display: 'flex', alignItems: 'center', gap: 5 }}>
-                  Redes <span style={{ fontSize: 10, transition: 'transform 0.2s', display: 'inline-block', transform: redesOpen ? 'rotate(180deg)' : 'none' }}>▼</span>
+                  Redes <span style={{ fontSize: 10, display: 'inline-block', transform: redesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
                 </button>
                 {redesOpen && (
-                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '6px', minWidth: 200, zIndex: 200, boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                  <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '6px', minWidth: 200, zIndex: 200, boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}>
                     {REDES.map(r => (
                       <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer"
                         onClick={() => setRedesOpen(false)}
@@ -85,7 +88,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="hide-desktop" style={{ background: '#0e1014', borderTop: '1px solid #1c1f26', padding: '8px 1rem 1rem' }}>
+          <div className="hide-desktop" style={{ background: '#0a0a0a', borderTop: '1px solid #1c1f26', padding: '8px 1rem 1rem' }}>
             {CATS.map(c => (
               <Link key={c.slug} href={`/categoria/${c.slug}`} onClick={() => setMenuOpen(false)}
                 style={{ display: 'block', fontSize: 15, color: '#8b909e', padding: '10px 8px', borderRadius: 8, textDecoration: 'none', fontWeight: 500 }}>
@@ -119,10 +122,7 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* Clique fora fecha o dropdown de redes */}
-      {redesOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />
-      )}
+      {redesOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />}
     </>
   )
 }

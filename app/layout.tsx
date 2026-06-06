@@ -3,13 +3,17 @@ import './globals.css'
 import FloatingButtons from '@/components/FloatingButtons'
 
 export const metadata: Metadata = {
-  title: 'eFootball Diário — Notícias, Eventos e Torneios',
-  description: 'O portal de notícias em português sobre eFootball. Atualizações, eventos, campanhas, guias e torneios. FSKATE GAMES.',
+  title: 'eFootball News — Notícias, Torneios e Co-op ao vivo',
+  description: 'O portal de notícias em português sobre eFootball. Atualizações, eventos, campanhas, guias, torneios e fila Co-op ao vivo. FSKATE GAMES.',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
-    title: 'eFootball Diário — FSKATE GAMES',
+    title: 'eFootball News — FSKATE GAMES',
     description: 'Notícias diárias sobre eFootball em português',
-    siteName: 'eFootball Diário',
-    images: ['https://linktr.ee/og/image/fskategames.jpg'],
+    siteName: 'eFootball News',
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
 }
 
