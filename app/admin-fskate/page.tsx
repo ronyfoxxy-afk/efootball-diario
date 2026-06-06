@@ -221,11 +221,11 @@ export default function Admin() {
               <div style={{ ...S.cardBody, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {[
                   { icon: '✏️', label: 'Novo Post', sub: 'Escrever manualmente', tab: 'post', c: G.blue },
-                  { icon: '▶', label: 'Via YouTube', sub: 'Transcrever e publicar', tab: 'youtube', c: G.red },
+                  { icon: '▶', label: 'Via YouTube', sub: 'Radar IA — Ollama local', tab: 'youtube', c: G.red },
                   { icon: '◻', label: `Rascunhos (${stats.draft})`, sub: 'Aprovar do n8n', tab: 'rascunhos', c: '#8b5cf6' },
                   { icon: '◈', label: 'Torneios', sub: 'Gerenciar campeonatos', tab: 'torneios', c: G.gold },
                 ].map(a => (
-                  <button key={a.tab} onClick={() => { setTab(a.tab as Tab); if (a.tab === 'torneios') loadTorneios(); if (a.tab === 'rascunhos') loadStats() }}
+                  <button key={a.tab} onClick={() => { if (a.tab === 'youtube') { window.location.href = '/admin-fskate/youtube'; return } setTab(a.tab as Tab); if (a.tab === 'torneios') loadTorneios(); if (a.tab === 'rascunhos') loadStats() }}
                     style={{ background: G.surface2, border: `1px solid ${a.c}22`, borderRadius: 12, padding: '14px', textAlign: 'left' as const, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, transition: 'border-color 0.2s' }}>
                     <div style={{ width: 36, height: 36, background: a.c + '18', borderRadius: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{a.icon}</div>
                     <div>
