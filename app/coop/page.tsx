@@ -59,7 +59,7 @@ export default function CoopQueuePage() {
     const position = (count || 0) + 1
 
     // Calcular sala (grupos de 3)
-    const salaNum = Math.ceil(position / 3)
+    const salaNum = Math.ceil(position / 5)
     const salaId = String(salaNum).padStart(2, '0')
 
     // Gerar senha única por sala — todos do mesmo grupo têm a mesma senha
@@ -108,10 +108,10 @@ export default function CoopQueuePage() {
         {/* Header */}
         <div style={{ marginBottom: '1.5rem' }}>
           <h1 style={{ fontFamily: "'Syne',sans-serif", fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 4 }}>
-            🎮 Fila Co-op 3x3
+            🎮 Fila Co-op 5x5
           </h1>
           <p style={{ fontSize: 14, color: '#4b5060' }}>
-            Entre na fila e jogue ao vivo com o FSKATE! Grupos de 3 jogadores por partida.
+            Entre na fila e jogue ao vivo com o FSKATE! Grupos de 5 jogadores por partida.
           </p>
         </div>
 
@@ -207,7 +207,7 @@ export default function CoopQueuePage() {
                       {j.player_name}
                     </span>
                   ))}
-                  {Array.from({ length: Math.max(0, 3 - jogadores.length) }).map((_, i) => (
+                  {Array.from({ length: Math.max(0, 5 - jogadores.length) }).map((_, i) => (
                     <span key={i} style={{ background: '#08090c', border: '1px dashed #252830', borderRadius: 20, padding: '4px 14px', fontSize: 13, color: '#374151' }}>
                       vaga livre
                     </span>

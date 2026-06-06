@@ -1,6 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
+
+const G = {
+  green: '#00e56e', bg: '#060a0f', surface: '#0d1520', surface2: '#131e2e',
+  border: 'rgba(255,255,255,0.07)', borderActive: 'rgba(0,229,110,0.4)',
+  text: '#f0f4f8', muted: '#5a7190', gold: '#e8b84b', red: '#f87171', blue: '#0ea5e9'
+}
 
 type Entry = { id: string; player_name: string; sala_id: string; sala_senha: string; status: string; position: number; created_at: string }
 
@@ -8,6 +14,8 @@ export default function AdminCoop() {
   const [fila, setFila] = useState<Entry[]>([])
   const [chamadas, setChamadas] = useState<Entry[]>([])
   const [toast, setToast] = useState('')
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [widgetOpen, setWidgetOpen] = useState(false)
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
@@ -20,121 +28,314 @@ export default function AdminCoop() {
 
   useEffect(() => {
     carregar()
-    const ch = supabase.channel('coop_admin').on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, carregar).subscribe()
+    const ch = supabase.channel('coop_admin_v2').on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, carregar).subscribe()
     return () => { supabase.removeChannel(ch) }
   }, [])
 
   async function chamarSala(salaId: string) {
     await supabase.from('coop_queue').update({ status: 'called' }).eq('sala_id', salaId).eq('status', 'waiting')
-    showToast('📢 Sala #' + salaId + ' chamada!')
-    carregar()
+    showToast('📢 Sala #' + salaId + ' chamada!'); carregar()
   }
 
   async function encerrarSala(salaId: string) {
     await supabase.from('coop_queue').update({ status: 'done' }).eq('sala_id', salaId)
-    showToast('✅ Sala #' + salaId + ' encerrada')
-    carregar()
+    showToast('✅ Sala #' + salaId + ' encerrada'); carregar()
   }
 
   async function limparTudo() {
     if (!confirm('Limpar toda a fila?')) return
     await supabase.from('coop_queue').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    showToast('🗑️ Fila limpa!')
-    carregar()
+    showToast('🗑️ Fila limpa!'); carregar()
   }
 
-  // Agrupar em salas
+  // Agrupar em salas de 5
   const salas: Record<string, Entry[]> = {}
   fila.forEach(p => { if (!salas[p.sala_id]) salas[p.sala_id] = []; salas[p.sala_id].push(p) })
 
-  const s: any = {
-    page: { minHeight: '100vh', background: '#08090c', color: '#e8eaf0', fontFamily: "'Inter',sans-serif" },
-    header: { background: '#0e1014', borderBottom: '1px solid #1c1f26', padding: '0 1rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 },
-    card: { background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '12px', marginBottom: 8 },
-    btnCall: { background: '#4f7ef8', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Inter',sans-serif" },
-    btnDone: { background: '#14161b', color: '#3ecf8e', border: '1px solid rgba(62,207,142,0.2)', borderRadius: 8, padding: '8px 14px', fontSize: 13, cursor: 'pointer', fontFamily: "'Inter',sans-serif" },
+  // Gerar PNG da fila
+  function gerarPNG() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const W = 800, ROW = 52, PAD = 20
+    const salasList = Object.entries(salas)
+    const H = PAD * 2 + 80 + salasList.reduce((acc, [, jogs]) => acc + ROW + (Math.ceil(jogs.length / 1) * 40) + 16, 0)
+    canvas.width = W
+    canvas.height = Math.max(H, 200)
+
+    // Fundo
+    ctx.fillStyle = '#060a0f'
+    ctx.fillRect(0, 0, W, canvas.height)
+
+    // Borda verde
+    ctx.strokeStyle = '#00e56e33'
+    ctx.lineWidth = 1
+    ctx.strokeRect(1, 1, W - 2, canvas.height - 2)
+
+    // Header
+    ctx.fillStyle = '#00e56e'
+    ctx.font = 'bold 11px Arial'
+    ctx.letterSpacing = '2px'
+    ctx.fillText('FILA CO-OP 5×5  —  eFootball News', PAD, PAD + 14)
+    ctx.fillStyle = '#5a7190'
+    ctx.font = '10px Arial'
+    ctx.fillText(fila.length + ' jogadores na fila  ·  ' + salasList.length + ' salas', PAD, PAD + 30)
+
+    // Linha separadora
+    ctx.fillStyle = '#1c2638'
+    ctx.fillRect(PAD, PAD + 40, W - PAD * 2, 1)
+
+    let y = PAD + 58
+
+    salasList.forEach(([salaId, jogadores]) => {
+      const completa = jogadores.length >= 5
+
+      // Fundo da sala
+      ctx.fillStyle = completa ? 'rgba(0,229,110,0.06)' : 'rgba(13,21,32,0.8)'
+      ctx.beginPath()
+      ctx.roundRect(PAD, y - 8, W - PAD * 2, ROW + jogadores.length * 38 + 8, 8)
+      ctx.fill()
+
+      // Borda
+      ctx.strokeStyle = completa ? '#00e56e44' : '#1c2638'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.roundRect(PAD, y - 8, W - PAD * 2, ROW + jogadores.length * 38 + 8, 8)
+      ctx.stroke()
+
+      // Sala ID
+      ctx.fillStyle = '#f0f4f8'
+      ctx.font = 'bold 15px Arial'
+      ctx.fillText('SALA #' + salaId, PAD + 12, y + 10)
+
+      // Senha
+      ctx.fillStyle = '#e8b84b'
+      ctx.font = 'bold 18px Arial'
+      const senhaWidth = ctx.measureText('🔑 ' + jogadores[0]?.sala_senha).width
+      ctx.fillText('🔑 ' + jogadores[0]?.sala_senha, W - PAD - 12 - senhaWidth, y + 11)
+
+      if (completa) {
+        ctx.fillStyle = '#00e56e'
+        ctx.font = 'bold 9px Arial'
+        ctx.fillText('COMPLETA', PAD + 12 + ctx.measureText('SALA #' + salaId).width + 10, y + 9)
+      }
+
+      y += ROW
+
+      // Jogadores
+      jogadores.forEach((j, i) => {
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'transparent'
+        ctx.fillRect(PAD + 8, y - 6, W - PAD * 2 - 16, 34)
+
+        // Número
+        ctx.fillStyle = '#00e56e'
+        ctx.font = 'bold 11px Arial'
+        ctx.fillText(String(i + 1), PAD + 16, y + 10)
+
+        // Nome
+        ctx.fillStyle = '#f0f4f8'
+        ctx.font = '13px Arial'
+        ctx.fillText(j.player_name, PAD + 32, y + 11)
+
+        y += 38
+      })
+
+      // Vagas livres
+      for (let i = jogadores.length; i < 5; i++) {
+        ctx.strokeStyle = '#1c2638'
+        ctx.setLineDash([4, 4])
+        ctx.strokeRect(PAD + 8, y - 6, W - PAD * 2 - 16, 30)
+        ctx.setLineDash([])
+        ctx.fillStyle = '#2a3a4e'
+        ctx.font = '11px Arial'
+        ctx.fillText('vaga livre', PAD + 36, y + 10)
+        y += 38
+      }
+
+      y += 16
+    })
+
+    if (salasList.length === 0) {
+      ctx.fillStyle = '#5a7190'
+      ctx.font = '14px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText('Fila vazia', W / 2, canvas.height / 2)
+    }
+
+    // Download
+    const link = document.createElement('a')
+    link.download = 'fila-coop-efootball.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+    showToast('🖼️ PNG gerado!')
   }
 
+  const salasList = Object.entries(salas)
+  const salasChamadas = Object.entries(
+    chamadas.reduce((acc: Record<string, Entry[]>, p) => { if (!acc[p.sala_id]) acc[p.sala_id] = []; acc[p.sala_id].push(p); return acc }, {})
+  )
+
+  const S: any = {
+    lbl: { fontSize: 10, color: G.muted, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase' as const },
+    card: { background: G.surface, border: `1px solid ${G.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 8 },
+  }
+
+  // Código do widget para copiar
+  const widgetCode = `<!-- Widget Fila Co-op eFootball News -->
+<div id="coop-widget" style="font-family:'Barlow Condensed',sans-serif;background:#060a0f;border:1px solid #00e56e33;border-radius:12px;padding:16px;min-width:320px;max-width:400px;color:#f0f4f8">
+  <div style="font-size:11px;color:#00e56e;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">⚡ FILA CO-OP 5×5</div>
+  <div id="coop-salas"></div>
+</div>
+<script>
+const SUPABASE_URL='https://clgbognxfbcjzbouxhfi.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsZ2JvZ254ZmJjanpib3V4aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDcyODgsImV4cCI6MjA5NjE4MzI4OH0.dOGaJon-zaB_tPKMzcaFPKIztNmZWMptDY0RjgkQvb0';
+async function atualizarFila(){
+  const r=await fetch(SUPABASE_URL+"/rest/v1/coop_queue?status=eq.waiting&order=created_at.asc",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}});
+  const data=await r.json();
+  const salas={};
+  data.forEach(p=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)});
+  const el=document.getElementById('coop-salas');
+  if(!el)return;
+  if(!Object.keys(salas).length){el.innerHTML='<div style="color:#5a7190;font-size:13px;text-align:center;padding:1rem">Fila vazia</div>';return;}
+  el.innerHTML=Object.entries(salas).map(([salaId,jogs])=>
+    '<div style="background:#0d1520;border:1px solid '+(jogs.length>=5?'#00e56e44':'rgba(255,255,255,0.07)')+';border-radius:8px;padding:10px;margin-bottom:8px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+    '<span style="font-size:13px;font-weight:700;letter-spacing:0.5px">SALA #'+salaId+'</span>'+
+    '<span style="color:#e8b84b;font-size:15px;font-weight:700">🔑 '+jogs[0].sala_senha+'</span></div>'+
+    jogs.map((j,i)=>'<div style="font-size:12px;color:#f0f4f8;padding:3px 0"><span style="color:#00e56e;margin-right:6px">'+(i+1)+'.</span>'+j.player_name+'</div>').join('')+
+    Array(Math.max(0,5-jogs.length)).fill('<div style="font-size:11px;color:#2a3a4e;padding:3px 0;border-top:1px dashed #1c2638;margin-top:3px">vaga livre</div>').join('')+
+    '</div>'
+  ).join('');
+}
+atualizarFila();
+setInterval(atualizarFila,5000);
+</script>`
+
   return (
-    <div style={s.page}>
-      <header style={s.header}>
+    <div style={{ minHeight: '100vh', background: G.bg, color: G.text, fontFamily: "'Barlow', 'Inter', sans-serif" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap')`}</style>
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      <header style={{ background: G.surface, borderBottom: `1px solid ${G.border}`, padding: '0 1rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky' as const, top: 0, zIndex: 50 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <a href="/admin-fskate" style={{ color: '#4b5060', fontSize: 20, textDecoration: 'none' }}>←</a>
-          <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 700, fontSize: 16, color: '#fff' }}>🎮 Gerenciar Fila Co-op</span>
+          <a href="/admin-fskate" style={{ color: G.muted, fontSize: 20, textDecoration: 'none' }}>←</a>
+          <div>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 16, color: G.text, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              🎮 Co-op 5×5
+            </div>
+            <div style={{ fontSize: 9, color: G.muted, letterSpacing: '2px', fontWeight: 700, textTransform: 'uppercase' }}>GERENCIAR FILA</div>
+          </div>
         </div>
-        <button onClick={limparTudo} style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '6px 14px', fontSize: 12, cursor: 'pointer', fontFamily: "'Inter',sans-serif" }}>
-          Limpar fila
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={gerarPNG} style={{ background: 'rgba(0,229,110,0.1)', color: G.green, border: `1px solid ${G.borderActive}`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
+            🖼️ PNG
+          </button>
+          <button onClick={() => setWidgetOpen(!widgetOpen)} style={{ background: 'rgba(14,165,233,0.1)', color: G.blue, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
+            {'</>'}
+          </button>
+          <button onClick={limparTudo} style={{ background: 'rgba(248,113,113,0.1)', color: G.red, border: `1px solid rgba(248,113,113,0.2)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Limpar
+          </button>
+        </div>
       </header>
 
       {toast && (
-        <div style={{ position: 'fixed', top: 66, left: '50%', transform: 'translateX(-50%)', background: '#0e1014', border: '1px solid #3ecf8e', borderRadius: 10, padding: '10px 20px', fontSize: 13, color: '#3ecf8e', zIndex: 300, whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'fixed' as const, top: 66, left: '50%', transform: 'translateX(-50%)', background: G.surface, border: `1px solid ${G.green}`, borderRadius: 10, padding: '10px 22px', fontSize: 13, color: G.green, zIndex: 300, whiteSpace: 'nowrap' as const, boxShadow: '0 8px 32px rgba(0,229,110,0.15)' }}>
           {toast}
         </div>
       )}
 
-      <div style={{ maxWidth: 600, margin: '0 auto', padding: '1.25rem 1rem' }}>
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '1.25rem 1rem' }}>
+
+        {/* Widget code */}
+        {widgetOpen && (
+          <div style={{ background: G.surface, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 12, padding: '14px', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <span style={{ fontSize: 11, color: G.blue, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const }}>{'</>'} Widget para a Live</span>
+              <button onClick={() => { navigator.clipboard.writeText(widgetCode); showToast('✅ Copiado!') }}
+                style={{ background: 'rgba(14,165,233,0.15)', color: G.blue, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 6, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                Copiar código
+              </button>
+            </div>
+            <div style={{ fontSize: 12, color: G.muted, marginBottom: 8 }}>
+              Cole este código no OBS Browser Source (800×400px) para mostrar a fila ao vivo na stream. Atualiza a cada 5 segundos automaticamente.
+            </div>
+            <pre style={{ background: G.surface2, borderRadius: 8, padding: '10px', fontSize: 10, color: G.muted, overflowX: 'auto' as const, maxHeight: 120 }}>
+              {widgetCode.substring(0, 200)}...
+            </pre>
+          </div>
+        )}
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: '1.25rem' }}>
           {[
-            { label: 'Na fila', value: fila.length, color: '#4f7ef8' },
-            { label: 'Salas', value: Object.keys(salas).length, color: '#e8b84b' },
-            { label: 'Chamadas', value: chamadas.length, color: '#3ecf8e' },
+            { l: 'Na fila', v: fila.length, c: G.green },
+            { l: 'Salas', v: salasList.length, c: G.gold },
+            { l: 'Chamadas', v: chamadas.length, c: G.blue },
           ].map(st => (
-            <div key={st.label} style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', textAlign: 'center' }}>
-              <div style={{ fontFamily: "'Syne',sans-serif", fontSize: 26, fontWeight: 800, color: st.color }}>{st.value}</div>
-              <div style={{ fontSize: 11, color: '#4b5060' }}>{st.label}</div>
+            <div key={st.l} style={{ background: G.surface, border: `1px solid ${G.border}`, borderRadius: 10, padding: '14px', textAlign: 'center' as const }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 28, color: st.c }}>{st.v}</div>
+              <div style={{ fontSize: 10, color: G.muted, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, marginTop: 2 }}>{st.l}</div>
             </div>
           ))}
         </div>
 
-        {/* Salas em espera */}
-        <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: '0.75rem' }}>
-          Salas aguardando
-        </h2>
+        {/* Salas aguardando */}
+        <div style={{ fontSize: 11, color: G.muted, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: 10 }}>Salas aguardando</div>
 
-        {Object.keys(salas).length === 0 && (
-          <div style={{ ...s.card, textAlign: 'center', padding: '2rem', color: '#4b5060' }}>Fila vazia</div>
+        {salasList.length === 0 && (
+          <div style={{ background: G.surface, border: `1px solid ${G.border}`, borderRadius: 12, padding: '2.5rem', textAlign: 'center' as const, color: G.muted }}>
+            Fila vazia — aguardando jogadores
+          </div>
         )}
 
-        {Object.entries(salas).map(([salaId, jogadores]) => (
-          <div key={salaId} style={{ ...s.card, border: jogadores.length >= 3 ? '1px solid rgba(62,207,142,0.3)' : '1px solid #1c1f26' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 18, color: '#fff' }}>Sala #{salaId}</span>
-                <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 18, fontWeight: 800, color: '#e8b84b' }}>🔑 {jogadores[0]?.sala_senha}</span>
-                {jogadores.length >= 3 && <span style={{ background: 'rgba(62,207,142,0.1)', color: '#3ecf8e', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>COMPLETA</span>}
+        {salasList.map(([salaId, jogadores]) => (
+          <div key={salaId} style={{ ...S.card, border: `1px solid ${jogadores.length >= 5 ? G.borderActive : G.border}` }}>
+            <div style={{ padding: '12px 14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 18, color: G.text, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    SALA #{salaId}
+                  </span>
+                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 900, color: G.gold }}>
+                    🔑 {jogadores[0]?.sala_senha}
+                  </span>
+                  {jogadores.length >= 5 && (
+                    <span style={{ background: 'rgba(0,229,110,0.1)', color: G.green, fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 20, letterSpacing: '1px', textTransform: 'uppercase' as const }}>COMPLETA</span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button style={{ background: 'rgba(0,229,110,0.1)', color: G.green, border: `1px solid rgba(0,229,110,0.25)`, borderRadius: 7, padding: '6px 14px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.8px', textTransform: 'uppercase' as const }} onClick={() => chamarSala(salaId)}>📢 Chamar</button>
+                  <button style={{ background: 'rgba(14,165,233,0.08)', color: G.blue, border: `1px solid rgba(14,165,233,0.2)`, borderRadius: 7, padding: '6px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }} onClick={() => encerrarSala(salaId)}>✅</button>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button style={s.btnCall} onClick={() => chamarSala(salaId)}>📢 Chamar</button>
-                <button style={s.btnDone} onClick={() => encerrarSala(salaId)}>✅</button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {jogadores.map((j, i) => (
+                  <span key={j.id} style={{ background: G.surface2, border: `1px solid ${G.border}`, borderRadius: 20, padding: '4px 12px', fontSize: 13, color: G.text, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ color: G.green, fontWeight: 700, fontSize: 11 }}>{i + 1}</span>
+                    {j.player_name}
+                  </span>
+                ))}
+                {Array.from({ length: Math.max(0, 5 - jogadores.length) }).map((_, i) => (
+                  <span key={i} style={{ border: `1px dashed ${G.border}`, borderRadius: 20, padding: '4px 14px', fontSize: 12, color: '#2a3a4e' }}>vaga livre</span>
+                ))}
               </div>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {jogadores.map((j, i) => (
-                <span key={j.id} style={{ background: '#14161b', border: '1px solid #1c1f26', borderRadius: 20, padding: '4px 12px', fontSize: 13, color: '#e2e8f0' }}>
-                  {i + 1}. {j.player_name}
-                </span>
-              ))}
-              {Array.from({ length: Math.max(0, 3 - jogadores.length) }).map((_, i) => (
-                <span key={i} style={{ border: '1px dashed #252830', borderRadius: 20, padding: '4px 14px', fontSize: 13, color: '#374151' }}>vaga livre</span>
-              ))}
             </div>
           </div>
         ))}
 
-        {/* Salas chamadas */}
-        {chamadas.length > 0 && (
+        {/* Chamadas */}
+        {salasChamadas.length > 0 && (
           <>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 700, color: '#8b909e', marginBottom: '0.75rem', marginTop: '1.25rem' }}>
-              Chamadas recentemente
-            </h2>
-            {Object.entries(
-              chamadas.reduce((acc: Record<string, Entry[]>, p) => { if (!acc[p.sala_id]) acc[p.sala_id] = []; acc[p.sala_id].push(p); return acc }, {})
-            ).map(([salaId, jogs]) => (
-              <div key={salaId} style={{ ...s.card, opacity: 0.6 }}>
-                <span style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, color: '#8b909e' }}>Sala #{salaId} — {jogs.map(j => j.player_name).join(', ')}</span>
+            <div style={{ fontSize: 11, color: G.muted, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: 10, marginTop: '1.25rem' }}>Chamadas recentemente</div>
+            {salasChamadas.map(([salaId, jogs]) => (
+              <div key={salaId} style={{ ...S.card, opacity: 0.5 }}>
+                <div style={{ padding: '10px 14px', fontSize: 13, color: G.muted }}>
+                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, color: G.text }}>SALA #{salaId}</span>
+                  {' — '}{jogs.map(j => j.player_name).join(', ')}
+                </div>
               </div>
             ))}
           </>
