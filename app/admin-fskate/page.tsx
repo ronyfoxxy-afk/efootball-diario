@@ -221,7 +221,7 @@ export default function Admin() {
               <div style={{ ...S.cardBody, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {[
                   { icon: '✏️', label: 'Novo Post', sub: 'Escrever manualmente', tab: 'post', c: G.blue },
-                  { icon: '▶', label: 'Via YouTube', sub: 'Radar IA — Ollama local', tab: 'youtube', c: G.red },
+                  { icon: '▶', label: 'Radar IA', sub: 'YouTube → Notícia (Ollama)', tab: 'youtube', c: G.red },
                   { icon: '◻', label: `Rascunhos (${stats.draft})`, sub: 'Aprovar do n8n', tab: 'rascunhos', c: '#8b5cf6' },
                   { icon: '◈', label: 'Torneios', sub: 'Gerenciar campeonatos', tab: 'torneios', c: G.gold },
                 ].map(a => (
