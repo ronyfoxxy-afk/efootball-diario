@@ -182,36 +182,8 @@ export default function AdminCoop() {
     card: { background: G.surface, border: `1px solid ${G.border}`, borderRadius: 12, overflow: 'hidden', marginBottom: 8 },
   }
 
-  // Código do widget para copiar
-  const widgetCode = `<!-- Widget Fila Co-op eFootball News -->
-<div id="coop-widget" style="font-family:'Barlow Condensed',sans-serif;background:#060a0f;border:1px solid #00e56e33;border-radius:12px;padding:16px;min-width:320px;max-width:400px;color:#f0f4f8">
-  <div style="font-size:11px;color:#00e56e;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">⚡ FILA CO-OP 5×5</div>
-  <div id="coop-salas"></div>
-</div>
-<script>
-const SUPABASE_URL='https://clgbognxfbcjzbouxhfi.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsZ2JvZ254ZmJjanpib3V4aGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDcyODgsImV4cCI6MjA5NjE4MzI4OH0.dOGaJon-zaB_tPKMzcaFPKIztNmZWMptDY0RjgkQvb0';
-async function atualizarFila(){
-  const r=await fetch(SUPABASE_URL+"/rest/v1/coop_queue?status=eq.waiting&order=created_at.asc",{headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY}});
-  const data=await r.json();
-  const salas={};
-  data.forEach(p=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)});
-  const el=document.getElementById('coop-salas');
-  if(!el)return;
-  if(!Object.keys(salas).length){el.innerHTML='<div style="color:#5a7190;font-size:13px;text-align:center;padding:1rem">Fila vazia</div>';return;}
-  el.innerHTML=Object.entries(salas).map(([salaId,jogs])=>
-    '<div style="background:#0d1520;border:1px solid '+(jogs.length>=5?'#00e56e44':'rgba(255,255,255,0.07)')+';border-radius:8px;padding:10px;margin-bottom:8px">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-    '<span style="font-size:13px;font-weight:700;letter-spacing:0.5px">SALA #'+salaId+'</span>'+
-    '<span style="color:#e8b84b;font-size:15px;font-weight:700">🔑 '+jogs[0].sala_senha+'</span></div>'+
-    jogs.map((j,i)=>'<div style="font-size:12px;color:#f0f4f8;padding:3px 0"><span style="color:#00e56e;margin-right:6px">'+(i+1)+'.</span>'+j.player_name+'</div>').join('')+
-    Array(Math.max(0,5-jogs.length)).fill('<div style="font-size:11px;color:#2a3a4e;padding:3px 0;border-top:1px dashed #1c2638;margin-top:3px">vaga livre</div>').join('')+
-    '</div>'
-  ).join('');
-}
-atualizarFila();
-setInterval(atualizarFila,5000);
-</script>`
+  // URL do widget para OBS
+  const widgetUrl = 'https://efootball-diario.vercel.app/widget/coop'
 
   return (
     <div style={{ minHeight: '100vh', background: G.bg, color: G.text, fontFamily: "'Barlow', 'Inter', sans-serif" }}>
@@ -249,22 +221,30 @@ setInterval(atualizarFila,5000);
 
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '1.25rem 1rem' }}>
 
-        {/* Widget code */}
+        {/* Widget URL para OBS */}
         {widgetOpen && (
           <div style={{ background: G.surface, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 12, padding: '14px', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <span style={{ fontSize: 11, color: G.blue, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const }}>{'</>'} Widget para a Live</span>
-              <button onClick={() => { navigator.clipboard.writeText(widgetCode); showToast('✅ Copiado!') }}
+              <span style={{ fontSize: 11, color: G.blue, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const }}>{'</>'} Widget para o OBS</span>
+              <button onClick={() => { navigator.clipboard.writeText(widgetUrl); showToast('✅ URL copiada!') }}
                 style={{ background: 'rgba(14,165,233,0.15)', color: G.blue, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 6, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                Copiar código
+                Copiar URL
               </button>
             </div>
-            <div style={{ fontSize: 12, color: G.muted, marginBottom: 8 }}>
-              Cole este código no OBS Browser Source (800×400px) para mostrar a fila ao vivo na stream. Atualiza a cada 5 segundos automaticamente.
+            <div style={{ fontSize: 12, color: G.muted, marginBottom: 10, lineHeight: 1.6 }}>
+              No OBS → <strong style={{ color: G.text }}>Fontes → + → Navegador</strong> e cole a URL abaixo:
             </div>
-            <pre style={{ background: G.surface2, borderRadius: 8, padding: '10px', fontSize: 10, color: G.muted, overflowX: 'auto' as const, maxHeight: 120 }}>
-              {widgetCode.substring(0, 200)}...
-            </pre>
+            <div style={{ background: G.surface2, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: G.green, fontFamily: 'monospace', wordBreak: 'break-all' as const, marginBottom: 10 }}>
+              {widgetUrl}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 11, color: G.muted }}>
+              {[['Largura', '460px'], ['Altura', '500px'], ['CSS', 'fundo transparente']].map(([l, v]) => (
+                <div key={l} style={{ background: G.surface2, borderRadius: 6, padding: '7px 10px' }}>
+                  <div style={{ fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const, fontSize: 10, marginBottom: 2 }}>{l}</div>
+                  <div style={{ color: G.text, fontSize: 12 }}>{v}</div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
