@@ -425,11 +425,36 @@ export default function Admin() {
               <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:20,color:G.text,textTransform:'uppercase',letterSpacing:1}}>
                 Co-op — {coopFila.length} aguardando
               </span>
-              <div style={{display:'flex',gap:8}}>
+              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
                 <button onClick={loadCoop} style={{...S.btnSm(G.green,'rgba(34,211,160,0.08)'),padding:'7px 12px',fontSize:11}}>🔄 Atualizar</button>
                 <a href="/widget/coop" target="_blank" style={{...S.btnSm(G.gold,'rgba(232,184,75,0.08)'),padding:'7px 12px',fontSize:11,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:4}}>
                   📺 Widget OBS →
                 </a>
+                <button
+                  onClick={async()=>{
+                    const salas:Record<string,any[]>={}
+                    coopFila.forEach((p:any)=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)})
+                    const primeira=Object.keys(salas)[0]
+                    if(!primeira){showToast('⚠️ Fila vazia');return}
+                    await supabase.from('coop_queue').update({status:'done'}).eq('sala_id',primeira)
+                    showToast('✅ Sala #'+primeira+' encerrada!');loadCoop()
+                  }}
+                  style={{background:'#22d3a0',color:'#000',border:'none',borderRadius:8,padding:'7px 14px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit',letterSpacing:'0.5px'}}>
+                  ✅ Encerrar sala
+                </button>
+                <button
+                  onClick={()=>{
+                    const salas:Record<string,any[]>={}
+                    coopFila.forEach((p:any)=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)})
+                    const primeira=Object.keys(salas)[0]
+                    const token=process.env.NEXT_PUBLIC_COOP_SECRET||'fskate2024'
+                    const link=`${window.location.origin}/api/coop/encerrar?token=${token}${primeira?'&sala='+primeira:''}`
+                    navigator.clipboard.writeText(link)
+                    showToast('🔗 Link copiado!')
+                  }}
+                  style={{...S.btnSm(G.muted,'rgba(255,255,255,0.04)'),padding:'7px 12px',fontSize:11}}>
+                  🔗 Link celular
+                </button>
               </div>
             </div>
 
