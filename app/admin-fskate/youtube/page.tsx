@@ -681,22 +681,37 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               </button>
               <Msg msg={ytMsg} type={ytMsgType} />
 
-              {ytConteudo && !ytPublicado && (
-                <>
-                  <div style={{ height:1, background:G.border, margin:'4px 0 12px' }} />
-                  <label style={S.lbl}>Título</label>
-                  <input style={S.inp} value={ytTitulo} onChange={e=>setYtTitulo(e.target.value)} />
-                  <label style={S.lbl}>Resumo</label>
-                  <input style={S.inp} value={ytResumo} onChange={e=>setYtResumo(e.target.value)} />
-                  <label style={S.lbl}>Conteúdo</label>
-                  <textarea style={{ ...S.inp, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }} value={ytConteudo} onChange={e=>setYtConteudo(e.target.value)} />
-                  <ImagePicker val={ytImagem} set={setYtImagem} label="Imagem de capa (padrão: thumbnail do YouTube)" />
-                  <button onClick={publicarYt} disabled={ytPublicando} style={{ ...S.btnGld, width:'100%', opacity:ytPublicando?0.6:1 }}>
-                    {ytPublicando ? 'Publicando...' : '✅ Publicar no site'}
-                  </button>
-                </>
-              )}
-              {ytPublicado && <div style={{ textAlign:'center', padding:'1rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, textTransform:'uppercase' }}>🎉 Publicado!</div>}
+              {ytPublicado && <div style={{ textAlign:'center', padding:'1.5rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:20, textTransform:'uppercase' }}>🎉 Publicado!</div>}
+            </div>
+          </div>
+        )}
+
+        {/* YouTube — editor de resultado */}
+        {mode === 'youtube' && ytConteudo && !ytPublicado && (
+          <div style={{ ...S.card, border:`1px solid rgba(232,184,75,0.3)` }}>
+            <div style={{ ...S.head, background:'rgba(232,184,75,0.05)' }}>
+              <span style={{ ...S.secTit, color:G.gold }}>✏️ Revise antes de publicar</span>
+              <span style={{ fontSize:10, color:G.dim }}>edite o que quiser</span>
+            </div>
+            <div style={S.body}>
+              <label style={S.lbl}>Título</label>
+              <input style={S.inp} value={ytTitulo} onChange={e=>setYtTitulo(e.target.value)} />
+              <label style={S.lbl}>Resumo</label>
+              <textarea style={{ ...S.inp, minHeight:60, resize:'vertical' as const }} value={ytResumo} onChange={e=>setYtResumo(e.target.value)} />
+              <label style={S.lbl}>Categoria</label>
+              <CatBtns val={ytCat} set={setYtCat} />
+              <label style={S.lbl}>Conteúdo</label>
+              <textarea style={{ ...S.inp, minHeight:280, resize:'vertical' as const, fontFamily:'monospace', fontSize:13, lineHeight:1.7 }} value={ytConteudo} onChange={e=>setYtConteudo(e.target.value)} />
+              <ImagePicker val={ytImagem} set={setYtImagem} label="Imagem de capa (padrão: thumbnail do YouTube)" />
+              <StatusBtns val={ytStatus} set={setYtStatus} />
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={()=>{setYtConteudo('');setYtTitulo('');setYtResumo('');setYtImagem('')}}
+                  style={{ ...S.btnOut, flex:1 }}>✕ Descartar</button>
+                <button onClick={publicarYt} disabled={ytPublicando}
+                  style={{ ...S.btnGrn, flex:2, opacity:ytPublicando?0.6:1 }}>
+                  {ytPublicando ? 'Publicando...' : '✅ Publicar no site'}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -719,20 +734,35 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               </button>
               <Msg msg={pMsg} type={pMsgType} />
 
-              {pConteudo && !pPublicado && (
-                <>
-                  <div style={{ height:1, background:G.border, margin:'4px 0 12px' }} />
-                  <label style={S.lbl}>Título</label>
-                  <input style={S.inp} value={pTitulo} onChange={e=>setPTitulo(e.target.value)} />
-                  <label style={S.lbl}>Resumo</label>
-                  <input style={S.inp} value={pResumo} onChange={e=>setPResumo(e.target.value)} />
-                  <label style={S.lbl}>Conteúdo</label>
-                  <textarea style={{ ...S.inp, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }} value={pConteudo} onChange={e=>setPConteudo(e.target.value)} />
-                  <ImagePicker val={pImagem} set={setPImagem} />
-                  <button onClick={publicarPesquisa} style={{ ...S.btnGld, width:'100%' }}>✅ Publicar no site</button>
-                </>
-              )}
-              {pPublicado && <div style={{ textAlign:'center', padding:'1rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, textTransform:'uppercase' }}>🎉 Publicado!</div>}
+              {pPublicado && <div style={{ textAlign:'center', padding:'1.5rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:20, textTransform:'uppercase' }}>🎉 Publicado!</div>}
+            </div>
+          </div>
+        )}
+
+        {/* Pesquisa — editor de resultado */}
+        {mode === 'pesquisa' && pConteudo && !pPublicado && (
+          <div style={{ ...S.card, border:`1px solid rgba(232,184,75,0.3)` }}>
+            <div style={{ ...S.head, background:'rgba(232,184,75,0.05)' }}>
+              <span style={{ ...S.secTit, color:G.gold }}>✏️ Revise antes de publicar</span>
+              <span style={{ fontSize:10, color:G.dim }}>edite o que quiser</span>
+            </div>
+            <div style={S.body}>
+              <label style={S.lbl}>Título</label>
+              <input style={S.inp} value={pTitulo} onChange={e=>setPTitulo(e.target.value)} />
+              <label style={S.lbl}>Resumo</label>
+              <textarea style={{ ...S.inp, minHeight:60, resize:'vertical' as const }} value={pResumo} onChange={e=>setPResumo(e.target.value)} />
+              <label style={S.lbl}>Categoria</label>
+              <CatBtns val={pCat} set={setPCat} />
+              <label style={S.lbl}>Conteúdo</label>
+              <textarea style={{ ...S.inp, minHeight:280, resize:'vertical' as const, fontFamily:'monospace', fontSize:13, lineHeight:1.7 }} value={pConteudo} onChange={e=>setPConteudo(e.target.value)} />
+              <ImagePicker val={pImagem} set={setPImagem} />
+              <StatusBtns val={pStatus} set={setPStatus} />
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={()=>{setPConteudo('');setPTitulo('');setPResumo('');setPImagem('')}}
+                  style={{ ...S.btnOut, flex:1 }}>✕ Descartar</button>
+                <button onClick={publicarPesquisa}
+                  style={{ ...S.btnGrn, flex:2 }}>✅ Publicar no site</button>
+              </div>
             </div>
           </div>
         )}
