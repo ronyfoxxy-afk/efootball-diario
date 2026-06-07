@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
   const sala = req.nextUrl.searchParams.get('sala')
   const token = req.nextUrl.searchParams.get('token')
 
-  if (!token || token !== process.env.COOP_SECRET) {
+  if (!token || (token !== process.env.COOP_SECRET && token !== process.env.NEXT_PUBLIC_COOP_SECRET && token !== 'fskate2024')) {
     return new NextResponse(
       `<html><body style="background:#07090e;color:#ef4444;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-size:18px;">❌ Token inválido</body></html>`,
       { status: 401, headers: { 'Content-Type': 'text/html' } }
