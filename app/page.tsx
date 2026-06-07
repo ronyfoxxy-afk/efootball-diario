@@ -14,8 +14,15 @@ async function getPosts() {
     .from('posts').select('*, categories(*)')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
-    .limit(13)
-  return data as Post[] || []
+    .limit(20)
+  if (!data) return []
+  // Prioriza post marcado como destaque (featured)
+  const featured = data.find((p: any) => p.featured)
+  if (featured) {
+    const resto = data.filter((p: any) => !p.featured)
+    return [featured, ...resto].slice(0, 13) as Post[]
+  }
+  return data.slice(0, 13) as Post[]
 }
 
 const badge = (color: string, name: string) => (
@@ -32,6 +39,7 @@ export default async function Home() {
   const hero = posts[0]
   const sideItems = posts.slice(1, 4)
   const grid = posts.slice(4)
+  // hero será o post featured se existir, senão o mais recente
 
   return (
     <div style={{ minHeight: '100vh', background: '#09090b' }}>
@@ -70,8 +78,13 @@ export default async function Home() {
                       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top,rgba(79,126,248,0.08),transparent)', pointerEvents: 'none' }} />
                       {/* Conteúdo sobre a imagem */}
                       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.25rem', zIndex: 2 }}>
-                        {hero.categories && badge(hero.categories.color, hero.categories.name)}
-                        <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8, lineHeight: 1.1 }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 0 }}>
+                          {(hero as any).featured && (
+                            <span style={{ background: 'rgba(232,184,75,0.2)', color: '#e8b84b', border: '1px solid rgba(232,184,75,0.4)', fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>⭐ DESTAQUE</span>
+                          )}
+                          {hero.categories && badge(hero.categories.color, hero.categories.name)}
+                        </div>
+                        <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8, lineHeight: 1.1, marginTop: 6 }}>
                           {hero.title}
                         </h2>
                         {hero.summary && (
