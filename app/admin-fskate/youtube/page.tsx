@@ -619,7 +619,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
                   </button>
                 ))}
               </div>
-              <input style={{ ...S.inp, fontFamily:'monospace' }} type="password" placeholder={APIS_TRANS.find(a=>a.id===apiTrans)?.ph+' (deixe vazio para usar só pesquisa)'} value={keyTrans} onChange={e=>setKeyTrans(e.target.value)} />
+              <input style={{ ...S.inp, fontFamily:'monospace' }} type="text" placeholder={APIS_TRANS.find(a=>a.id===apiTrans)?.ph+' (deixe vazio para usar só pesquisa)'} value={keyTrans} onChange={e=>setKeyTrans(e.target.value)} />
 
               <div style={{ height:1, background:G.border, margin:'12px 0' }} />
 
@@ -638,8 +638,13 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
                   </button>
                 ))}
               </div>
-              <input style={{ ...S.inp, fontFamily:'monospace' }} type="password" placeholder={APIS_IA.find(a=>a.id===apiIA)?.ph} value={keyIA} onChange={e=>setKeyIA(e.target.value)} />
+              <input style={{ ...S.inp, fontFamily:'monospace' }} type="text" placeholder={APIS_IA.find(a=>a.id===apiIA)?.ph} value={keyIA} onChange={e=>setKeyIA(e.target.value)} />
 
+              {keyTrans && keyIA && (
+                <div style={{ background:'rgba(34,211,160,0.08)', border:'1px solid rgba(34,211,160,0.2)', borderRadius:8, padding:'8px 12px', marginBottom:10, fontSize:12, color:G.green }}>
+                  ✅ Chaves carregadas do banco — prontas para usar
+                </div>
+              )}
               <button onClick={salvarChaves} disabled={savingKeys} style={{ ...S.btnGrn, width:'100%', opacity:savingKeys?0.6:1 }}>
                 {savingKeys ? '💾 Salvando...' : '💾 Salvar chaves (ficam gravadas)'}
               </button>
