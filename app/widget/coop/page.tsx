@@ -123,8 +123,8 @@ export default function CoopWidget() {
                 )}
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 9, color: '#52525b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Senha</div>
-                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 22, color: '#e8b84b', lineHeight: 1 }}>🔑 {jogadores[0]?.sala_senha}</div>
+                <div style={{ fontSize: 10, color: '#52525b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Jogadores</div>
+                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 16, color: '#4f7ef8', lineHeight: 1 }}>{jogadores.length}/5</div>
               </div>
             </div>
 
