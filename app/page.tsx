@@ -54,31 +54,47 @@ export default async function Home() {
                 <div className="card-hover" style={{
                   position: 'relative', borderRadius: 14, overflow: 'hidden',
                   border: '1px solid #1d1d20', cursor: 'pointer',
-                  minHeight: 300, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+                  display: 'flex', flexDirection: 'column',
                 }}>
-                  {/* BG image */}
-                  <div className="thumb-inner" style={{
-                    position: 'absolute', inset: 0, transition: 'transform 0.35s',
-                    background: hero.cover_image
-                      ? `url(${hero.cover_image}) center/cover`
-                      : 'linear-gradient(135deg,#0d0820 0%,#091428 50%,#0a1a0d 100%)',
-                  }} />
-                  {/* Glow overlay */}
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.55) 45%, rgba(9,9,11,0.05) 100%)' }} />
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 160, background: 'linear-gradient(to top,rgba(79,126,248,0.07),transparent)', pointerEvents: 'none' }} />
-                  {/* Content */}
-                  <div style={{ position: 'relative', zIndex: 2, padding: '1.25rem' }}>
-                    {hero.categories && badge(hero.categories.color, hero.categories.name)}
-                    <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8, lineHeight: 1.1 }}>
-                      {hero.title}
-                    </h2>
-                    {hero.summary && (
-                      <p style={{ fontSize: 13, color: '#a1a1aa', lineHeight: 1.55, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {hero.summary}
-                      </p>
-                    )}
-                    <span style={{ fontSize: 11, color: '#52525b' }}>{timeAgo(hero.published_at || hero.created_at)}</span>
-                  </div>
+                  {/* Imagem INTEIRA — sem corte, com overlay gradiente por cima */}
+                  {hero.cover_image ? (
+                    <div style={{ position: 'relative', width: '100%' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={hero.cover_image}
+                        alt={hero.title}
+                        style={{ width: '100%', height: 'auto', display: 'block', minHeight: 180 }}
+                      />
+                      {/* Overlay gradiente sobre a imagem */}
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.45) 50%, rgba(9,9,11,0.1) 100%)' }} />
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, background: 'linear-gradient(to top,rgba(79,126,248,0.08),transparent)', pointerEvents: 'none' }} />
+                      {/* Conteúdo sobre a imagem */}
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.25rem', zIndex: 2 }}>
+                        {hero.categories && badge(hero.categories.color, hero.categories.name)}
+                        <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8, lineHeight: 1.1 }}>
+                          {hero.title}
+                        </h2>
+                        {hero.summary && (
+                          <p style={{ fontSize: 13, color: '#a1a1aa', lineHeight: 1.55, marginBottom: 6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {hero.summary}
+                          </p>
+                        )}
+                        <span style={{ fontSize: 11, color: '#52525b' }}>{timeAgo(hero.published_at || hero.created_at)}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Sem imagem: card com fundo sólido */
+                    <div style={{ background: 'linear-gradient(135deg,#0d0820 0%,#091428 50%,#0a1a0d 100%)', minHeight: 280, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '1.25rem' }}>
+                      {hero.categories && badge(hero.categories.color, hero.categories.name)}
+                      <h2 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 26, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8, lineHeight: 1.1 }}>
+                        {hero.title}
+                      </h2>
+                      {hero.summary && (
+                        <p style={{ fontSize: 13, color: '#a1a1aa', lineHeight: 1.55, marginBottom: 6 }}>{hero.summary}</p>
+                      )}
+                      <span style={{ fontSize: 11, color: '#52525b' }}>{timeAgo(hero.published_at || hero.created_at)}</span>
+                    </div>
+                  )}
                 </div>
               </Link>
             )}
