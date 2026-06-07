@@ -39,8 +39,11 @@ export default function CoopWidget() {
   useEffect(() => {
     carregarFila()
 
-    // Polling a cada 4s como fallback (garante atualização mesmo se Realtime cair)
-    const interval = setInterval(carregarFila, 4000)
+    // Polling a cada 2s
+    const interval = setInterval(carregarFila, 2000)
+
+    // Reload completo a cada 30s pra garantir que o OBS não trave
+    const reload = setInterval(() => window.location.reload(), 30000)
 
     const channel = supabase.channel('widget_coop_v2')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, () => carregarFila())
@@ -48,6 +51,7 @@ export default function CoopWidget() {
 
     return () => {
       clearInterval(interval)
+      clearInterval(reload)
       supabase.removeChannel(channel)
     }
   }, [])
