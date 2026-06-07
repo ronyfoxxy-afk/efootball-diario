@@ -27,7 +27,7 @@ function slugify(t: string) {
 }
 
 const S: any = {
-  page:   { minHeight:'100vh', background:G.bg, color:G.text, fontFamily:"'Barlow',sans-serif", paddingBottom:72 },
+  page:   { minHeight:'100vh', background:G.bg, color:G.text, fontFamily:"'Barlow',sans-serif" },
   header: { background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:54, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 },
   main:   { maxWidth:860, margin:'0 auto', padding:'1.25rem 1rem' },
   card:   { background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, overflow:'hidden', marginBottom:'1rem' },
@@ -38,8 +38,8 @@ const S: any = {
   btnGrn: { background:G.green, color:'#041a10', border:'none', borderRadius:8, padding:'11px 18px', fontSize:12, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif" },
   btnOut: { background:G.surface2, color:G.text, border:`1px solid ${G.border}`, borderRadius:8, padding:'11px 18px', fontSize:12, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif" },
   btnSm:  (c:string,bg:string) => ({ background:bg, color:c, border:`1px solid ${c}28`, borderRadius:6, padding:'4px 9px', fontSize:10, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:'inherit' }),
-  nav:    { position:'fixed' as const, bottom:0, left:0, right:0, background:G.surface, borderTop:`1px solid ${G.border}`, display:'flex', zIndex:100 },
-  navBtn: (a:boolean) => ({ flex:1, display:'flex', flexDirection:'column' as const, alignItems:'center', gap:2, background:'none', border:'none', cursor:'pointer', padding:'8px 4px', color:a?G.gold:G.dim, fontFamily:'inherit', borderTop:`2px solid ${a?G.gold:'transparent'}`, transition:'color 0.15s' }),
+
+  navBtn: (a:boolean) => ({ display:'flex', alignItems:'center', gap:5, background:a?'rgba(232,184,75,0.08)':'none', border:a?`1px solid rgba(232,184,75,0.2)`:'1px solid transparent', borderRadius:7, cursor:'pointer', padding:'5px 10px', color:a?G.gold:G.dim, fontFamily:'inherit', fontSize:11, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase' as const, transition:'all 0.15s' }),
   toast:  { position:'fixed' as const, top:66, left:'50%', transform:'translateX(-50%)', background:G.surface, border:`1px solid ${G.green}`, borderRadius:8, padding:'9px 20px', fontSize:13, color:G.green, zIndex:300, whiteSpace:'nowrap' as const },
   secTit: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:12, letterSpacing:'2px', textTransform:'uppercase' as const, color:G.muted },
 }
@@ -263,17 +263,24 @@ export default function Admin() {
             <div style={{fontSize:9,color:G.dim,letterSpacing:'2px',fontWeight:700,textTransform:'uppercase'}}>FSKATE · PAINEL</div>
           </div>
         </div>
-        <div style={{display:'flex',gap:8,alignItems:'center'}}>
-          <a href="/admin-fskate/youtube" style={{fontSize:10,color:G.gold,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',background:'rgba(232,184,75,0.08)',border:`1px solid rgba(232,184,75,0.2)`,padding:'5px 10px',borderRadius:6}}>
-            ✍️ Radar IA
-          </a>
-          <div style={{display:'flex',gap:8,alignItems:'center'}}>
-            <a href="/" target="_blank" style={{fontSize:10,color:G.dim,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>Ver site →</a>
-            <button onClick={async()=>{await fetch('/api/admin-auth',{method:'DELETE'});window.location.href='/admin-login'}}
-              style={{fontSize:10,color:G.dim,background:'none',border:`1px solid ${G.border}`,borderRadius:6,padding:'5px 10px',cursor:'pointer',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>
-              Sair
+        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+          {/* Nav tabs no header */}
+          {TABS.map(t=>(
+            <button key={t.id} style={S.navBtn(tab===t.id)}
+              onClick={()=>{setTab(t.id);if(t.id==='torneios')loadTorneios();if(t.id==='coop')loadCoop()}}>
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
             </button>
-          </div>
+          ))}
+          <div style={{width:1,height:20,background:G.border,margin:'0 4px'}}/>
+          <a href="/admin-fskate/youtube" style={{fontSize:10,color:G.gold,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',background:'rgba(232,184,75,0.08)',border:`1px solid rgba(232,184,75,0.2)`,padding:'5px 10px',borderRadius:7}}>
+            ✍️ IA
+          </a>
+          <a href="/" target="_blank" style={{fontSize:10,color:G.dim,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>Site →</a>
+          <button onClick={async()=>{await fetch('/api/admin-auth',{method:'DELETE'});window.location.href='/admin-login'}}
+            style={{fontSize:10,color:G.dim,background:'none',border:`1px solid ${G.border}`,borderRadius:6,padding:'5px 10px',cursor:'pointer',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>
+            Sair
+          </button>
         </div>
       </header>
 
@@ -342,13 +349,7 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* Ações rápidas */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-              <button onClick={()=>setTab('posts')} style={{...S.btnOut,padding:'13px',fontSize:13,borderRadius:10,width:'100%'}}>≡ Gerenciar Posts</button>
-              <button onClick={()=>{setTab('torneios');loadTorneios()}} style={{...S.btnOut,padding:'13px',fontSize:13,borderRadius:10}}>🏆 Torneios</button>
-              <button onClick={()=>{setTab('coop');loadCoop()}} style={{...S.btnOut,padding:'13px',fontSize:13,borderRadius:10}}>🎮 Fila Co-op</button>
-              <button onClick={()=>setTab('site')} style={{...S.btnOut,padding:'13px',fontSize:13,borderRadius:10}}>👁 Visibilidade</button>
-            </div>
+
           </>
         )}
 
@@ -566,16 +567,7 @@ export default function Admin() {
 
       </div>
 
-      {/* BOTTOM NAV */}
-      <nav style={S.nav}>
-        {TABS.map(t=>(
-          <button key={t.id} style={S.navBtn(tab===t.id)}
-            onClick={()=>{setTab(t.id);if(t.id==='torneios')loadTorneios();if(t.id==='coop')loadCoop()}}>
-            <span style={{fontSize:15}}>{t.icon}</span>
-            <span style={{fontSize:9,fontWeight:700,letterSpacing:'0.8px',textTransform:'uppercase' as const}}>{t.label}</span>
-          </button>
-        ))}
-      </nav>
+
     </div>
   )
 }
