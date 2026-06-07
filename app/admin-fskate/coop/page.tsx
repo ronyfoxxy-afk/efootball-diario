@@ -45,10 +45,6 @@ export default function AdminCoop() {
     const { data: w } = await supabase.from('coop_queue').select('*').eq('status', 'waiting').order('created_at', { ascending: true })
     const { data: c } = await supabase.from('coop_queue').select('*').eq('status', 'called').order('created_at', { ascending: false }).limit(10)
     const novaFila = (w || []) as Entry[]
-    // Toca som se entrou alguém novo
-    if (novaFila.length > filaRef.current.length) {
-      tocarSom()
-    }
     filaRef.current = novaFila
     setFila(novaFila)
     setChamadas((c || []) as Entry[])

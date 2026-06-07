@@ -51,7 +51,6 @@ export default function CoopQueuePage() {
       .from('coop_queue').select('*').eq('status', 'waiting')
       .order('created_at', { ascending: true })
     const nova = (data || []) as QueueEntry[]
-    if (nova.length > prevFilaLen.current) tocarSom()
     prevFilaLen.current = nova.length
     setFila(nova)
   }
