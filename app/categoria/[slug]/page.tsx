@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
-import PostCard, { PostCardType } from '@/components/PostCard'
+import PostCard from '@/components/PostCard'
 import { notFound } from 'next/navigation'
 import type { Post } from '@/lib/supabase'
 
@@ -36,7 +36,7 @@ export default async function CategoriaPage({ params }: { params: Promise<{ slug
           <p style={{ color: '#6b7280', textAlign: 'center', padding: '3rem' }}>Nenhuma notícia nesta categoria ainda.</p>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            {(posts as PostCardType[]).map(post => <PostCard key={post.id} post={post} />)}
+            {(posts as Post[]).map(post => <PostCard key={post.id} post={post} />)}
           </div>
         )}
       </main>
