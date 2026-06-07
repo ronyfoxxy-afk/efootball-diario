@@ -173,125 +173,96 @@ export default function RadarIA() {
   }
 
   // ── Pesquisa REAL em fontes da comunidade ──
+  // ── Pesquisa REAL via RSS2JSON (client-side, sem bloqueios) + IA especialista ──
   async function pesquisarFontesReais(tema: string): Promise<string> {
     const resultados: string[] = []
-    const headers = { 'User-Agent': 'Mozilla/5.0 (compatible; efootballnews/1.0)' }
+    const temaEnc = encodeURIComponent(tema + ' efootball')
 
-    // 1. Reddit r/eFootball
+    // 1. Reddit r/eFootball via RSS2JSON (proxy público, funciona no browser)
     try {
-      const q = encodeURIComponent(tema + ' efootball')
-      const res = await fetch(`https://www.reddit.com/r/eFootball/search.json?q=${q}&sort=new&limit=5&t=month`, { headers })
+      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/eFootball/search.rss?q=${temaEnc}&sort=top&t=month`)
+      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=6`)
       if (res.ok) {
         const data = await res.json()
-        const posts = data?.data?.children || []
-        if (posts.length > 0) {
-          resultados.push('=== REDDIT r/eFootball ===')
-          posts.slice(0, 4).forEach((p: any) => {
-            const post = p.data
-            resultados.push(`• ${post.title}`)
-            if (post.selftext && post.selftext.length > 50) {
-              resultados.push(`  "${post.selftext.substring(0, 300)}"`)
-            }
-            resultados.push(`  👍 ${post.score} upvotes | 💬 ${post.num_comments} comentários`)
-          })
-        }
-      }
-    } catch(e) { resultados.push('Reddit: indisponível') }
-
-    // 2. Reddit r/pesmobile (comunidade BR)
-    try {
-      const q = encodeURIComponent(tema)
-      const res = await fetch(`https://www.reddit.com/r/pesmobile/search.json?q=${q}&sort=new&limit=3&t=month`, { headers })
-      if (res.ok) {
-        const data = await res.json()
-        const posts = data?.data?.children || []
-        if (posts.length > 0) {
-          resultados.push('
-=== REDDIT r/pesmobile ===')
-          posts.slice(0, 3).forEach((p: any) => {
-            const post = p.data
-            resultados.push(`• ${post.title}`)
-            if (post.selftext && post.selftext.length > 50) {
-              resultados.push(`  "${post.selftext.substring(0, 200)}"`)
-            }
-          })
-        }
-      }
-    } catch {}
-
-    // 3. X/Twitter via Nitter (público, sem auth)
-    try {
-      const queries = [
-        `https://nitter.net/search?q=${encodeURIComponent(tema + ' efootball')}&f=tweets`,
-        `https://nitter.poast.org/search?q=${encodeURIComponent(tema + ' efootball')}&f=tweets`,
-      ]
-      for (const url of queries) {
-        const res = await fetch(url, { headers })
-        if (res.ok) {
-          const html = await res.text()
-          const tweets: string[] = []
-          const matches = html.matchAll(/<div class="tweet-content[^"]*"[^>]*>([\s\S]*?)<\/div>/gi)
-          for (const m of matches) {
-            const text = m[1].replace(/<[^>]+>/g, '').trim()
-            if (text.length > 20) tweets.push(`• ${text.substring(0, 200)}`)
-            if (tweets.length >= 5) break
-          }
-          if (tweets.length > 0) {
-            resultados.push('
-=== X/TWITTER (comunidade) ===')
-            resultados.push(...tweets)
-            break
-          }
-        }
-      }
-    } catch {}
-
-    // 4. Google News RSS
-    try {
-      const q = encodeURIComponent(`${tema} efootball`)
-      const res = await fetch(`https://news.google.com/rss/search?q=${q}&hl=pt-BR&gl=BR&ceid=BR:pt`, { headers })
-      if (res.ok) {
-        const xml = await res.text()
-        const items = xml.match(/<item>([\s\S]*?)<\/item>/gi) || []
+        const items = data?.items || []
         if (items.length > 0) {
-          resultados.push('
-=== GOOGLE NEWS ===')
-          items.slice(0, 4).forEach(item => {
-            const title = item.match(/<title><!\[CDATA\[(.*?)\]\]>/)?.[1] || item.match(/<title>(.*?)<\/title>/)?.[1] || ''
-            const desc  = item.match(/<description><!\[CDATA\[(.*?)\]\]>/)?.[1] || ''
-            if (title) resultados.push(`• ${title}`)
-            if (desc) resultados.push(`  ${desc.replace(/<[^>]+>/g,'').substring(0,150)}`)
+          resultados.push('=== REDDIT r/eFootball (comunidade internacional) ===')
+          items.slice(0, 5).forEach((item: any) => {
+            resultados.push(`• ${item.title}`)
+            if (item.description) {
+              const text = item.description.replace(/<[^>]+>/g, '').trim().substring(0, 300)
+              if (text.length > 30) resultados.push(`  "${text}"`)
+            }
           })
         }
       }
     } catch {}
 
-    // 5. Site oficial Konami (notícias)
+    // 2. Reddit r/pesmobile (comunidade mobile/BR)
     try {
-      const res = await fetch('https://www.konami.com/efootball/pt-br/topic/news/list', { headers })
+      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/pesmobile/search.rss?q=${temaEnc}&sort=top&t=month`)
+      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=4`)
       if (res.ok) {
-        const html = await res.text()
-        const titles = html.match(/class="title">([^<]+)</gi) || []
-        if (titles.length > 0) {
-          resultados.push('
-=== SITE OFICIAL KONAMI (últimas notícias) ===')
-          titles.slice(0, 5).forEach(t => {
-            const title = t.replace(/class="title">/, '').replace(/<$/, '').trim()
-            resultados.push(`• ${title}`)
+        const data = await res.json()
+        const items = data?.items || []
+        if (items.length > 0) {
+          resultados.push('\n=== REDDIT r/pesmobile (comunidade mobile) ===')
+          items.slice(0, 3).forEach((item: any) => {
+            resultados.push(`• ${item.title}`)
+            if (item.description) {
+              const text = item.description.replace(/<[^>]+>/g, '').trim().substring(0, 200)
+              if (text.length > 30) resultados.push(`  "${text}"`)
+            }
           })
         }
       }
     } catch {}
 
-    if (resultados.length === 0) {
-      throw new Error('Nenhuma fonte retornou resultados. Tente um tema mais específico.')
+    // 3. Reddit top da semana em eFootball
+    try {
+      const rssUrl = encodeURIComponent('https://www.reddit.com/r/eFootball/top.rss?t=week')
+      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=5`)
+      if (res.ok) {
+        const data = await res.json()
+        const items = data?.items || []
+        if (items.length > 0) {
+          resultados.push('\n=== REDDIT r/eFootball — TOP DA SEMANA ===')
+          items.slice(0, 4).forEach((item: any) => {
+            resultados.push(`• ${item.title}`)
+            if (item.description) {
+              const text = item.description.replace(/<[^>]+>/g, '').trim().substring(0, 150)
+              if (text.length > 30) resultados.push(`  "${text}"`)
+            }
+          })
+        }
+      }
+    } catch {}
+
+    // 4. IA especialista complementa com conhecimento próprio e específico
+    try {
+      const iaContexto = await chamarIA(
+        `Você é especialista em eFootball da Konami. Responda de forma ESPECÍFICA sobre: "${tema}"
+
+Liste com detalhes reais:
+1. Jogadores específicos mais relevantes para esse tema AGORA (nomes reais, ex: Batistuta, Van Basten, Mbappé Epic)
+2. Mecânicas do jogo relacionadas (skills, posições, atributos como Finishing, Speed)
+3. O que criadores de conteúdo BR estão dizendo sobre isso (FSKATE, outros)
+4. Meta atual: quais são usados, quais foram nerfados/buffados
+5. Dicas práticas para o jogador
+
+Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Máximo 400 palavras.`
+      )
+      resultados.push('\n=== ANÁLISE ESPECIALIZADA ===')
+      resultados.push(iaContexto)
+    } catch {}
+
+    if (resultados.filter(r => r.length > 30).length < 2) {
+      throw new Error('Não encontrei informações suficientes. Tente um tema mais específico, ex: "melhores atacantes épicos meta atual"')
     }
 
-    return resultados.join('
-')
+    return resultados.join('\n')
   }
 
-  // ── Chamar IA (Ruud Gullit Jr. em TODAS) ──
   async function chamarIA(prompt: string): Promise<string> {
     if (apiIA === 'groq') {
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
