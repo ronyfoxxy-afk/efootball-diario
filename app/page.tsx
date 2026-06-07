@@ -56,14 +56,14 @@ export default async function Home() {
                   border: '1px solid #1d1d20', cursor: 'pointer',
                   display: 'flex', flexDirection: 'column',
                 }}>
-                  {/* Imagem INTEIRA — sem corte, com overlay gradiente por cima */}
+                  {/* Imagem hero — proporcional com altura máxima */}
                   {hero.cover_image ? (
                     <div style={{ position: 'relative', width: '100%' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={hero.cover_image}
                         alt={hero.title}
-                        style={{ width: '100%', height: 'auto', display: 'block', minHeight: 180 }}
+                        style={{ width: '100%', height: 'auto', display: 'block', maxHeight: 340, objectFit: 'cover' }}
                       />
                       {/* Overlay gradiente sobre a imagem */}
                       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.45) 50%, rgba(9,9,11,0.1) 100%)' }} />

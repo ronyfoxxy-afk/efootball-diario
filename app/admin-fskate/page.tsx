@@ -204,10 +204,10 @@ export default function Admin() {
     } catch { showToast('❌ Erro ao verificar') }
   }
 
-  const TABS: { id: Tab; icon: string; label: string }[] = [
+  const TABS: { id: Tab; icon: string; label: string; href?: string }[] = [
     { id: 'home',     icon: '⊞', label: 'Início'   },
     { id: 'post',     icon: '✏️', label: 'Post'     },
-    { id: 'youtube',  icon: '▶',  label: 'YouTube'  },
+    { id: 'youtube',  icon: '▶',  label: 'YouTube', href: '/admin-fskate/youtube' },
     { id: 'posts',    icon: '≡',  label: 'Posts'    },
     { id: 'torneios', icon: '🏆', label: 'Torneios' },
   ]
@@ -316,7 +316,7 @@ export default function Admin() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <button onClick={() => setTab('post')} style={{ ...S.btnPri, padding: '14px', fontSize: 13, borderRadius: 10 }}>✏️ Novo Post</button>
               <button onClick={() => { setTab('posts'); }} style={{ ...S.btnPri, padding: '14px', fontSize: 13, borderRadius: 10, background: G.surface, border: `1px solid ${G.border}`, color: G.text }}>≡ Ver Posts</button>
-              <button onClick={() => setTab('youtube')} style={{ ...S.btnPri, padding: '14px', fontSize: 13, borderRadius: 10, background: G.surface, border: `1px solid ${G.border}`, color: G.text }}>▶ YouTube → Post</button>
+              <a href="/admin-fskate/youtube" style={{ ...S.btnPri, padding: '14px', fontSize: 13, borderRadius: 10, background: G.surface, border: `1px solid ${G.border}`, color: G.text, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶ YouTube → Post</a>
               <button onClick={() => { setTab('torneios'); loadTorneios() }} style={{ ...S.btnPri, padding: '14px', fontSize: 13, borderRadius: 10, background: G.surface, border: `1px solid ${G.border}`, color: G.text }}>🏆 Torneios</button>
             </div>
           </>
@@ -561,7 +561,12 @@ export default function Admin() {
 
       {/* Bottom nav */}
       <nav style={S.nav}>
-        {TABS.map(t => (
+        {TABS.map(t => t.href ? (
+          <a key={t.id} href={t.href} style={{ ...S.navBtn(false), textDecoration: 'none' }}>
+            <span style={{ fontSize: 16 }}>{t.icon}</span>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>{t.label}</span>
+          </a>
+        ) : (
           <button key={t.id} style={S.navBtn(tab === t.id)}
             onClick={() => { setTab(t.id); if (t.id === 'torneios') loadTorneios() }}>
             <span style={{ fontSize: 16 }}>{t.icon}</span>
