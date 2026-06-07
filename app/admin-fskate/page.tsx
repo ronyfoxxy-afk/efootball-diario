@@ -172,7 +172,6 @@ export default function Admin() {
     { id: 'post', icon: '✏️', label: 'Post' },
     { id: 'youtube', icon: '▶', label: 'YouTube' },
     { id: 'rascunhos', icon: '◻', label: 'Rascunhos' },
-    { id: 'posts', icon: '📋', label: 'Posts' },
     { id: 'torneios', icon: '◈', label: 'Torneios' },
   ]
 
@@ -389,47 +388,6 @@ export default function Admin() {
           </>
         )}
 
-        {/* ── POSTS PUBLICADOS ── */}
-        {tab === 'posts' && (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <button onClick={() => setTab('home')} style={{ background: 'none', border: 'none', color: G.muted, cursor: 'pointer', fontSize: 18 }}>←</button>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 20, color: G.text, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Posts ({posts.length})</span>
-              </div>
-            </div>
-            {posts.length === 0 && (
-              <div style={{ ...S.card, padding: '2rem', textAlign: 'center' as const, color: G.muted }}>Nenhum post carregado</div>
-            )}
-            {posts.map(post => (
-              <div key={post.id} style={{ ...S.card, marginBottom: 8 }}>
-                <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' as const }}>
-                      {post.categories && <span style={{ fontSize: 9, fontWeight: 700, background: post.categories.color + '22', color: post.categories.color, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase' as const, letterSpacing: '0.5px' }}>{post.categories.name}</span>}
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, textTransform: 'uppercase' as const, background: post.status === 'published' ? 'rgba(62,207,142,0.1)' : 'rgba(232,184,75,0.1)', color: post.status === 'published' ? '#3ecf8e' : G.gold }}>
-                        {post.status === 'published' ? 'Publicado' : 'Rascunho'}
-                      </span>
-                      {post.auto_published && <span style={{ fontSize: 9, color: G.muted, fontWeight: 700 }}>AUTO</span>}
-                    </div>
-                    <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, fontWeight: 700, color: G.text, margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-                      {post.title}
-                    </p>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    {post.status === 'draft' && (
-                      <button style={{ ...S.btnSm(G.green, 'rgba(0,229,110,0.08)'), border: `1px solid rgba(0,229,110,0.2)`, padding: '5px 10px' }} onClick={() => publicarRascunho(post.id)}>✅</button>
-                    )}
-                    <a href={`/admin-fskate/editar/${post.id}`}
-                      style={{ ...S.btnSm(G.blue, 'rgba(14,165,233,0.08)'), border: `1px solid rgba(14,165,233,0.2)`, padding: '5px 10px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>✏️</a>
-                    <button style={{ ...S.btnSm(G.red, 'rgba(248,113,113,0.08)'), border: `1px solid rgba(248,113,113,0.15)`, padding: '5px 10px' }} onClick={() => apagarPost(post.id)}>🗑️</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </>
-        )}
-
         {/* ── TORNEIOS ── */}
         {tab === 'torneios' && !editTorneio && (
           <>
@@ -511,7 +469,7 @@ export default function Admin() {
       <nav style={S.nav}>
         {TABS.map(t => (
           <button key={t.id} style={S.navBtn(tab === t.id)}
-            onClick={() => { setTab(t.id as Tab); if (t.id === 'rascunhos') loadStats(); if (t.id === 'torneios') loadTorneios(); if (t.id === 'posts') loadPosts() }}>
+            onClick={() => { setTab(t.id as Tab); if (t.id === 'rascunhos') loadStats(); if (t.id === 'torneios') loadTorneios() }}>
             <span style={{ fontSize: 17 }}>{t.icon}</span>
             <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>{t.label}</span>
           </button>
