@@ -291,65 +291,42 @@ export default function Admin() {
         {/* ── HOME ── */}
         {tab==='home' && (
           <>
-            {/* Stats */}
-            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:'1.25rem'}}>
-              {[
-                {n:stats.pub,   l:'Publicados', c:G.green},
-                {n:stats.draft, l:'Rascunhos',  c:G.gold },
-                {n:stats.hoje,  l:'Hoje',        c:G.text },
-                {n:stats.torneios,l:'Torneios',  c:G.muted},
-              ].map(s=>(
-                <div key={s.l} style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:10,padding:'12px',textAlign:'center'}}>
-                  <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:28,lineHeight:1,color:s.c}}>{s.n}</div>
-                  <div style={{fontSize:9,color:G.dim,marginTop:3,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>{s.l}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Radar IA — destaque */}
-            <div style={{background:'rgba(232,184,75,0.05)',border:'1px solid rgba(232,184,75,0.2)',borderRadius:14,padding:'1.25rem',marginBottom:'1rem'}}>
-              <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:18,color:G.gold,textTransform:'uppercase',letterSpacing:1,marginBottom:6}}>
-                ✍️ Radar IA — Publicar notícia
-              </div>
-              <p style={{fontSize:13,color:G.dim,marginBottom:'1rem',lineHeight:1.6}}>
-                3 formas de publicar: YouTube (transcrição real), Pesquisa (IA busca o tema) ou Manual (você escreve).
-              </p>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+            {/* Linha de stats + botão publicar */}
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:'1.5rem'}}>
+              <div style={{display:'flex',gap:6}}>
                 {[
-                  {icon:'▶', label:'YouTube → Post', desc:'Cola o link, transcreve e publica', url:'/admin-fskate/youtube?modo=youtube'},
-                  {icon:'🔍',label:'Tema + IA',       desc:'Digita o assunto, IA pesquisa',    url:'/admin-fskate/youtube?modo=pesquisa'},
-                  {icon:'✏️',label:'Manual',          desc:'Você escreve tudo',                url:'/admin-fskate/youtube?modo=manual'},
-                ].map(m=>(
-                  <a key={m.label} href={m.url}
-                    style={{background:G.surface2,border:`1px solid ${G.border}`,borderRadius:10,padding:'12px',textDecoration:'none',display:'block',textAlign:'center',transition:'border-color .15s'}}>
-                    <div style={{fontSize:22,marginBottom:4}}>{m.icon}</div>
-                    <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:13,color:G.text,textTransform:'uppercase',marginBottom:3}}>{m.label}</div>
-                    <div style={{fontSize:10,color:G.dim,lineHeight:1.4}}>{m.desc}</div>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Destaque hero */}
-            <div style={S.card}>
-              <div style={S.cHead}>
-                <span style={S.secTit}>⭐ Post em Destaque (hero da home)</span>
-              </div>
-              <div style={{padding:'10px'}}>
-                {posts.filter(p=>p.status==='published').slice(0,6).map(p=>(
-                  <div key={p.id} onClick={()=>toggleFeatured(p.id)}
-                    style={{display:'flex',alignItems:'center',gap:10,padding:'8px 10px',borderRadius:8,cursor:'pointer',marginBottom:4,
-                      background:featuredId===p.id?'rgba(232,184,75,0.06)':'transparent',
-                      border:`1px solid ${featuredId===p.id?'rgba(232,184,75,0.25)':G.border}`,transition:'all .15s'}}>
-                    {p.cover_image&&<div style={{width:36,height:36,borderRadius:6,background:`url(${p.cover_image}) center/cover`,flexShrink:0}}/>}
-                    <div style={{flex:1,minWidth:0,fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:G.text,textTransform:'uppercase',lineHeight:1.2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</div>
-                    <span style={{fontSize:15,flexShrink:0}}>{featuredId===p.id?'⭐':'☆'}</span>
+                  {n:stats.pub,   l:'publicados', c:G.green},
+                  {n:stats.draft, l:'rascunhos',  c:G.gold },
+                  {n:stats.hoje,  l:'hoje',        c:G.text },
+                ].map(s=>(
+                  <div key={s.l} style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:8,padding:'8px 14px',display:'flex',alignItems:'baseline',gap:5}}>
+                    <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:22,color:s.c}}>{s.n}</span>
+                    <span style={{fontSize:10,color:G.dim}}>{s.l}</span>
                   </div>
                 ))}
               </div>
+              <a href="/admin-fskate/youtube"
+                style={{marginLeft:'auto',background:'rgba(232,184,75,0.1)',border:'1px solid rgba(232,184,75,0.3)',borderRadius:8,padding:'9px 16px',textDecoration:'none',color:G.gold,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:13,textTransform:'uppercase',letterSpacing:1,display:'flex',alignItems:'center',gap:6}}>
+                ✍️ Nova Publicação
+              </a>
             </div>
 
-
+            {/* Destaque */}
+            <div style={{fontSize:10,color:G.dim,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:8}}>
+              ⭐ Destaque na home — clique para trocar
+            </div>
+            <div style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:12,overflow:'hidden'}}>
+              {posts.filter(p=>p.status==='published').slice(0,8).map((p,i)=>(
+                <div key={p.id} onClick={()=>toggleFeatured(p.id)}
+                  style={{display:'flex',alignItems:'center',gap:10,padding:'9px 14px',cursor:'pointer',
+                    background:featuredId===p.id?'rgba(232,184,75,0.06)':'transparent',
+                    borderBottom:i<7?`1px solid ${G.border}`:'none',transition:'background .15s'}}>
+                  {p.cover_image&&<div style={{width:32,height:32,borderRadius:5,background:`url(${p.cover_image}) center/cover`,flexShrink:0}}/>}
+                  <div style={{flex:1,minWidth:0,fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:featuredId===p.id?G.gold:G.text,textTransform:'uppercase',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</div>
+                  <span style={{fontSize:14,flexShrink:0,color:featuredId===p.id?G.gold:G.dim}}>{featuredId===p.id?'⭐':'☆'}</span>
+                </div>
+              ))}
+            </div>
           </>
         )}
 
