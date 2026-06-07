@@ -225,25 +225,6 @@ export default function AdminCoop() {
           <button onClick={() => setWidgetOpen(!widgetOpen)} style={{ background: 'rgba(14,165,233,0.1)', color: G.blue, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
             {'</>'}
           </button>
-          <button
-            onClick={async () => {
-              const primeiraSlot = salasList[0]?.[0]
-              if (!primeiraSlot) { showToast('⚠️ Fila vazia'); return }
-              await encerrarSala(primeiraSlot)
-            }}
-            style={{ background: 'rgba(34,211,160,0.12)', color: '#22d3a0', border: `1px solid rgba(34,211,160,0.3)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
-            ✅ Encerrar sala
-          </button>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(encerrarLink)
-              setLinkCopiado(true)
-              showToast('🔗 Link copiado! Cole no celular.')
-              setTimeout(() => setLinkCopiado(false), 3000)
-            }}
-            style={{ background: linkCopiado ? 'rgba(34,211,160,0.15)' : 'rgba(255,255,255,0.04)', color: linkCopiado ? '#22d3a0' : G.muted, border: `1px solid ${linkCopiado ? 'rgba(34,211,160,0.3)' : G.border}`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
-            {linkCopiado ? '✅ Copiado!' : '🔗 Link celular'}
-          </button>
           <button onClick={limparTudo} style={{ background: 'rgba(248,113,113,0.1)', color: G.red, border: `1px solid rgba(248,113,113,0.2)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
             Limpar
           </button>
@@ -257,6 +238,35 @@ export default function AdminCoop() {
       )}
 
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '1.25rem 1rem' }}>
+
+        {/* ── ENCERRAR SALA ── */}
+        <div style={{ background: G.surface, border: `1px solid rgba(34,211,160,0.25)`, borderRadius: 14, padding: '16px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' as const }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 12, color: '#22d3a0', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' as const, marginBottom: 2 }}>Encerrar sala atual</div>
+            <div style={{ fontSize: 12, color: G.muted }}>Finaliza a primeira sala da fila e o widget avança automaticamente</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexShrink: 0, flexWrap: 'wrap' as const }}>
+            <button
+              onClick={async () => {
+                const primeiraSlot = salasList[0]?.[0]
+                if (!primeiraSlot) { showToast('⚠️ Fila vazia'); return }
+                await encerrarSala(primeiraSlot)
+              }}
+              style={{ background: '#22d3a0', color: '#000', border: 'none', borderRadius: 10, padding: '12px 22px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', letterSpacing: '0.5px' }}>
+              ✅ Encerrar sala
+            </button>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(encerrarLink)
+                setLinkCopiado(true)
+                showToast('🔗 Link copiado! Cole no celular.')
+                setTimeout(() => setLinkCopiado(false), 3000)
+              }}
+              style={{ background: linkCopiado ? 'rgba(34,211,160,0.15)' : G.surface2, color: linkCopiado ? '#22d3a0' : G.muted, border: `1px solid ${linkCopiado ? 'rgba(34,211,160,0.3)' : G.border}`, borderRadius: 10, padding: '12px 18px', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+              {linkCopiado ? '✅ Link copiado!' : '🔗 Copiar link celular'}
+            </button>
+          </div>
+        </div>
 
         {/* Widget URL para OBS */}
         {widgetOpen && (
