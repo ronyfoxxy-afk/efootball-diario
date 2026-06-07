@@ -276,15 +276,13 @@ IMPORTANTE: Seja honesto sobre o que é confirmado vs especulação. Não invent
         usouPesquisa = true
       }
 
-      // Se transcrição falhou, usar agente de pesquisa
+      // Se transcrição falhou — PARA. Não inventa.
       if (usouPesquisa) {
-        setYtMsg('🔍 Agente de pesquisa buscando informações sobre o tema...'); setYtMsgType('info')
-        try {
-          const pesquisa = await pesquisarInfoVideo(tituloVideo, ytUrl)
-          contexto = `PESQUISA SOBRE O TEMA (vídeo sem transcrição disponível):\n${pesquisa}\n\nNOTA: A notícia deve ser baseada APENAS nas informações acima. Mencione que é baseado no tema do vídeo "${tituloVideo}".`
-        } catch (e2: any) {
-          throw new Error('Transcrição e pesquisa falharam. Tente outra API ou verifique as chaves.')
-        }
+        throw new Error(
+          keyTrans.trim()
+            ? `❌ Transcrição falhou para este vídeo. Possíveis causas:\n• O vídeo não tem legendas/closed captions ativadas\n• O vídeo é privado ou com restrição de idade\n• Tente outro vídeo que tenha CC ativado`
+            : `⚠️ Nenhuma chave de transcrição configurada.\nVá em ⚙️ APIs e configure a chave do Supadata.`
+        )
       }
 
       setYtMsg(`🤖 Ruud Gullit Jr. escrevendo a notícia com ${APIS_IA.find(a=>a.id===apiIA)?.nome}...`); setYtMsgType('info')
