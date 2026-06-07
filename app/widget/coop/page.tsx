@@ -26,7 +26,7 @@ export default function CoopWidget() {
     return () => { supabase.removeChannel(channel) }
   }, [])
 
-  // Agrupar em salas de 4 (+FSKATE = 5)
+  // Agrupar em salas de 5 (+FSKATE = 6 total)
   const salas: Record<string, QueueEntry[]> = {}
   fila.forEach(p => {
     if (!salas[p.sala_id]) salas[p.sala_id] = []
@@ -77,7 +77,7 @@ export default function CoopWidget() {
                     {idx + 1}. {j.player_name}
                   </span>
                 ))}
-                {Array.from({ length: Math.max(0, 4 - jogadores.length) }).map((_, i) => (
+                {Array.from({ length: Math.max(0, 5 - jogadores.length) }).map((_, i) => (
                   <span key={i} style={{ border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 14, padding: '3px 10px', fontSize: 11, color: '#3f3f46' }}>vaga</span>
                 ))}
               </div>

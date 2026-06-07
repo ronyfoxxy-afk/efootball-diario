@@ -21,7 +21,7 @@ const CATS = [
   { slug: 'top-rank',           name: 'Top Rank',     color: '#f97316' },
 ]
 
-type Tab = 'home' | 'post' | 'posts' | 'torneios' | 'site'
+type Tab = 'home' | 'post' | 'posts' | 'torneios' | 'site' | 'coop'
 
 function slugify(t: string) {
   return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').substring(0,80)+'-'+Date.now()
@@ -67,6 +67,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(false)
   const [editPost, setEditPost] = useState<any>(null)
   const [editTorneio, setEditTorneio] = useState<any>(null)
+  const [coopFila, setCoopFila] = useState<any[]>([])
 
   // Post form
   const [titulo, setTitulo] = useState('')
@@ -112,6 +113,11 @@ export default function Admin() {
       await supabase.from('site_settings').upsert({ key, value: String(novoVal) }, { onConflict: 'key' })
       showToast(novoVal ? '👁 Seção visível' : '🙈 Seção ocultada')
     } catch { showToast('⚠️ Salvo localmente — crie a tabela site_settings') }
+  }
+
+  async function loadCoop() {
+    const { data } = await supabase.from('coop_queue').select('*').eq('status','waiting').order('created_at',{ascending:true})
+    setCoopFila(data||[])
   }
 
   async function loadTorneios() {
@@ -206,6 +212,7 @@ export default function Admin() {
     { id: 'posts' as Tab,    icon: '≡',  label: 'Posts'    },
     { id: 'torneios' as Tab, icon: '🏆', label: 'Torneios' },
     { id: 'site' as Tab,     icon: '👁', label: 'Site'     },
+    { id: 'coop' as Tab,     icon: '🎮', label: 'Co-op'    },
   ]
 
   // ── Tela edição post ──
@@ -516,9 +523,99 @@ export default function Admin() {
           </>
         )}
 
+
+        {/* ── CO-OP ── */}
+        {tab === 'coop' && (
+          <>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem',flexWrap:'wrap',gap:8}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <button onClick={() => setTab('home')} style={{background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20}}>←</button>
+                <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:20,color:G.text,textTransform:'uppercase',letterSpacing:1}}>Co-op 3x3</span>
+              </div>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={loadCoop} style={{...S.btnSm(G.green,'rgba(34,211,160,0.08)'),padding:'7px 12px',fontSize:11}}>🔄 Atualizar</button>
+                <a href="/widget/coop" target="_blank"
+                  style={{...S.btnSm(G.gold,'rgba(232,184,75,0.08)'),padding:'7px 12px',fontSize:11,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:5}}>
+                  📺 Widget OBS/TikTok →
+                </a>
+              </div>
+            </div>
+
+            {/* Info widget */}
+            <div style={{background:'rgba(232,184,75,0.05)',border:'1px solid rgba(232,184,75,0.2)',borderRadius:12,padding:'12px 16px',marginBottom:'1rem'}}>
+              <div style={{fontSize:11,color:G.gold,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',marginBottom:4}}>📺 URL do Widget (OBS / TikTok Studio)</div>
+              <div style={{display:'flex',alignItems:'center',gap:8,background:G.surface2,borderRadius:8,padding:'8px 12px'}}>
+                <code style={{fontSize:12,color:G.text,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                  https://efootball-diario.vercel.app/widget/coop
+                </code>
+                <button onClick={() => {navigator.clipboard.writeText('https://efootball-diario.vercel.app/widget/coop');showToast('✅ URL copiada!')}}
+                  style={{...S.btnSm(G.muted,'rgba(255,255,255,0.05)'),flexShrink:0}}>Copiar</button>
+              </div>
+              <div style={{fontSize:11,color:G.dim,marginTop:6}}>Adicione como Browser Source no OBS ou TikTok Studio · Fundo transparente · Atualização em tempo real</div>
+            </div>
+
+            {/* Fila */}
+            <div style={S.card}>
+              <div style={S.cHead}>
+                <span style={S.title}>🎮 Fila atual — {coopFila.length} aguardando</span>
+              </div>
+              <div style={S.cBody}>
+                {coopFila.length === 0 ? (
+                  <p style={{color:G.dim,textAlign:'center',padding:'1rem',fontSize:13}}>Fila vazia no momento.</p>
+                ) : (
+                  (() => {
+                    const salas: Record<string,any[]> = {}
+                    coopFila.forEach(p => { if(!salas[p.sala_id]) salas[p.sala_id]=[]; salas[p.sala_id].push(p) })
+                    return Object.entries(salas).map(([salaId, jogadores]) => (
+                      <div key={salaId} style={{background:G.surface2,borderRadius:10,padding:'10px 12px',marginBottom:8,border:`1px solid ${G.border}`}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                          <div style={{display:'flex',alignItems:'center',gap:8}}>
+                            <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:14,color:G.text,textTransform:'uppercase'}}>Sala #{salaId}</span>
+                            <span style={{fontSize:10,color:G.dim}}>{jogadores.length}/5 jogadores</span>
+                          </div>
+                          <div style={{display:'flex',alignItems:'center',gap:8}}>
+                            <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:16,color:G.gold}}>🔑 {jogadores[0]?.sala_senha}</span>
+                            <button onClick={async () => {
+                              if(!confirm('Chamar sala #'+salaId+' como concluída?')) return
+                              await supabase.from('coop_queue').update({status:'called'}).eq('sala_id',salaId).eq('status','waiting')
+                              showToast('✅ Sala #'+salaId+' chamada!'); loadCoop()
+                            }} style={{...S.btnSm(G.green,'rgba(34,211,160,0.08)'),fontSize:10}}>Chamar →</button>
+                          </div>
+                        </div>
+                        <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+                          <span style={{background:'rgba(232,184,75,0.1)',border:'1px solid rgba(232,184,75,0.25)',borderRadius:14,padding:'3px 10px',fontSize:11,color:G.gold,fontWeight:700}}>👑 FSKATE</span>
+                          {jogadores.map((j,i) => (
+                            <span key={j.id} style={{background:G.bg,border:`1px solid ${G.border}`,borderRadius:14,padding:'3px 10px',fontSize:11,color:G.muted,display:'flex',alignItems:'center',gap:5}}>
+                              {i+1}. {j.player_name}
+                              <button onClick={async () => { await supabase.from('coop_queue').update({status:'done'}).eq('id',j.id); loadCoop() }}
+                                style={{background:'none',border:'none',color:G.dim,cursor:'pointer',fontSize:11,padding:0,lineHeight:1}}>✕</button>
+                            </span>
+                          ))}
+                          {Array.from({length:Math.max(0,5-jogadores.length)}).map((_,i) => (
+                            <span key={i} style={{border:`1px dashed ${G.border2}`,borderRadius:14,padding:'3px 12px',fontSize:11,color:G.dim}}>vaga</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  })()
+                )}
+              </div>
+            </div>
+
+            {/* Limpar fila */}
+            <button onClick={async () => {
+              if(!confirm('Limpar TODA a fila?')) return
+              await supabase.from('coop_queue').update({status:'done'}).eq('status','waiting')
+              showToast('🗑️ Fila limpa!'); loadCoop()
+            }} style={{...S.btnSm(G.red,'rgba(248,113,113,0.06)'),padding:'8px 16px',fontSize:11,width:'100%'}}>
+              🗑️ Limpar toda a fila
+            </button>
+          </>
+        )}
+
       </div>
 
-      {/* Bottom nav */}
+      {/* Bottom nav */}}
       <nav style={S.nav}>
         {TABS.map(t => (
           <button key={t.id} style={S.navBtn(tab===t.id)} onClick={() => { setTab(t.id); if(t.id==='torneios') loadTorneios() }}>
