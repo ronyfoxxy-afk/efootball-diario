@@ -27,33 +27,39 @@ function slugify(t: string) {
 }
 
 const S: any = {
-  page:   { minHeight:'100vh', background:G.bg, color:G.text, fontFamily:"'Barlow',sans-serif" },
-  header: { background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:54, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 },
-  main:   { maxWidth:860, margin:'0 auto', padding:'1.25rem 1rem' },
-  card:   { background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, overflow:'hidden', marginBottom:'1rem' },
-  cHead:  { padding:'11px 16px', borderBottom:`1px solid ${G.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' },
-  cBody:  { padding:'16px' },
-  inp:    { width:'100%', background:G.surface2, border:`1px solid ${G.border}`, borderRadius:8, padding:'10px 12px', color:G.text, fontSize:14, fontFamily:'inherit', outline:'none', boxSizing:'border-box' as const, marginBottom:10 },
-  lbl:    { fontSize:10, color:G.dim, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase' as const, marginBottom:5, display:'block' },
-  btnGrn: { background:G.green, color:'#041a10', border:'none', borderRadius:8, padding:'11px 18px', fontSize:12, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif" },
-  btnOut: { background:G.surface2, color:G.text, border:`1px solid ${G.border}`, borderRadius:8, padding:'11px 18px', fontSize:12, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif" },
-  btnSm:  (c:string,bg:string) => ({ background:bg, color:c, border:`1px solid ${c}28`, borderRadius:6, padding:'4px 9px', fontSize:10, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:'inherit' }),
-
-  navBtn: (a:boolean) => ({ display:'flex', alignItems:'center', gap:5, background:a?'rgba(232,184,75,0.08)':'none', border:a?`1px solid rgba(232,184,75,0.2)`:'1px solid transparent', borderRadius:7, cursor:'pointer', padding:'5px 10px', color:a?G.gold:G.dim, fontFamily:'inherit', fontSize:11, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase' as const, transition:'all 0.15s' }),
-  toast:  { position:'fixed' as const, top:66, left:'50%', transform:'translateX(-50%)', background:G.surface, border:`1px solid ${G.green}`, borderRadius:8, padding:'9px 20px', fontSize:13, color:G.green, zIndex:300, whiteSpace:'nowrap' as const },
-  secTit: { fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:12, letterSpacing:'2px', textTransform:'uppercase' as const, color:G.muted },
+  page:  { minHeight:'100vh', background:G.bg, color:G.text, fontFamily:"'Barlow',sans-serif" },
+  main:  { maxWidth:760, margin:'0 auto', padding:'1.5rem 1rem' },
+  card:  { background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, overflow:'hidden', marginBottom:'1rem' },
+  cHead: { padding:'11px 16px', borderBottom:`1px solid ${G.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' },
+  cBody: { padding:'16px' },
+  inp:   { width:'100%', background:G.surface2, border:`1px solid ${G.border}`, borderRadius:8, padding:'10px 12px', color:G.text, fontSize:14, fontFamily:'inherit', outline:'none', boxSizing:'border-box' as const, marginBottom:10 },
+  lbl:   { fontSize:10, color:G.dim, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase' as const, marginBottom:5, display:'block' },
+  btnGrn:{ background:G.green, color:'#041a10', border:'none', borderRadius:8, padding:'11px 18px', fontSize:12, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif" },
+  btnOut:{ background:G.surface2, color:G.text, border:`1px solid ${G.border}`, borderRadius:8, padding:'11px 18px', fontSize:12, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif" },
+  btnSm: (c:string,bg:string) => ({ background:bg, color:c, border:`1px solid ${c}28`, borderRadius:6, padding:'4px 9px', fontSize:10, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase' as const, cursor:'pointer', fontFamily:'inherit' }),
+  toast: { position:'fixed' as const, top:66, left:'50%', transform:'translateX(-50%)', background:G.surface, border:`1px solid ${G.green}`, borderRadius:8, padding:'9px 20px', fontSize:13, color:G.green, zIndex:300, whiteSpace:'nowrap' as const },
+  secTit:{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:12, letterSpacing:'2px', textTransform:'uppercase' as const, color:G.muted },
 }
 
 const SITE_SECTIONS = [
-  { key:'show_torneios',       label:'🏆 Torneios',       desc:'Banner torneios na home' },
-  { key:'show_coop',           label:'🎮 Co-op',           desc:'Banner co-op na home' },
-  { key:'show_criar_torneio',  label:'➕ Criar Torneio',   desc:'Link criar torneio' },
-  { key:'show_livepix_banner', label:'💰 Banner LivePix',  desc:'Faixa doe no topo' },
+  { key:'show_torneios',       label:'🏆 Torneios',      desc:'Banner torneios na home' },
+  { key:'show_coop',           label:'🎮 Co-op',          desc:'Banner co-op na home' },
+  { key:'show_criar_torneio',  label:'➕ Criar Torneio',  desc:'Link criar torneio' },
+  { key:'show_livepix_banner', label:'💰 Banner LivePix', desc:'Faixa doe no topo' },
+]
+
+const MENU_ITEMS = [
+  { id:'home' as Tab,     icon:'⊞', label:'Início'    },
+  { id:'posts' as Tab,    icon:'≡',  label:'Posts'     },
+  { id:'torneios' as Tab, icon:'🏆', label:'Torneios'  },
+  { id:'coop' as Tab,     icon:'🎮', label:'Co-op'     },
+  { id:'site' as Tab,     icon:'👁', label:'Site'      },
 ]
 
 export default function Admin() {
   const [tab, setTab] = useState<Tab>('home')
-  const [stats, setStats] = useState({ pub:0, draft:0, hoje:0, torneios:0 })
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [stats, setStats] = useState({ pub:0, draft:0, hoje:0 })
   const [posts, setPosts] = useState<any[]>([])
   const [torneios, setTorneios] = useState<any[]>([])
   const [coopFila, setCoopFila] = useState<any[]>([])
@@ -62,20 +68,19 @@ export default function Admin() {
   const [toast, setToast] = useState('')
   const [editPost, setEditPost] = useState<any>(null)
   const [editTorneio, setEditTorneio] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
 
   function showToast(m:string) { setToast(m); setTimeout(()=>setToast(''),2800) }
+  function goTab(t:Tab) { setTab(t); setMenuOpen(false); if(t==='torneios') loadTorneios(); if(t==='coop') loadCoop() }
 
   useEffect(() => { loadAll(); loadVis() }, [])
 
   async function loadAll() {
-    const [{ count:pub },{ count:draft },{ count:hoje },{ count:torn }] = await Promise.all([
+    const [{ count:pub },{ count:draft },{ count:hoje }] = await Promise.all([
       supabase.from('posts').select('*',{count:'exact',head:true}).eq('status','published'),
       supabase.from('posts').select('*',{count:'exact',head:true}).eq('status','draft'),
       supabase.from('posts').select('*',{count:'exact',head:true}).gte('published_at',new Date().toISOString().split('T')[0]),
-      supabase.from('tournaments').select('*',{count:'exact',head:true}),
     ])
-    setStats({ pub:pub||0, draft:draft||0, hoje:hoje||0, torneios:torn||0 })
+    setStats({ pub:pub||0, draft:draft||0, hoje:hoje||0 })
     const { data } = await supabase.from('posts').select('id,title,summary,content,status,auto_published,cover_image,source_url,published_at,categories(name,color),featured').order('published_at',{ascending:false}).limit(50)
     setPosts(data||[])
     setFeaturedId((data||[]).find((p:any)=>p.featured)?.id||null)
@@ -101,13 +106,13 @@ export default function Admin() {
   async function toggleVis(key:string) {
     const v = !siteVis[key]
     setSiteVis(prev=>({...prev,[key]:v}))
-    try { await supabase.from('site_settings').upsert({key,value:String(v)},{onConflict:'key'}); showToast(v?'👁 Visível':'🙈 Oculto') } catch { showToast('⚠️ Erro ao salvar') }
+    try { await supabase.from('site_settings').upsert({key,value:String(v)},{onConflict:'key'}); showToast(v?'👁 Visível':'🙈 Oculto') } catch { showToast('⚠️ Erro') }
   }
 
   async function toggleFeatured(id:string) {
     await supabase.from('posts').update({featured:false}).neq('id','00000000-0000-0000-0000-000000000000')
     if (featuredId!==id) { await supabase.from('posts').update({featured:true}).eq('id',id); setFeaturedId(id); showToast('⭐ Destaque definido!') }
-    else { setFeaturedId(null); showToast('✓ Destaque removido') }
+    else { setFeaturedId(null); showToast('✓ Removido') }
     loadAll()
   }
 
@@ -160,23 +165,20 @@ export default function Admin() {
       const data = await res.json()
       if (data.status==='paid') { showToast('✅ Pago! Torneio ativado.'); loadTorneios() }
       else showToast(`⏳ ${data.status||'pendente'}`)
-    } catch { showToast('❌ Erro ao verificar') }
+    } catch { showToast('❌ Erro') }
   }
 
-  const TABS = [
-    { id:'home' as Tab,     icon:'⊞', label:'Início'   },
-    { id:'posts' as Tab,    icon:'≡',  label:'Posts'    },
-    { id:'torneios' as Tab, icon:'🏆', label:'Torneios' },
-    { id:'coop' as Tab,     icon:'🎮', label:'Co-op'    },
-    { id:'site' as Tab,     icon:'👁', label:'Site'     },
-  ]
+  async function sair() {
+    await fetch('/api/admin-auth', { method:'DELETE' })
+    window.location.href = '/admin-login'
+  }
 
   // ── EDITAR POST ──
   if (editPost) return (
     <div style={S.page}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
-      <header style={S.header}>
-        <button onClick={()=>setEditPost(null)} style={{background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20}}>←</button>
+      <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 }}>
+        <button onClick={()=>setEditPost(null)} style={{ background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20 }}>←</button>
         <span style={S.secTit}>Editar Post</span>
         <button onClick={salvarEdicaoPost} style={S.btnGrn}>Salvar</button>
       </header>
@@ -191,7 +193,6 @@ export default function Admin() {
           <textarea style={{...S.inp,minHeight:220,resize:'vertical' as const,fontFamily:'monospace',fontSize:13,lineHeight:1.6}} value={editPost.content||''} onChange={e=>setEditPost({...editPost,content:e.target.value})} />
           <label style={S.lbl}>Imagem de capa</label>
           <div style={{display:'flex',gap:6,marginBottom:8}}>
-            <span style={{fontSize:11,color:G.dim}}>Link:</span>
             <input style={{...S.inp,marginBottom:0,flex:1}} placeholder="https://..." value={editPost.cover_image||''} onChange={e=>setEditPost({...editPost,cover_image:e.target.value})} />
           </div>
           <div style={{border:`2px dashed ${G.border2}`,borderRadius:8,padding:'12px',textAlign:'center',background:G.surface2,position:'relative' as const,marginBottom:10,cursor:'pointer'}}>
@@ -202,10 +203,10 @@ export default function Admin() {
                 reader.onload = ev => { if(ev.target?.result) setEditPost({...editPost,cover_image:ev.target.result as string}) }
                 reader.readAsDataURL(file)
               }} />
-            <div style={{fontSize:20,marginBottom:2}}>🖼️</div>
-            <div style={{fontSize:11,color:G.muted,fontWeight:600}}>Upload de imagem — clique ou arraste</div>
+            <div style={{fontSize:18,marginBottom:2}}>🖼️</div>
+            <div style={{fontSize:11,color:G.muted,fontWeight:600}}>Upload — clique ou arraste</div>
           </div>
-          {editPost.cover_image && <div style={{borderRadius:8,overflow:'hidden',border:`1px solid ${G.border}`,marginBottom:10}}><img src={editPost.cover_image} alt="preview" style={{width:'100%',height:'auto',display:'block',maxHeight:220,objectFit:'cover',background:G.surface2}} /></div>}
+          {editPost.cover_image && <div style={{borderRadius:8,overflow:'hidden',border:`1px solid ${G.border}`,marginBottom:10}}><img src={editPost.cover_image} alt="preview" style={{width:'100%',height:'auto',display:'block',maxHeight:200,objectFit:'cover',background:G.surface2}} /></div>}
           <div><label style={S.lbl}>Fonte URL</label><input style={S.inp} placeholder="https://..." value={editPost.source_url||''} onChange={e=>setEditPost({...editPost,source_url:e.target.value})} /></div>
         </div></div>
       </div>
@@ -216,8 +217,8 @@ export default function Admin() {
   if (editTorneio) return (
     <div style={S.page}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
-      <header style={S.header}>
-        <button onClick={()=>setEditTorneio(null)} style={{background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20}}>←</button>
+      <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 }}>
+        <button onClick={()=>setEditTorneio(null)} style={{ background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20 }}>←</button>
         <span style={S.secTit}>Editar Torneio</span>
         <button onClick={salvarTorneio} style={S.btnGrn}>Salvar</button>
       </header>
@@ -252,37 +253,70 @@ export default function Admin() {
     <div style={S.page}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap'); input:focus,textarea:focus{border-color:${G.gold}!important;outline:none}`}</style>
 
-      {/* HEADER */}
-      <header style={S.header}>
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <Image src="/logo.png" alt="logo" width={30} height={30} style={{borderRadius:7}} />
+      {/* ── HEADER ── */}
+      <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', position:'sticky' as const, top:0, zIndex:100 }}>
+
+        {/* Esquerda: hamburguer + início */}
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <button onClick={()=>setMenuOpen(!menuOpen)}
+            style={{ background:'none', border:`1px solid ${menuOpen?G.border:'transparent'}`, borderRadius:8, color:G.muted, cursor:'pointer', fontSize:18, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            {menuOpen ? '✕' : '☰'}
+          </button>
+          {tab !== 'home' && (
+            <button onClick={()=>goTab('home')}
+              style={{ background:'none', border:'none', color:G.dim, cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', fontFamily:'inherit', display:'flex', alignItems:'center', gap:4 }}>
+              ← Início
+            </button>
+          )}
+        </div>
+
+        {/* Centro: logo */}
+        <div style={{ position:'absolute', left:'50%', transform:'translateX(-50%)', display:'flex', alignItems:'center', gap:8 }}>
+          <Image src="/logo.png" alt="logo" width={28} height={28} style={{ borderRadius:6 }} />
           <div>
-            <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:16,color:G.text,letterSpacing:1,textTransform:'uppercase',lineHeight:1}}>
-              <span style={{color:G.gold}}>e</span>FOOTBALL <span style={{color:G.muted,fontSize:12}}>ADMIN</span>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, color:G.text, letterSpacing:1, textTransform:'uppercase', lineHeight:1 }}>
+              <span style={{ color:G.gold }}>e</span>FOOTBALL <span style={{ color:G.dim, fontSize:12 }}>ADMIN</span>
             </div>
-            <div style={{fontSize:9,color:G.dim,letterSpacing:'2px',fontWeight:700,textTransform:'uppercase'}}>FSKATE · PAINEL</div>
+            <div style={{ fontSize:8, color:G.dim, letterSpacing:'2px', fontWeight:700, textTransform:'uppercase' }}>FSKATE · PAINEL</div>
           </div>
         </div>
-        <div style={{display:'flex',gap:6,alignItems:'center'}}>
-          {/* Nav tabs no header */}
-          {TABS.map(t=>(
-            <button key={t.id} style={S.navBtn(tab===t.id)}
-              onClick={()=>{setTab(t.id);if(t.id==='torneios')loadTorneios();if(t.id==='coop')loadCoop()}}>
-              <span>{t.icon}</span>
-              <span>{t.label}</span>
-            </button>
-          ))}
-          <div style={{width:1,height:20,background:G.border,margin:'0 4px'}}/>
-          <a href="/admin-fskate/youtube" style={{fontSize:10,color:G.gold,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',background:'rgba(232,184,75,0.08)',border:`1px solid rgba(232,184,75,0.2)`,padding:'5px 10px',borderRadius:7}}>
-            ✍️ IA
-          </a>
-          <a href="/" target="_blank" style={{fontSize:10,color:G.dim,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>Site →</a>
-          <button onClick={async()=>{await fetch('/api/admin-auth',{method:'DELETE'});window.location.href='/admin-login'}}
-            style={{fontSize:10,color:G.dim,background:'none',border:`1px solid ${G.border}`,borderRadius:6,padding:'5px 10px',cursor:'pointer',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>
+
+        {/* Direita: sair */}
+        <div style={{ marginLeft:'auto' }}>
+          <button onClick={sair}
+            style={{ background:'none', border:`1px solid ${G.border}`, borderRadius:8, color:G.dim, cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', fontFamily:'inherit', padding:'6px 12px' }}>
             Sair
           </button>
         </div>
       </header>
+
+      {/* ── MENU LATERAL ── */}
+      {menuOpen && (
+        <>
+          <div style={{ position:'fixed', inset:0, zIndex:150 }} onClick={()=>setMenuOpen(false)} />
+          <div style={{ position:'fixed', top:56, left:0, bottom:0, width:240, background:G.surface, borderRight:`1px solid ${G.border}`, zIndex:200, padding:'1rem 0' }}>
+            <div style={{ padding:'0 1rem', marginBottom:'1rem', fontSize:9, color:G.dim, fontWeight:700, letterSpacing:'2px', textTransform:'uppercase' }}>Menu</div>
+            {MENU_ITEMS.map(item => (
+              <button key={item.id} onClick={()=>goTab(item.id)}
+                style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 1rem', background:tab===item.id?'rgba(232,184,75,0.08)':'none', border:'none', borderLeft:tab===item.id?`3px solid ${G.gold}`:'3px solid transparent', cursor:'pointer', textAlign:'left', color:tab===item.id?G.gold:G.muted, fontFamily:'inherit', transition:'all .15s' }}>
+                <span style={{ fontSize:18 }}>{item.icon}</span>
+                <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:15, textTransform:'uppercase', letterSpacing:'0.5px' }}>{item.label}</span>
+              </button>
+            ))}
+            <div style={{ height:1, background:G.border, margin:'1rem 0' }} />
+            <a href="/admin-fskate/youtube"
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 1rem', background:'rgba(232,184,75,0.05)', border:'none', borderLeft:`3px solid ${G.gold}`, cursor:'pointer', textAlign:'left', color:G.gold, fontFamily:'inherit', textDecoration:'none' }}>
+              <span style={{ fontSize:18 }}>✍️</span>
+              <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:15, textTransform:'uppercase', letterSpacing:'0.5px' }}>Radar IA</span>
+            </a>
+            <a href="/" target="_blank"
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 1rem', background:'none', border:'none', borderLeft:'3px solid transparent', cursor:'pointer', textAlign:'left', color:G.dim, fontFamily:'inherit', textDecoration:'none' }}>
+              <span style={{ fontSize:18 }}>🌐</span>
+              <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:15, textTransform:'uppercase', letterSpacing:'0.5px' }}>Ver Site</span>
+            </a>
+          </div>
+        </>
+      )}
 
       {toast && <div style={S.toast}>{toast}</div>}
 
@@ -291,39 +325,43 @@ export default function Admin() {
         {/* ── HOME ── */}
         {tab==='home' && (
           <>
-            {/* Linha de stats + botão publicar */}
-            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:'1.5rem'}}>
-              <div style={{display:'flex',gap:6}}>
-                {[
-                  {n:stats.pub,   l:'publicados', c:G.green},
-                  {n:stats.draft, l:'rascunhos',  c:G.gold },
-                  {n:stats.hoje,  l:'hoje',        c:G.text },
-                ].map(s=>(
-                  <div key={s.l} style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:8,padding:'8px 14px',display:'flex',alignItems:'baseline',gap:5}}>
-                    <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:22,color:s.c}}>{s.n}</span>
-                    <span style={{fontSize:10,color:G.dim}}>{s.l}</span>
-                  </div>
-                ))}
-              </div>
-              <a href="/admin-fskate/youtube"
-                style={{marginLeft:'auto',background:'rgba(232,184,75,0.1)',border:'1px solid rgba(232,184,75,0.3)',borderRadius:8,padding:'9px 16px',textDecoration:'none',color:G.gold,fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:13,textTransform:'uppercase',letterSpacing:1,display:'flex',alignItems:'center',gap:6}}>
-                ✍️ Nova Publicação
-              </a>
+            {/* Stats */}
+            <div style={{ display:'flex', gap:8, marginBottom:'2rem' }}>
+              {[
+                { n:stats.pub,   l:'publicados', c:G.green },
+                { n:stats.draft, l:'rascunhos',  c:G.gold  },
+                { n:stats.hoje,  l:'hoje',        c:G.text  },
+              ].map(s => (
+                <div key={s.l} style={{ background:G.surface, border:`1px solid ${G.border}`, borderRadius:8, padding:'8px 16px', display:'flex', alignItems:'baseline', gap:6 }}>
+                  <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:24, color:s.c }}>{s.n}</span>
+                  <span style={{ fontSize:11, color:G.dim }}>{s.l}</span>
+                </div>
+              ))}
             </div>
 
+            {/* Botão publicar grande */}
+            <a href="/admin-fskate/youtube"
+              style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, background:G.gold, color:'#0a0800', borderRadius:14, padding:'1.25rem', textDecoration:'none', marginBottom:'2rem', cursor:'pointer' }}>
+              <span style={{ fontSize:28 }}>✍️</span>
+              <div>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:22, textTransform:'uppercase', letterSpacing:1, lineHeight:1 }}>Nova Publicação</div>
+                <div style={{ fontSize:12, marginTop:3, opacity:0.7 }}>YouTube · Pesquisa IA · Manual</div>
+              </div>
+            </a>
+
             {/* Destaque */}
-            <div style={{fontSize:10,color:G.dim,fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:8}}>
+            <div style={{ fontSize:10, color:G.dim, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:10 }}>
               ⭐ Destaque na home — clique para trocar
             </div>
-            <div style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:12,overflow:'hidden'}}>
-              {posts.filter(p=>p.status==='published').slice(0,8).map((p,i)=>(
+            <div style={{ background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, overflow:'hidden' }}>
+              {posts.filter(p=>p.status==='published').slice(0,8).map((p,i) => (
                 <div key={p.id} onClick={()=>toggleFeatured(p.id)}
-                  style={{display:'flex',alignItems:'center',gap:10,padding:'9px 14px',cursor:'pointer',
+                  style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', cursor:'pointer',
                     background:featuredId===p.id?'rgba(232,184,75,0.06)':'transparent',
-                    borderBottom:i<7?`1px solid ${G.border}`:'none',transition:'background .15s'}}>
-                  {p.cover_image&&<div style={{width:32,height:32,borderRadius:5,background:`url(${p.cover_image}) center/cover`,flexShrink:0}}/>}
-                  <div style={{flex:1,minWidth:0,fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:featuredId===p.id?G.gold:G.text,textTransform:'uppercase',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</div>
-                  <span style={{fontSize:14,flexShrink:0,color:featuredId===p.id?G.gold:G.dim}}>{featuredId===p.id?'⭐':'☆'}</span>
+                    borderBottom:i<7?`1px solid ${G.border}`:'none', transition:'background .15s' }}>
+                  {p.cover_image && <div style={{ width:34, height:34, borderRadius:6, background:`url(${p.cover_image}) center/cover`, flexShrink:0 }} />}
+                  <div style={{ flex:1, minWidth:0, fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, color:featuredId===p.id?G.gold:G.text, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.title}</div>
+                  <span style={{ fontSize:14, flexShrink:0, color:featuredId===p.id?G.gold:G.dim }}>{featuredId===p.id?'⭐':'☆'}</span>
                 </div>
               ))}
             </div>
@@ -333,39 +371,34 @@ export default function Admin() {
         {/* ── POSTS ── */}
         {tab==='posts' && !editPost && (
           <>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem'}}>
-              <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:20,color:G.text,textTransform:'uppercase',letterSpacing:1}}>
-                Posts ({posts.length})
-              </span>
-              <button onClick={()=>setTab('home')} style={{background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:13,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>← Início</button>
-            </div>
-
-            {/* Filtro visual */}
+            <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:22, color:G.text, textTransform:'uppercase', letterSpacing:1, marginBottom:'1.25rem' }}>
+              Posts <span style={{ color:G.dim, fontSize:16 }}>({posts.length})</span>
+            </h2>
             {['published','draft','hidden'].map(status => {
               const filtered = posts.filter(p=>p.status===status)
               if (!filtered.length) return null
-              const colors: Record<string,string> = {published:G.green,draft:G.gold,hidden:G.dim}
-              const labels: Record<string,string> = {published:'Publicados',draft:'Rascunhos',hidden:'Ocultos'}
+              const colors: Record<string,string> = { published:G.green, draft:G.gold, hidden:G.dim }
+              const labels: Record<string,string> = { published:'Publicados', draft:'Rascunhos', hidden:'Ocultos' }
               return (
-                <div key={status} style={{marginBottom:'1rem'}}>
-                  <div style={{fontSize:10,color:colors[status],fontWeight:700,letterSpacing:'1.5px',textTransform:'uppercase',marginBottom:6,display:'flex',alignItems:'center',gap:6}}>
-                    <span style={{width:6,height:6,borderRadius:'50%',background:colors[status],display:'inline-block'}}/>
+                <div key={status} style={{ marginBottom:'1.25rem' }}>
+                  <div style={{ fontSize:10, color:colors[status], fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ width:6, height:6, borderRadius:'50%', background:colors[status], display:'inline-block' }}/>
                     {labels[status]} · {filtered.length}
                   </div>
-                  {filtered.map(p=>(
-                    <div key={p.id} style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:10,padding:'9px 12px',marginBottom:6,display:'flex',alignItems:'center',gap:8}}>
-                      {p.cover_image&&<div style={{width:34,height:34,borderRadius:6,background:`url(${p.cover_image}) center/cover`,flexShrink:0}}/>}
-                      <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,color:G.text,textTransform:'uppercase',lineHeight:1.2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.title}</div>
-                        <div style={{fontSize:10,color:G.dim,marginTop:1,display:'flex',gap:8}}>
-                          {p.auto_published&&<span style={{color:G.green}}>AUTO</span>}
-                          {featuredId===p.id&&<span style={{color:G.gold}}>⭐ DESTAQUE</span>}
+                  {filtered.map(p => (
+                    <div key={p.id} style={{ background:G.surface, border:`1px solid ${G.border}`, borderRadius:10, padding:'9px 12px', marginBottom:5, display:'flex', alignItems:'center', gap:8 }}>
+                      {p.cover_image && <div style={{ width:34, height:34, borderRadius:6, background:`url(${p.cover_image}) center/cover`, flexShrink:0 }} />}
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, color:G.text, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.title}</div>
+                        <div style={{ fontSize:10, color:G.dim, marginTop:1, display:'flex', gap:8 }}>
+                          {p.auto_published && <span style={{ color:G.green }}>AUTO</span>}
+                          {featuredId===p.id && <span style={{ color:G.gold }}>⭐ DESTAQUE</span>}
                         </div>
                       </div>
-                      <div style={{display:'flex',gap:4,flexShrink:0}}>
-                        <button onClick={()=>toggleFeatured(p.id)} style={{...S.btnSm(G.gold,'rgba(232,184,75,0.08)'),padding:'4px 8px',fontSize:13}}>{featuredId===p.id?'⭐':'☆'}</button>
+                      <div style={{ display:'flex', gap:4, flexShrink:0 }}>
+                        <button onClick={()=>toggleFeatured(p.id)} style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'4px 8px', fontSize:13 }}>{featuredId===p.id?'⭐':'☆'}</button>
                         <button onClick={()=>setEditPost(p)} style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
-                        {p.status==='draft'&&<button onClick={()=>publicarDraft(p.id)} style={S.btnSm(G.green,'rgba(34,211,160,0.08)')}>Pub.</button>}
+                        {p.status==='draft' && <button onClick={()=>publicarDraft(p.id)} style={S.btnSm(G.green,'rgba(34,211,160,0.08)')}>Pub.</button>}
                         <button onClick={()=>toggleHide(p)} style={S.btnSm(p.status==='hidden'?G.green:G.gold,'rgba(255,255,255,0.04)')}>{p.status==='hidden'?'Mostrar':'Ocultar'}</button>
                         <button onClick={()=>apagarPost(p.id)} style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
                       </div>
@@ -380,33 +413,29 @@ export default function Admin() {
         {/* ── TORNEIOS ── */}
         {tab==='torneios' && !editTorneio && (
           <>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem'}}>
-              <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:20,color:G.text,textTransform:'uppercase',letterSpacing:1}}>Torneios</span>
-              <button onClick={()=>setTab('home')} style={{background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:13,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>← Início</button>
-            </div>
-            {torneios.length===0&&<div style={{textAlign:'center',padding:'2rem',color:G.dim}}><p style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,textTransform:'uppercase'}}>Nenhum torneio ainda</p></div>}
-            {torneios.map(t=>{
+            <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:22, color:G.text, textTransform:'uppercase', letterSpacing:1, marginBottom:'1.25rem' }}>Torneios</h2>
+            {torneios.length===0 && <p style={{ color:G.dim, fontSize:14 }}>Nenhum torneio ainda.</p>}
+            {torneios.map(t => {
               const pend = t.status==='draft'||t.creation_payment_status==='pending'
               return (
-                <div key={t.id} style={{background:G.surface,border:`1px solid ${pend?'rgba(248,113,113,0.25)':G.border}`,borderRadius:10,padding:'12px 14px',marginBottom:8}}>
-                  <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:15,fontWeight:900,color:G.text,textTransform:'uppercase',marginBottom:4}}>{t.name}</div>
-                      <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
-                        <span style={{fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:4,letterSpacing:'0.8px',textTransform:'uppercase',background:t.status==='open'?'rgba(34,211,160,0.1)':'rgba(82,82,91,0.15)',color:t.status==='open'?G.green:G.muted}}>
+                <div key={t.id} style={{ background:G.surface, border:`1px solid ${pend?'rgba(248,113,113,0.25)':G.border}`, borderRadius:10, padding:'12px 14px', marginBottom:8 }}>
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:15, fontWeight:900, color:G.text, textTransform:'uppercase', marginBottom:4 }}>{t.name}</div>
+                      <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
+                        <span style={{ fontSize:9, fontWeight:700, padding:'2px 7px', borderRadius:4, letterSpacing:'0.8px', textTransform:'uppercase', background:t.status==='open'?'rgba(34,211,160,0.1)':'rgba(82,82,91,0.15)', color:t.status==='open'?G.green:G.muted }}>
                           {t.status==='open'?'Aberto':t.status==='draft'?'Aguard. pgto':t.status}
                         </span>
-                        <span style={{fontSize:11,color:G.gold,fontWeight:700}}>R${Number(t.entry_fee).toFixed(2)}</span>
-                        <span style={{fontSize:11,color:G.green,fontWeight:700}}>🎁 R${Number(t.prize).toFixed(2)}</span>
-                        {t.is_user_created&&<span style={{fontSize:9,color:G.muted,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>USER</span>}
+                        <span style={{ fontSize:11, color:G.gold, fontWeight:700 }}>R${Number(t.entry_fee).toFixed(2)}</span>
+                        <span style={{ fontSize:11, color:G.green, fontWeight:700 }}>🎁 R${Number(t.prize).toFixed(2)}</span>
                       </div>
                     </div>
-                    <div style={{display:'flex',flexDirection:'column',gap:5,alignItems:'flex-end',flexShrink:0}}>
-                      <div style={{display:'flex',gap:4}}>
+                    <div style={{ display:'flex', flexDirection:'column', gap:5, alignItems:'flex-end', flexShrink:0 }}>
+                      <div style={{ display:'flex', gap:4 }}>
                         <button onClick={()=>setEditTorneio(t)} style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
                         <button onClick={()=>apagarTorneio(t.id)} style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
                       </div>
-                      {pend&&<button onClick={()=>verificarLivePix(t)} style={{...S.btnSm(G.green,'rgba(34,211,160,0.08)'),fontSize:10}}>🔄 Verificar LivePix</button>}
+                      {pend && <button onClick={()=>verificarLivePix(t)} style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>🔄 Verificar LivePix</button>}
                     </div>
                   </div>
                 </div>
@@ -418,133 +447,95 @@ export default function Admin() {
         {/* ── CO-OP ── */}
         {tab==='coop' && (
           <>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem',flexWrap:'wrap',gap:8}}>
-              <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:20,color:G.text,textTransform:'uppercase',letterSpacing:1}}>
-                Co-op — {coopFila.length} aguardando
-              </span>
-              <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-                <button onClick={loadCoop} style={{...S.btnSm(G.green,'rgba(34,211,160,0.08)'),padding:'7px 12px',fontSize:11}}>🔄 Atualizar</button>
-                <a href="/widget/coop" target="_blank" style={{...S.btnSm(G.gold,'rgba(232,184,75,0.08)'),padding:'7px 12px',fontSize:11,textDecoration:'none',display:'inline-flex',alignItems:'center',gap:4}}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.25rem', flexWrap:'wrap', gap:8 }}>
+              <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:22, color:G.text, textTransform:'uppercase', letterSpacing:1 }}>
+                Co-op <span style={{ color:G.dim, fontSize:14 }}>{coopFila.length} aguardando</span>
+              </h2>
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={loadCoop} style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), padding:'7px 12px', fontSize:11 }}>🔄 Atualizar</button>
+                <a href="/widget/coop" target="_blank" style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'7px 12px', fontSize:11, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:4 }}>
                   📺 Widget OBS →
                 </a>
-                <button
-                  onClick={async()=>{
-                    const salas:Record<string,any[]>={}
-                    coopFila.forEach((p:any)=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)})
-                    const primeira=Object.keys(salas)[0]
-                    if(!primeira){showToast('⚠️ Fila vazia');return}
-                    await supabase.from('coop_queue').update({status:'done'}).eq('sala_id',primeira)
-                    showToast('✅ Sala #'+primeira+' encerrada!');loadCoop()
-                  }}
-                  style={{background:'#22d3a0',color:'#000',border:'none',borderRadius:8,padding:'7px 14px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit',letterSpacing:'0.5px'}}>
-                  ✅ Encerrar sala
-                </button>
-                <button
-                  onClick={()=>{
-                    const salas:Record<string,any[]>={}
-                    coopFila.forEach((p:any)=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)})
-                    const primeira=Object.keys(salas)[0]
-                    const token=process.env.NEXT_PUBLIC_COOP_SECRET||'fskate2024'
-                    const link=`${window.location.origin}/api/coop/encerrar?token=${token}${primeira?'&sala='+primeira:''}`
-                    navigator.clipboard.writeText(link)
-                    showToast('🔗 Link copiado!')
-                  }}
-                  style={{...S.btnSm(G.muted,'rgba(255,255,255,0.04)'),padding:'7px 12px',fontSize:11}}>
-                  🔗 Link celular
-                </button>
               </div>
             </div>
-
-            {/* URL widget */}
-            <div style={{background:'rgba(232,184,75,0.05)',border:'1px solid rgba(232,184,75,0.2)',borderRadius:10,padding:'10px 14px',marginBottom:'1rem'}}>
-              <div style={{fontSize:10,color:G.gold,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',marginBottom:6}}>URL — OBS / TikTok Studio</div>
-              <div style={{display:'flex',alignItems:'center',gap:8,background:G.surface2,borderRadius:7,padding:'8px 12px'}}>
-                <code style={{fontSize:12,color:G.text,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                  https://efootball-diario.vercel.app/widget/coop
-                </code>
+            <div style={{ background:'rgba(232,184,75,0.05)', border:'1px solid rgba(232,184,75,0.2)', borderRadius:10, padding:'10px 14px', marginBottom:'1rem' }}>
+              <div style={{ fontSize:10, color:G.gold, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', marginBottom:6 }}>URL — OBS / TikTok Studio</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8, background:G.surface2, borderRadius:7, padding:'8px 12px' }}>
+                <code style={{ fontSize:12, color:G.text, flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>https://efootball-diario.vercel.app/widget/coop</code>
                 <button onClick={()=>{navigator.clipboard.writeText('https://efootball-diario.vercel.app/widget/coop');showToast('✅ Copiado!')}}
-                  style={{...S.btnSm(G.muted,'rgba(255,255,255,0.05)'),flexShrink:0}}>Copiar</button>
+                  style={{ ...S.btnSm(G.muted,'rgba(255,255,255,0.05)'), flexShrink:0 }}>Copiar</button>
               </div>
             </div>
-
-            {/* Fila */}
             {coopFila.length===0
-              ? <div style={{textAlign:'center',padding:'2rem',color:G.dim,fontSize:14}}>Fila vazia.</div>
+              ? <p style={{ color:G.dim, fontSize:14, textAlign:'center', padding:'2rem' }}>Fila vazia.</p>
               : (() => {
                   const salas: Record<string,any[]>={}
-                  coopFila.forEach(p=>{if(!salas[p.sala_id])salas[p.sala_id]=[];salas[p.sala_id].push(p)})
-                  return Object.entries(salas).map(([salaId,jogadores])=>(
-                    <div key={salaId} style={{background:G.surface,border:`1px solid ${G.border}`,borderRadius:10,padding:'10px 12px',marginBottom:8}}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                        <div style={{display:'flex',alignItems:'center',gap:8}}>
-                          <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:14,color:G.text,textTransform:'uppercase'}}>Sala #{salaId}</span>
-                          <span style={{fontSize:10,color:G.dim}}>{jogadores.length}/5</span>
+                  coopFila.forEach(p => { if(!salas[p.sala_id]) salas[p.sala_id]=[]; salas[p.sala_id].push(p) })
+                  return Object.entries(salas).map(([salaId,jogadores]) => (
+                    <div key={salaId} style={{ background:G.surface, border:`1px solid ${G.border}`, borderRadius:10, padding:'10px 12px', marginBottom:8 }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+                        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                          <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:14, color:G.text, textTransform:'uppercase' }}>Sala #{salaId}</span>
+                          <span style={{ fontSize:10, color:G.dim }}>{jogadores.length}/5</span>
                         </div>
-                        <div style={{display:'flex',gap:6,alignItems:'center'}}>
-                          <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:16,color:G.gold}}>🔑 {jogadores[0]?.sala_senha}</span>
-                          <button onClick={async()=>{if(!confirm('Chamar sala #'+salaId+'?'))return;await supabase.from('coop_queue').update({status:'called'}).eq('sala_id',salaId).eq('status','waiting');showToast('✅ Sala #'+salaId+' chamada!');loadCoop()}}
-                            style={{...S.btnSm(G.green,'rgba(34,211,160,0.08)'),fontSize:10}}>Chamar →</button>
+                        <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+                          <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, color:G.gold }}>🔑 {jogadores[0]?.sala_senha}</span>
+                          <button onClick={async()=>{if(!confirm('Chamar sala #'+salaId+'?'))return;await supabase.from('coop_queue').update({status:'called'}).eq('sala_id',salaId).eq('status','waiting');showToast('✅ Sala chamada!');loadCoop()}}
+                            style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>Chamar →</button>
                         </div>
                       </div>
-                      <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-                        <span style={{background:'rgba(232,184,75,0.1)',border:'1px solid rgba(232,184,75,0.25)',borderRadius:14,padding:'3px 10px',fontSize:11,color:G.gold,fontWeight:700}}>👑 FSKATE</span>
-                        {jogadores.map((j,i)=>(
-                          <span key={j.id} style={{background:G.surface2,border:`1px solid ${G.border}`,borderRadius:14,padding:'3px 10px',fontSize:11,color:G.muted,display:'flex',alignItems:'center',gap:5}}>
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+                        <span style={{ background:'rgba(232,184,75,0.1)', border:'1px solid rgba(232,184,75,0.25)', borderRadius:14, padding:'3px 10px', fontSize:11, color:G.gold, fontWeight:700 }}>👑 FSKATE</span>
+                        {jogadores.map((j,i) => (
+                          <span key={j.id} style={{ background:G.surface2, border:`1px solid ${G.border}`, borderRadius:14, padding:'3px 10px', fontSize:11, color:G.muted, display:'flex', alignItems:'center', gap:5 }}>
                             {i+1}. {j.player_name}
                             <button onClick={async()=>{await supabase.from('coop_queue').update({status:'done'}).eq('id',j.id);loadCoop()}}
-                              style={{background:'none',border:'none',color:G.dim,cursor:'pointer',fontSize:11,padding:0,lineHeight:1}}>✕</button>
+                              style={{ background:'none', border:'none', color:G.dim, cursor:'pointer', fontSize:11, padding:0, lineHeight:1 }}>✕</button>
                           </span>
                         ))}
-                        {Array.from({length:Math.max(0,5-jogadores.length)}).map((_,i)=>(
-                          <span key={i} style={{border:`1px dashed ${G.border2}`,borderRadius:14,padding:'3px 12px',fontSize:11,color:G.dim}}>vaga</span>
+                        {Array.from({length:Math.max(0,5-jogadores.length)}).map((_,i) => (
+                          <span key={i} style={{ border:`1px dashed ${G.border2}`, borderRadius:14, padding:'3px 12px', fontSize:11, color:G.dim }}>vaga</span>
                         ))}
                       </div>
                     </div>
                   ))
                 })()
             }
-            {coopFila.length>0&&(
+            {coopFila.length>0 && (
               <button onClick={async()=>{if(!confirm('Limpar toda a fila?'))return;await supabase.from('coop_queue').update({status:'done'}).eq('status','waiting');showToast('🗑️ Fila limpa!');loadCoop()}}
-                style={{...S.btnSm(G.red,'rgba(248,113,113,0.06)'),padding:'8px 16px',fontSize:11,width:'100%',marginTop:4}}>
+                style={{ ...S.btnSm(G.red,'rgba(248,113,113,0.06)'), padding:'8px 16px', fontSize:11, width:'100%', marginTop:4 }}>
                 🗑️ Limpar toda a fila
               </button>
             )}
           </>
         )}
 
-        {/* ── VISIBILIDADE ── */}
+        {/* ── SITE ── */}
         {tab==='site' && (
           <>
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1rem'}}>
-              <span style={{fontFamily:"'Barlow Condensed',sans-serif",fontWeight:900,fontSize:20,color:G.text,textTransform:'uppercase',letterSpacing:1}}>Visibilidade do Site</span>
-              <button onClick={()=>setTab('home')} style={{background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:13,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>← Início</button>
-            </div>
-            <div style={S.card}>
-              <div style={S.cBody}>
-                <p style={{fontSize:13,color:G.dim,marginBottom:14,lineHeight:1.6}}>Ocultar ou mostrar seções da home.</p>
-                {SITE_SECTIONS.map(sec=>{
-                  const vis = siteVis[sec.key]!==false
-                  return (
-                    <div key={sec.key} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',background:G.surface2,borderRadius:10,marginBottom:8,border:`1px solid ${G.border}`}}>
-                      <div>
-                        <div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:700,color:G.text,textTransform:'uppercase'}}>{sec.label}</div>
-                        <div style={{fontSize:11,color:G.dim,marginTop:2}}>{sec.desc}</div>
-                      </div>
-                      <button onClick={()=>toggleVis(sec.key)}
-                        style={{background:vis?'rgba(34,211,160,0.1)':'rgba(248,113,113,0.08)',color:vis?G.green:G.red,border:`1px solid ${vis?'rgba(34,211,160,0.3)':'rgba(248,113,113,0.2)'}`,borderRadius:8,padding:'7px 14px',fontSize:11,fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',cursor:'pointer',fontFamily:"'Barlow Condensed',sans-serif",minWidth:90}}>
-                        {vis?'👁 Visível':'🙈 Oculto'}
-                      </button>
+            <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:22, color:G.text, textTransform:'uppercase', letterSpacing:1, marginBottom:'1.25rem' }}>Visibilidade do Site</h2>
+            <div style={S.card}><div style={S.cBody}>
+              <p style={{ fontSize:13, color:G.dim, marginBottom:14, lineHeight:1.6 }}>Ocultar ou mostrar seções da home.</p>
+              {SITE_SECTIONS.map(sec => {
+                const vis = siteVis[sec.key]!==false
+                return (
+                  <div key={sec.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 14px', background:G.surface2, borderRadius:10, marginBottom:8, border:`1px solid ${G.border}` }}>
+                    <div>
+                      <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:700, color:G.text, textTransform:'uppercase' }}>{sec.label}</div>
+                      <div style={{ fontSize:11, color:G.dim, marginTop:2 }}>{sec.desc}</div>
                     </div>
-                  )
-                })}
-              </div>
-            </div>
+                    <button onClick={()=>toggleVis(sec.key)}
+                      style={{ background:vis?'rgba(34,211,160,0.1)':'rgba(248,113,113,0.08)', color:vis?G.green:G.red, border:`1px solid ${vis?'rgba(34,211,160,0.3)':'rgba(248,113,113,0.2)'}`, borderRadius:8, padding:'7px 14px', fontSize:11, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif", minWidth:90 }}>
+                      {vis?'👁 Visível':'🙈 Oculto'}
+                    </button>
+                  </div>
+                )
+              })}
+            </div></div>
           </>
         )}
 
       </div>
-
-
     </div>
   )
 }
