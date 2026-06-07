@@ -5,6 +5,7 @@ export default function WidgetLayout({ children }: { children: React.ReactNode }
     <html lang="pt-BR">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="noindex" />
         <style>{`
           html, body { background: transparent !important; margin: 0; padding: 0; }
         `}</style>
