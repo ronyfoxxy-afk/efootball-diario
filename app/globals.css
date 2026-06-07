@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
 
 :root {
   --bg:      #09090b;
@@ -41,7 +41,6 @@ img { max-width: 100%; height: auto; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
-/* Grid */
 .grid-news {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -57,7 +56,6 @@ img { max-width: 100%; height: auto; }
 }
 @media (max-width: 768px) { .hero-grid { grid-template-columns: 1fr; } }
 
-/* Hide helpers */
 .hide-mobile { display: flex !important; }
 .hide-desktop { display: none !important; }
 @media (max-width: 768px) {
@@ -65,7 +63,6 @@ img { max-width: 100%; height: auto; }
   .hide-desktop { display: flex !important; }
 }
 
-/* Card hover */
 .card-hover {
   transition: border-color 0.18s, transform 0.18s;
 }
