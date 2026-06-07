@@ -58,14 +58,14 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Redes — canto superior direito */}
-          <div className="hide-mobile" style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
+          {/* Redes — canto superior esquerdo */}
+          <div className="hide-mobile" style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
             <button onClick={() => setRedesOpen(!redesOpen)}
               style={{ fontSize: 11, color: '#71717a', padding: '5px 11px', borderRadius: 6, background: redesOpen ? '#18181c' : 'none', border: redesOpen ? '1px solid #1d1d20' : '1px solid transparent', cursor: 'pointer', fontFamily: "'Barlow',sans-serif", fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 5 }}>
               Redes <span style={{ fontSize: 9, display: 'inline-block', transform: redesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
             </button>
             {redesOpen && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#111115', border: '1px solid #1d1d20', borderRadius: 10, padding: 6, minWidth: 190, zIndex: 200, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 6, background: '#111115', border: '1px solid #1d1d20', borderRadius: 10, padding: 6, minWidth: 190, zIndex: 200, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
                 {REDES.map(r => (
                   <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setRedesOpen(false)}
                     style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, textDecoration: 'none', color: '#a1a1aa', fontSize: 13, transition: 'background .15s' }}>
