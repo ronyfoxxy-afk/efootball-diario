@@ -1,170 +1,141 @@
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
+import PostCard from '@/components/PostCard'
 import Footer from '@/components/Footer'
 import LivePixBanner from '@/components/LivePixBanner'
-import PostCard from '@/components/PostCard'
+import Link from 'next/link'
+import type { Post } from '@/lib/supabase'
+import { timeAgo } from '@/lib/utils'
 
 export const revalidate = 60
 
 async function getPosts() {
-  const { data } = await supabase.from('posts').select('id,title,slug,summary,cover_image,published_at,categories(name,slug,color)').eq('status', 'published').order('published_at', { ascending: false }).limit(12)
-  return data || []
-}
-
-async function getDestaque() {
-  const { data } = await supabase.from('posts').select('id,title,slug,summary,cover_image,published_at,categories(name,slug,color)').eq('status', 'published').order('published_at', { ascending: false }).limit(1).single()
-  return data
-}
-
-async function getTorneios() {
-  const { data } = await supabase.from('tournaments').select('id,name,slug,entry_fee,prize,status,model').eq('status', 'open').limit(3)
-  return data || []
+  const { data } = await supabase
+    .from('posts').select('*, categories(*)')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(13)
+  return data as Post[] || []
 }
 
 export default async function Home() {
-  const [destaque, posts, torneios] = await Promise.all([getDestaque(), getPosts(), getTorneios()])
-  const grid = posts.slice(1, 9)
-
-  function timeAgo(d: string) {
-    const diff = Date.now() - new Date(d).getTime()
-    const m = Math.floor(diff / 60000)
-    if (m < 60) return `${m}min`
-    const h = Math.floor(m / 60)
-    if (h < 24) return `${h}h`
-    return `${Math.floor(h / 24)}d`
-  }
+  const posts = await getPosts()
+  const hero = posts[0]
+  const sideItems = posts.slice(1, 4)
+  const grid = posts.slice(4)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080808' }}>
+    <div style={{ minHeight: '100vh', background: '#08090c' }}>
       <Navbar />
+      <main style={{ maxWidth: 1160, margin: '0 auto', padding: '1.25rem 1rem' }}>
 
-      <main style={{ maxWidth: 1160, margin: '0 auto', padding: '1.25rem 1rem 3rem' }}>
-
-        {/* LivePix Banner */}
-        <div style={{ marginBottom: '1.25rem' }}>
+        {/* LivePix */}
+        <div style={{ marginBottom: '1rem' }}>
           <LivePixBanner />
         </div>
 
-        {/* DESTAQUE */}
-        {destaque && (
-          <Link href={`/post/${destaque.slug}`} style={{ textDecoration: 'none', display: 'block', marginBottom: '1.25rem' }}>
-            <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', background: '#0e0e0e', border: '1px solid #1a1a1a', minHeight: 280 }}>
-              {destaque.cover_image && (
-                <div style={{ position: 'absolute', inset: 0 }}>
-                  <img src={destaque.cover_image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }} />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #080808 40%, transparent 100%)' }} />
+        {/* Hero */}
+        {posts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#4b5060', borderRadius: 12, border: '1px solid #1c1f26', background: '#0e1014', marginBottom: '1rem' }}>
+            <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.3 }}>⚽</div>
+            <p style={{ fontFamily: "'Syne',sans-serif", fontSize: 18, fontWeight: 700, color: '#8b909e' }}>Nenhuma notícia ainda</p>
+            <p style={{ fontSize: 13, marginTop: 6 }}>As primeiras notícias chegam em breve!</p>
+          </div>
+        ) : (
+          <div className="hero-grid" style={{ marginBottom: '1rem' }}>
+            {hero && (
+              <Link href={`/post/${hero.slug}`} style={{ textDecoration: 'none' }}>
+                <div style={{
+                  position: 'relative', borderRadius: 14, overflow: 'hidden',
+                  border: '1px solid #1c1f26', cursor: 'pointer',
+                  background: hero.cover_image
+                    ? `linear-gradient(to top, #08090c 0%, rgba(8,9,12,0.4) 55%, transparent 100%), url(${hero.cover_image}) center/cover`
+                    : '#0e1014',
+                  minHeight: 280, display: 'flex', flexDirection: 'column',
+                  justifyContent: 'flex-end', padding: '1.25rem',
+                }}>
+                  {!hero.cover_image && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 72, opacity: 0.04 }}>⚽</div>}
+                  {hero.categories && (
+                    <span style={{ display: 'inline-block', marginBottom: 8, width: 'fit-content', background: hero.categories.color + '18', color: hero.categories.color, border: `1px solid ${hero.categories.color}33`, fontSize: 10, fontWeight: 600, padding: '2px 9px', borderRadius: 5, letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                      {hero.categories.name}
+                    </span>
+                  )}
+                  <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.2, marginBottom: 8 }}>
+                    {hero.title}
+                  </h2>
+                  {hero.summary && (
+                    <p style={{ fontSize: 13, color: '#8b909e', lineHeight: 1.5, marginBottom: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {hero.summary}
+                    </p>
+                  )}
+                  <span style={{ fontSize: 12, color: '#4b5060' }}>{timeAgo(hero.published_at || hero.created_at)}</span>
                 </div>
-              )}
-              <div style={{ position: 'relative', padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 280 }}>
-                {destaque.categories && (
-                  <span style={{ display: 'inline-block', fontSize: 9, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', padding: '3px 10px', borderRadius: 4, background: (destaque.categories as any).color + '22', color: (destaque.categories as any).color, marginBottom: 10, width: 'fit-content' }}>
-                    🔥 DESTAQUE · {(destaque.categories as any).name.toUpperCase()}
-                  </span>
-                )}
-                <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 'clamp(22px, 4vw, 36px)', fontWeight: 900, color: '#fff', lineHeight: 1.1, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  {destaque.title}
-                </h1>
-                {destaque.summary && (
-                  <p style={{ fontSize: 14, color: '#aaa', lineHeight: 1.5, maxWidth: 600 }}>{destaque.summary}</p>
-                )}
-                <div style={{ fontSize: 11, color: '#444', marginTop: 10, fontWeight: 600, letterSpacing: '0.5px' }}>
-                  {timeAgo(destaque.published_at)} atrás
-                </div>
-              </div>
-            </div>
-          </Link>
-        )}
-
-        {/* Layout principal: posts + sidebar */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '1.25rem', alignItems: 'start' }}>
-
-          {/* GRID DE POSTS */}
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#444', display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem' }}>
-              <span style={{ width: 3, height: 14, background: '#e8b84b', borderRadius: 2, display: 'inline-block', flexShrink: 0 }} />
-              ÚLTIMAS NOTÍCIAS
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-              {grid.map(post => (
-                <PostCard key={post.id} post={post as any} />
+              </Link>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {sideItems.map(post => (
+                <Link key={post.id} href={`/post/${post.slug}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '12px', display: 'flex', gap: 10, cursor: 'pointer' }}>
+                    {post.cover_image && <div style={{ width: 56, height: 56, borderRadius: 8, background: `url(${post.cover_image}) center/cover`, flexShrink: 0 }} />}
+                    <div style={{ minWidth: 0 }}>
+                      {post.categories && (
+                        <span style={{ background: post.categories.color + '18', color: post.categories.color, fontSize: 9, fontWeight: 600, padding: '1px 6px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          {post.categories.name}
+                        </span>
+                      )}
+                      <p style={{ fontFamily: "'Syne',sans-serif", fontSize: 14, fontWeight: 700, color: '#e2e8f0', margin: '4px 0 3px', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</p>
+                      <p style={{ fontSize: 11, color: '#4b5060' }}>{timeAgo(post.published_at || post.created_at)}</p>
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
-            {posts.length > 8 && (
-              <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
-                <Link href="/categoria/noticias" style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', color: '#555', border: '1px solid #1a1a1a', borderRadius: 8, padding: '10px 24px', textDecoration: 'none' }}>
-                  Ver mais notícias →
-                </Link>
-              </div>
-            )}
           </div>
+        )}
 
-          {/* SIDEBAR */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-            {/* Torneios */}
-            <div style={{ background: '#0e0e0e', border: '1px solid #1a1a1a', borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '12px 14px', borderBottom: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#e8b84b' }}>🏆 TORNEIOS</span>
-                <Link href="/torneios" style={{ fontSize: 10, color: '#444', textDecoration: 'none', fontWeight: 700, letterSpacing: '1px' }}>VER TODOS →</Link>
-              </div>
-              {torneios.length === 0 ? (
-                <div style={{ padding: '1.25rem', textAlign: 'center', fontSize: 13, color: '#333' }}>Nenhum torneio aberto</div>
-              ) : (
-                torneios.map((t, i) => (
-                  <Link key={t.id} href={`/torneios/${t.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{ padding: '12px 14px', borderBottom: i < torneios.length - 1 ? '1px solid #141414' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#ddd', marginBottom: 2 }}>{t.name}</div>
-                        <div style={{ fontSize: 11, color: '#444' }}>Inscrição R${Number(t.entry_fee).toFixed(0)} · Prêmio R${Number(t.prize).toFixed(0)}</div>
-                      </div>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: '#3ecf8e', background: 'rgba(62,207,142,0.08)', padding: '2px 8px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>ABERTO</span>
-                    </div>
-                  </Link>
-                ))
-              )}
-              <div style={{ padding: '10px 14px' }}>
-                <Link href="/criar-torneio" style={{ display: 'block', textAlign: 'center', fontSize: 11, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: '#e8b84b', textDecoration: 'none', border: '1px solid rgba(232,184,75,0.15)', borderRadius: 8, padding: '9px' }}>
-                  ➕ Criar meu torneio — R$10
-                </Link>
-              </div>
+        {/* Grid notícias */}
+        {grid.length > 0 && (
+          <div style={{ marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.875rem' }}>
+              <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 18, fontWeight: 800, color: '#e8eaf0' }}>Últimas notícias</h2>
+              <Link href="/categoria/noticias" style={{ fontSize: 12, color: '#4f7ef8', textDecoration: 'none', fontWeight: 500 }}>Ver todas →</Link>
             </div>
-
-            {/* Co-op */}
-            <Link href="/coop" style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#0e0e0e', border: '1px solid #1a1a1a', borderRadius: 12, padding: '14px', borderLeft: '3px solid #4f7ef8' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#4f7ef8', marginBottom: 6 }}>🎮 CO-OP 5×5</div>
-                <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>Entre na fila e jogue ao vivo com o FSKATE na próxima live!</div>
-                <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: '#4f7ef8', textTransform: 'uppercase', letterSpacing: '1px' }}>Entrar na fila →</div>
-              </div>
-            </Link>
-
-            {/* Tops */}
-            <Link href="/categoria/tops" style={{ textDecoration: 'none' }}>
-              <div style={{ background: '#0e0e0e', border: '1px solid #1a1a1a', borderRadius: 12, padding: '14px', borderLeft: '3px solid #f59e0b' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: '#f59e0b', marginBottom: 6 }}>🏅 TOPS & RANKINGS</div>
-                <div style={{ fontSize: 13, color: '#888', lineHeight: 1.5 }}>Top 10 jogadores, melhores times e rankings da comunidade.</div>
-                <div style={{ marginTop: 10, fontSize: 11, fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '1px' }}>Ver rankings →</div>
-              </div>
-            </Link>
-
+            <div className="grid-news">
+              {grid.map(post => <PostCard key={post.id} post={post} />)}
+            </div>
           </div>
+        )}
+
+        {/* Torneios + Co-op */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+          <Link href="/torneios" style={{ textDecoration: 'none' }}>
+            <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #e8b84b', borderRadius: 12, padding: '1rem', cursor: 'pointer', height: '100%' }}>
+              <p style={{ fontSize: 10, color: '#e8b84b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 3 }}>Evento Principal</p>
+              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 2 }}>🏆 Liga eFootball</h3>
+              <p style={{ fontSize: 12, color: '#4b5060' }}>R$20 · Prêmio R$50</p>
+            </div>
+          </Link>
+          <Link href="/coop" style={{ textDecoration: 'none' }}>
+            <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #4f7ef8', borderRadius: 12, padding: '1rem', cursor: 'pointer', height: '100%' }}>
+              <p style={{ fontSize: 10, color: '#4f7ef8', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 3 }}>Ao vivo</p>
+              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 2 }}>🎮 Co-op 3x3</h3>
+              <p style={{ fontSize: 12, color: '#4b5060' }}>Jogue com o FSKATE</p>
+            </div>
+          </Link>
         </div>
+
+        <Link href="/criar-torneio" style={{ textDecoration: 'none', display: 'block', marginBottom: '1.5rem' }}>
+          <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 12, padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <h3 style={{ fontFamily: "'Syne',sans-serif", fontSize: 15, fontWeight: 700, color: '#e8eaf0', marginBottom: 2 }}>➕ Criar meu próprio torneio</h3>
+              <p style={{ fontSize: 12, color: '#4b5060' }}>Taxa de criação R$10 · Publicado no site</p>
+            </div>
+            <span style={{ fontSize: 13, color: '#8b909e', flexShrink: 0 }}>→</span>
+          </div>
+        </Link>
+
       </main>
-
       <Footer />
-
-      {/* Responsive */}
-      <style>{`
-        @media (max-width: 767px) {
-          main > div:last-child {
-            grid-template-columns: 1fr !important;
-          }
-          main > div:last-child > div:first-child > div:nth-child(2) {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }
