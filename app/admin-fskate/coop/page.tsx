@@ -10,19 +10,47 @@ const G = {
 
 type Entry = { id: string; player_name: string; sala_id: string; sala_senha: string; status: string; position: number; created_at: string }
 
+const COOP_SECRET = process.env.NEXT_PUBLIC_COOP_SECRET || 'fskate2024'
+
+function tocarSom() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const o = ctx.createOscillator()
+    const g = ctx.createGain()
+    o.connect(g); g.connect(ctx.destination)
+    o.type = 'sine'
+    o.frequency.setValueAtTime(660, ctx.currentTime)
+    o.frequency.setValueAtTime(880, ctx.currentTime + 0.1)
+    o.frequency.setValueAtTime(1100, ctx.currentTime + 0.2)
+    g.gain.setValueAtTime(0.4, ctx.currentTime)
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
+    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.5)
+  } catch {}
+}
+
 export default function AdminCoop() {
   const [fila, setFila] = useState<Entry[]>([])
   const [chamadas, setChamadas] = useState<Entry[]>([])
   const [toast, setToast] = useState('')
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [widgetOpen, setWidgetOpen] = useState(false)
+  const [linkCopiado, setLinkCopiado] = useState(false)
+  const filaRef = useRef<Entry[]>([])
+
+  const encerrarLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://efootball-diario.vercel.app'}/api/coop/encerrar?token=${COOP_SECRET}`
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
   async function carregar() {
     const { data: w } = await supabase.from('coop_queue').select('*').eq('status', 'waiting').order('created_at', { ascending: true })
     const { data: c } = await supabase.from('coop_queue').select('*').eq('status', 'called').order('created_at', { ascending: false }).limit(10)
-    setFila((w || []) as Entry[])
+    const novaFila = (w || []) as Entry[]
+    // Toca som se entrou alguém novo
+    if (novaFila.length > filaRef.current.length) {
+      tocarSom()
+    }
+    filaRef.current = novaFila
+    setFila(novaFila)
     setChamadas((c || []) as Entry[])
   }
 
@@ -206,6 +234,25 @@ export default function AdminCoop() {
           </button>
           <button onClick={() => setWidgetOpen(!widgetOpen)} style={{ background: 'rgba(14,165,233,0.1)', color: G.blue, border: `1px solid rgba(14,165,233,0.3)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
             {'</>'}
+          </button>
+          <button
+            onClick={async () => {
+              const primeiraSlot = salasList[0]?.[0]
+              if (!primeiraSlot) { showToast('⚠️ Fila vazia'); return }
+              await encerrarSala(primeiraSlot)
+            }}
+            style={{ background: 'rgba(34,211,160,0.12)', color: '#22d3a0', border: `1px solid rgba(34,211,160,0.3)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
+            ✅ Encerrar sala
+          </button>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(encerrarLink)
+              setLinkCopiado(true)
+              showToast('🔗 Link copiado! Cole no celular.')
+              setTimeout(() => setLinkCopiado(false), 3000)
+            }}
+            style={{ background: linkCopiado ? 'rgba(34,211,160,0.15)' : 'rgba(255,255,255,0.04)', color: linkCopiado ? '#22d3a0' : G.muted, border: `1px solid ${linkCopiado ? 'rgba(34,211,160,0.3)' : G.border}`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+            {linkCopiado ? '✅ Copiado!' : '🔗 Link celular'}
           </button>
           <button onClick={limparTudo} style={{ background: 'rgba(248,113,113,0.1)', color: G.red, border: `1px solid rgba(248,113,113,0.2)`, borderRadius: 8, padding: '7px 14px', fontSize: 11, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' as const, cursor: 'pointer', fontFamily: 'inherit' }}>
             Limpar

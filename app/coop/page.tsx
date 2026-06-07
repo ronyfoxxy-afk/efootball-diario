@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -19,20 +19,41 @@ const G = {
 // 3x3 = 6 jogadores por sala. 5 vagas abertas + 1 do FSKATE
 const VAGAS_POR_SALA = 5
 
+const TIKTOK_LIVE_URL = process.env.NEXT_PUBLIC_TIKTOK_URL || 'https://www.tiktok.com/@fskategames/live'
+
 export default function CoopQueuePage() {
   const [nome, setNome] = useState('')
   const [entrando, setEntrando] = useState(false)
   const [entrou, setEntrou] = useState<QueueEntry | null>(null)
   const [fila, setFila] = useState<QueueEntry[]>([])
   const [toast, setToast] = useState('')
+  const [redirecionando, setRedirecionando] = useState(false)
+  const prevFilaLen = useRef(0)
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 3000) }
+
+  function tocarSom() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const o = ctx.createOscillator()
+      const g = ctx.createGain()
+      o.connect(g); g.connect(ctx.destination)
+      o.frequency.setValueAtTime(880, ctx.currentTime)
+      o.frequency.setValueAtTime(1100, ctx.currentTime + 0.08)
+      g.gain.setValueAtTime(0.3, ctx.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+      o.start(); o.stop(ctx.currentTime + 0.4)
+    } catch {}
+  }
 
   async function carregarFila() {
     const { data } = await supabase
       .from('coop_queue').select('*').eq('status', 'waiting')
       .order('created_at', { ascending: true })
-    setFila((data || []) as QueueEntry[])
+    const nova = (data || []) as QueueEntry[]
+    if (nova.length > prevFilaLen.current) tocarSom()
+    prevFilaLen.current = nova.length
+    setFila(nova)
   }
 
   useEffect(() => {
@@ -45,6 +66,12 @@ export default function CoopQueuePage() {
 
   async function entrarNaFila() {
     if (!nome.trim()) { showToast('⚠️ Coloca seu nome!'); return }
+    // Redireciona pro TikTok e volta
+    setRedirecionando(true)
+    const retorno = encodeURIComponent(window.location.href + '?nome=' + encodeURIComponent(nome.trim()))
+    window.open(TIKTOK_LIVE_URL, '_blank')
+    setRedirecionando(false)
+    // Continua o processo normalmente
     setEntrando(true)
     const { count } = await supabase.from('coop_queue')
       .select('*', { count: 'exact', head: true }).eq('status', 'waiting')
