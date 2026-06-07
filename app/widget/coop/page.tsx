@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
 type QueueEntry = {
@@ -10,30 +10,46 @@ type QueueEntry = {
 // Widget para OBS / TikTok Studio — mostra APENAS a sala atual (primeira da fila)
 export default function CoopWidget() {
   const [fila, setFila] = useState<QueueEntry[]>([])
-  const [prevCount, setPrevCount] = useState(0)
+  const idsVistos = useRef<Set<string>>(new Set())
+  const iniciou = useRef(false)
+
+  function tocarSom() {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const o = ctx.createOscillator()
+      const g = ctx.createGain()
+      o.connect(g); g.connect(ctx.destination)
+      o.frequency.setValueAtTime(880, ctx.currentTime)
+      o.frequency.setValueAtTime(1100, ctx.currentTime + 0.08)
+      g.gain.setValueAtTime(0.3, ctx.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.4)
+    } catch {}
+  }
 
   async function carregarFila() {
     const { data } = await supabase
       .from('coop_queue').select('*').eq('status', 'waiting')
       .order('created_at', { ascending: true })
     const entries = (data || []) as QueueEntry[]
-    setFila(prev => {
-      // Detecta novo jogador pra tocar som
-      if (entries.length > prev.length) {
-        try {
-          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-          const o = ctx.createOscillator()
-          const g = ctx.createGain()
-          o.connect(g); g.connect(ctx.destination)
-          o.frequency.setValueAtTime(880, ctx.currentTime)
-          o.frequency.setValueAtTime(1100, ctx.currentTime + 0.08)
-          g.gain.setValueAtTime(0.3, ctx.currentTime)
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
-          o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.4)
-        } catch {}
-      }
-      return entries
-    })
+
+    // Na primeira carga só registra os IDs, não toca som
+    if (!iniciou.current) {
+      entries.forEach(e => idsVistos.current.add(e.id))
+      iniciou.current = true
+    } else {
+      // Toca som só pra IDs que ainda não vimos
+      let temNovo = false
+      entries.forEach(e => {
+        if (!idsVistos.current.has(e.id)) {
+          idsVistos.current.add(e.id)
+          temNovo = true
+        }
+      })
+      if (temNovo) tocarSom()
+    }
+
+    setFila(entries)
   }
 
   useEffect(() => {

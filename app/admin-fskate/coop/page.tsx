@@ -12,22 +12,6 @@ type Entry = { id: string; player_name: string; sala_id: string; sala_senha: str
 
 const COOP_SECRET = process.env.NEXT_PUBLIC_COOP_SECRET || 'fskate2024'
 
-function tocarSom() {
-  try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
-    const o = ctx.createOscillator()
-    const g = ctx.createGain()
-    o.connect(g); g.connect(ctx.destination)
-    o.type = 'sine'
-    o.frequency.setValueAtTime(660, ctx.currentTime)
-    o.frequency.setValueAtTime(880, ctx.currentTime + 0.1)
-    o.frequency.setValueAtTime(1100, ctx.currentTime + 0.2)
-    g.gain.setValueAtTime(0.4, ctx.currentTime)
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5)
-    o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.5)
-  } catch {}
-}
-
 export default function AdminCoop() {
   const [fila, setFila] = useState<Entry[]>([])
   const [chamadas, setChamadas] = useState<Entry[]>([])
