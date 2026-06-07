@@ -3,10 +3,10 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 const G = {
-  green: '#00e56e', greenGlow: 'rgba(0,229,110,0.15)',
-  bg: '#060a0f', surface: '#0d1520', surface2: '#131e2e',
-  border: 'rgba(255,255,255,0.07)', borderActive: 'rgba(0,229,110,0.4)',
-  text: '#f0f4f8', muted: '#5a7190', gold: '#e8b84b', red: '#f87171', blue: '#0ea5e9'
+  green: '#22d3a0', greenGlow: 'rgba(34,211,160,0.1)',
+  bg: '#09090b', surface: '#111115', surface2: '#18181c',
+  border: '#1d1d20', borderActive: 'rgba(232,184,75,0.4)',
+  text: '#e4e4e7', muted: '#71717a', gold: '#e8b84b', red: '#f87171', blue: '#4f7ef8'
 }
 
 const APIS_TRANSCRICAO = [

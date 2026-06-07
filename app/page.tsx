@@ -9,6 +9,14 @@ import { timeAgo } from '@/lib/utils'
 
 export const revalidate = 60
 
+async function getSiteSettings() {
+  try {
+    const { data } = await supabase.from('site_settings').select('key,value')
+    if (!data) return {}
+    return Object.fromEntries(data.map((r: any) => [r.key, r.value !== 'false']))
+  } catch { return {} }
+}
+
 async function getPosts() {
   const { data } = await supabase
     .from('posts').select('*, categories(*)')
@@ -35,18 +43,21 @@ const badge = (color: string, name: string) => (
 )
 
 export default async function Home() {
-  const posts = await getPosts()
+  const [posts, settings] = await Promise.all([getPosts(), getSiteSettings()])
   const hero = posts[0]
   const sideItems = posts.slice(1, 4)
   const grid = posts.slice(4)
-  // hero será o post featured se existir, senão o mais recente
+  const showTorneios = settings['show_torneios'] !== false
+  const showCoop = settings['show_coop'] !== false
+  const showCriarTorneio = settings['show_criar_torneio'] !== false
+  const showLivepix = settings['show_livepix_banner'] !== false
 
   return (
     <div style={{ minHeight: '100vh', background: '#09090b' }}>
       <Navbar />
       <main style={{ maxWidth: 1160, margin: '0 auto', padding: '1.25rem 1rem' }}>
 
-        <div style={{ marginBottom: '1rem' }}><LivePixBanner /></div>
+        {showLivepix && <div style={{ marginBottom: '1rem' }}><LivePixBanner /></div>}
 
         {/* ── HERO ── */}
         {posts.length === 0 ? (
@@ -146,7 +157,9 @@ export default async function Home() {
         )}
 
         {/* ── TORNEIOS + CO-OP ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+        {(showTorneios || showCoop) && (
+        <div style={{ display: 'grid', gridTemplateColumns: showTorneios && showCoop ? '1fr 1fr' : '1fr', gap: 10, marginBottom: 10 }}>
+          {showTorneios && (
           <Link href="/torneios" style={{ textDecoration: 'none' }}>
             <div className="card-hover" style={{ background: '#111115', border: '1px solid #1d1d20', borderLeft: '3px solid #e8b84b', borderRadius: '0 12px 12px 0', padding: '1rem', cursor: 'pointer', height: '100%' }}>
               <p style={{ fontSize: 9, color: '#e8b84b', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 3 }}>Evento Principal</p>
@@ -154,6 +167,8 @@ export default async function Home() {
               <p style={{ fontSize: 12, color: '#52525b' }}>R$20 · Prêmio R$50</p>
             </div>
           </Link>
+          )}
+          {showCoop && (
           <Link href="/coop" style={{ textDecoration: 'none' }}>
             <div className="card-hover" style={{ background: '#111115', border: '1px solid #1d1d20', borderLeft: '3px solid #4f7ef8', borderRadius: '0 12px 12px 0', padding: '1rem', cursor: 'pointer', height: '100%' }}>
               <p style={{ fontSize: 9, color: '#4f7ef8', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 3 }}>Ao Vivo</p>
@@ -161,9 +176,11 @@ export default async function Home() {
               <p style={{ fontSize: 12, color: '#52525b' }}>Jogue com o FSKATE</p>
             </div>
           </Link>
+          )}
         </div>
+        )}
 
-        <Link href="/criar-torneio" style={{ textDecoration: 'none', display: 'block', marginBottom: '1.5rem' }}>
+        {showCriarTorneio && <Link href="/criar-torneio" style={{ textDecoration: 'none', display: 'block', marginBottom: '1.5rem' }}>
           <div className="card-hover" style={{ background: '#111115', border: '1px solid #1d1d20', borderRadius: 12, padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <h3 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, fontWeight: 700, color: '#e4e4e7', textTransform: 'uppercase', marginBottom: 2 }}>➕ Criar meu próprio torneio</h3>
@@ -171,7 +188,7 @@ export default async function Home() {
             </div>
             <span style={{ fontSize: 13, color: '#52525b', flexShrink: 0 }}>→</span>
           </div>
-        </Link>
+        </Link>}
 
       </main>
       <Footer />
