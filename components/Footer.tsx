@@ -1,20 +1,21 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer style={{ borderTop: '1px solid #1c1f26', padding: '1.25rem 1rem', marginTop: '1rem' }}>
-      <div style={{ maxWidth: 1160, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Image src="/logo.png" alt="eFootball News" width={28} height={28} style={{ borderRadius: 6 }} />
+    <footer style={{ borderTop: '1px solid #1d1d20', padding: '1.5rem 1rem', marginTop: '2rem', background: '#09090b' }}>
+      <div style={{ maxWidth: 1160, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <Image src="/logo.png" alt="eFootball News" width={30} height={30} style={{ borderRadius: 6 }} />
           <div>
-            <div style={{ fontSize: 13, fontFamily: "'Syne',sans-serif", fontWeight: 800, lineHeight: 1 }}>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 15, lineHeight: 1, letterSpacing: 1, textTransform: 'uppercase' }}>
               <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
-              <span style={{ color: '#e8b84b', marginLeft: 4 }}>NEWS</span>
+              <span style={{ color: '#e8b84b', marginLeft: 6 }}>NEWS</span>
             </div>
-            <div style={{ fontSize: 11, color: '#4b5060', marginTop: 1 }}>FSKATE GAMES © 2026</div>
+            <div style={{ fontSize: 10, color: '#52525b', marginTop: 2, letterSpacing: '0.5px' }}>FSKATE GAMES © 2026</div>
           </div>
-        </div>
-        <span style={{ fontSize: 12, color: '#4b5060' }}>Jesus te ama ✝️</span>
+        </Link>
+        <span style={{ fontSize: 12, color: '#3f3f46' }}>Jesus te ama ✝️</span>
       </div>
     </footer>
   )

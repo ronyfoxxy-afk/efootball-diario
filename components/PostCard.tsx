@@ -6,52 +6,48 @@ import type { Post } from '@/lib/supabase'
 export default function PostCard({ post }: { post: Post }) {
   const cat = post.categories
   return (
-    <Link href={`/post/${post.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-      <div style={{
-        background: '#0e1014', border: '1px solid #1c1f26',
-        borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
-        transition: 'border-color 0.15s',
+    <Link href={`/post/${post.slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+      <div className="card-hover" style={{
+        background: '#111115', border: '1px solid #1d1d20',
+        borderRadius: 12, overflow: 'hidden',
         height: '100%', display: 'flex', flexDirection: 'column',
       }}>
-        {/* Thumb */}
-        <div style={{
-          height: 140,
-          background: post.cover_image
-            ? `url(${post.cover_image}) center/cover`
-            : '#14161b',
-          display: 'flex', alignItems: 'flex-end', padding: '10px 12px',
-          flexShrink: 0,
-        }}>
-          {!post.cover_image && (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', fontSize: 28, opacity: 0.08 }}>⚽</div>
-          )}
+        <div style={{ height: 130, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+          <div className="thumb-inner" style={{
+            width: '100%', height: '100%',
+            background: post.cover_image
+              ? `url(${post.cover_image}) center/cover`
+              : 'linear-gradient(135deg,#1a1020,#0d1a2e)',
+            transition: 'transform 0.3s',
+          }} />
+          {/* gradient overlay at bottom */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(9,9,11,.7) 0%, transparent 60%)' }} />
           {cat && (
             <span style={{
-              background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)',
+              position: 'absolute', bottom: 8, left: 10,
+              background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)',
               color: cat.color, border: `1px solid ${cat.color}44`,
-              fontSize: 10, fontWeight: 600, padding: '2px 8px',
-              borderRadius: 5, letterSpacing: '0.5px', textTransform: 'uppercase',
-              position: 'relative',
+              fontSize: 9, fontWeight: 700, padding: '2px 7px',
+              borderRadius: 4, letterSpacing: '1px', textTransform: 'uppercase',
             }}>
               {cat.name}
             </span>
           )}
         </div>
-
-        {/* Body */}
-        <div style={{ padding: '12px 14px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{
-            fontFamily: "'Syne', sans-serif", fontSize: 15, fontWeight: 700,
-            color: '#e8eaf0', lineHeight: 1.35, marginBottom: 6, flex: 1,
+            fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, fontWeight: 700,
+            color: '#e4e4e7', lineHeight: 1.2, marginBottom: 6, flex: 1,
+            textTransform: 'uppercase', letterSpacing: '0.3px',
             display: '-webkit-box', WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical', overflow: 'hidden',
           }}>
             {post.title}
           </h3>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-            <span style={{ fontSize: 11, color: '#4b5060' }}>{timeAgo(post.published_at || post.created_at)}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+            <span style={{ fontSize: 10, color: '#52525b' }}>{timeAgo(post.published_at || post.created_at)}</span>
             {post.auto_published && (
-              <span style={{ fontSize: 10, color: '#3ecf8e', fontWeight: 600, letterSpacing: '0.5px' }}>AUTO</span>
+              <span style={{ fontSize: 9, color: '#22d3a0', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase' }}>AUTO</span>
             )}
           </div>
         </div>
