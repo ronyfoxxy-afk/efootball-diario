@@ -76,7 +76,7 @@ export default function Admin() {
       supabase.from('tournaments').select('*',{count:'exact',head:true}),
     ])
     setStats({ pub:pub||0, draft:draft||0, hoje:hoje||0, torneios:torn||0 })
-    const { data } = await supabase.from('posts').select('id,title,status,auto_published,cover_image,published_at,categories(name,color),featured').order('published_at',{ascending:false}).limit(50)
+    const { data } = await supabase.from('posts').select('id,title,summary,content,status,auto_published,cover_image,source_url,published_at,categories(name,color),featured').order('published_at',{ascending:false}).limit(50)
     setPosts(data||[])
     setFeaturedId((data||[]).find((p:any)=>p.featured)?.id||null)
   }
