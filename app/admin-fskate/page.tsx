@@ -615,7 +615,7 @@ export default function Admin() {
 
       </div>
 
-      {/* Bottom nav */}}
+      {/* Bottom nav */}
       <nav style={S.nav}>
         {TABS.map(t => (
           <button key={t.id} style={S.navBtn(tab===t.id)} onClick={() => { setTab(t.id); if(t.id==='torneios') loadTorneios() }}>
