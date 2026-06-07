@@ -56,8 +56,18 @@ export default function AdminCoop() {
 
   useEffect(() => {
     carregar()
-    const ch = supabase.channel('coop_admin_v2').on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, carregar).subscribe()
-    return () => { supabase.removeChannel(ch) }
+
+    // Polling a cada 4s como fallback
+    const interval = setInterval(carregar, 4000)
+
+    const ch = supabase.channel('coop_admin_v2')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, carregar)
+      .subscribe()
+
+    return () => {
+      clearInterval(interval)
+      supabase.removeChannel(ch)
+    }
   }, [])
 
   async function chamarSala(salaId: string) {

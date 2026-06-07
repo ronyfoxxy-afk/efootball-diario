@@ -58,10 +58,18 @@ export default function CoopQueuePage() {
 
   useEffect(() => {
     carregarFila()
+
+    // Polling a cada 4s como fallback
+    const interval = setInterval(carregarFila, 4000)
+
     const ch = supabase.channel('coop_fila')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, carregarFila)
       .subscribe()
-    return () => { supabase.removeChannel(ch) }
+
+    return () => {
+      clearInterval(interval)
+      supabase.removeChannel(ch)
+    }
   }, [])
 
   async function entrarNaFila() {

@@ -38,10 +38,18 @@ export default function CoopWidget() {
 
   useEffect(() => {
     carregarFila()
+
+    // Polling a cada 4s como fallback (garante atualização mesmo se Realtime cair)
+    const interval = setInterval(carregarFila, 4000)
+
     const channel = supabase.channel('widget_coop_v2')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'coop_queue' }, () => carregarFila())
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
+
+    return () => {
+      clearInterval(interval)
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   // Pegar APENAS a primeira sala
