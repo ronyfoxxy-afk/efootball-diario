@@ -19,7 +19,7 @@ const G = {
 // 3x3 = 6 jogadores por sala. 5 vagas abertas + 1 do FSKATE
 const VAGAS_POR_SALA = 5
 
-const TIKTOK_LIVE_URL = process.env.NEXT_PUBLIC_TIKTOK_URL || 'https://www.tiktok.com/@fskategames/live'
+const TIKTOK_LIVE_URL = process.env.NEXT_PUBLIC_TIKTOK_URL || 'https://www.tiktok.com/@fskate.efootball/live'
 
 export default function CoopQueuePage() {
   const [nome, setNome] = useState('')
