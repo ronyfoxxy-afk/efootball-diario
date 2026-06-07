@@ -77,6 +77,7 @@ export default function RadarIA() {
   const [configOpen, setConfigOpen] = useState(false)
   const [toast, setToast] = useState('')
   const [savingKeys, setSavingKeys] = useState(false)
+  const [keysLoaded, setKeysLoaded] = useState(false)
 
   const [apiTrans, setApiTrans] = useState('supadata')
   const [keyTrans, setKeyTrans] = useState('')
@@ -128,13 +129,14 @@ export default function RadarIA() {
     supabase.from('site_settings').select('key,value')
       .in('key', ['api_trans_id','api_trans_key','api_ia_id','api_ia_key'])
       .then(({ data }) => {
-        if (!data) return
+        if (!data) { setKeysLoaded(true); return }
         const m: Record<string,string> = {}
         data.forEach((r: any) => { m[r.key] = r.value })
         if (m.api_trans_id) setApiTrans(m.api_trans_id)
         if (m.api_trans_key) setKeyTrans(m.api_trans_key)
         if (m.api_ia_id) setApiIA(m.api_ia_id)
         if (m.api_ia_key) setKeyIA(m.api_ia_key)
+        setKeysLoaded(true)
       })
   }, [])
 
@@ -681,8 +683,8 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               <label style={S.lbl}>Categoria</label>
               <CatBtns val={ytCat} set={setYtCat} />
               <StatusBtns val={ytStatus} set={setYtStatus} />
-              <button onClick={gerarDoYoutube} disabled={ytLoading} style={{ ...S.btnGrn, width:'100%', opacity:ytLoading?0.6:1, marginBottom:10, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                {ytLoading ? <><Spinner/>Gerando...</> : '▶ Gerar com Ruud Gullit Jr.'}
+              <button onClick={gerarDoYoutube} disabled={ytLoading || !keysLoaded} style={{ ...S.btnGrn, width:'100%', opacity:ytLoading?0.6:1, marginBottom:10, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                {!keysLoaded ? 'Carregando chaves...' : ytLoading ? <><Spinner/>Gerando...</> : '▶ Gerar com Ruud Gullit Jr.'}
               </button>
               <Msg msg={ytMsg} type={ytMsgType} />
 
