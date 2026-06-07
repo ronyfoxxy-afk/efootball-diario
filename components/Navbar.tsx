@@ -4,12 +4,13 @@ import Image from 'next/image'
 import { useState } from 'react'
 
 const CATS = [
-  { name: 'Notícias',    slug: 'noticias' },
-  { name: 'Eventos',     slug: 'eventos' },
-  { name: 'Atualizações',slug: 'atualizacoes' },
-  { name: 'Campanhas',   slug: 'campanhas' },
-  { name: 'Guias',       slug: 'guias' },
-  { name: 'Vazamentos',  slug: 'vazamentos-rumores' },
+  { name: 'Notícias',     slug: 'noticias' },
+  { name: 'Eventos',      slug: 'eventos' },
+  { name: 'Atualizações', slug: 'atualizacoes' },
+  { name: 'Campanhas',    slug: 'campanhas' },
+  { name: 'Guias',        slug: 'guias' },
+  { name: 'Vazamentos',   slug: 'vazamentos-rumores' },
+  { name: '🏅 Top Rank',  slug: 'top-rank' },
 ]
 
 const REDES = [
@@ -21,75 +22,84 @@ const REDES = [
   { label: 'Downloads', url: 'https://fskategames.blogspot.com',          color: '#6b7280', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4h14v-2H5v2z"/></svg>` },
 ]
 
-const N: any = {
-  header: { background: 'rgba(9,9,11,0.97)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #1d1d20', position: 'sticky' as const, top: 0, zIndex: 100 },
-  inner:  { maxWidth: 1160, margin: '0 auto', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 },
-  link:   { fontSize: 12, color: '#71717a', padding: '5px 9px', borderRadius: 7, textDecoration: 'none', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' as const },
-}
-
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [redesOpen, setRedesOpen] = useState(false)
 
   return (
     <>
-      <header style={N.header}>
-        <div style={N.inner}>
+      <header style={{ background: 'rgba(9,9,11,0.98)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #1d1d20', position: 'sticky', top: 0, zIndex: 100 }}>
+
+        {/* ── Barra superior: só logo centralizado ── */}
+        <div style={{ borderBottom: '1px solid #1d1d20', padding: '0 1rem', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <Image src="/logo.png" alt="eFootball News" width={40} height={40} style={{ borderRadius: 8 }} />
+            <Image src="/logo.png" alt="eFootball News" width={36} height={36} style={{ borderRadius: 8 }} />
             <div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 18, lineHeight: 1, letterSpacing: 1, textTransform: 'uppercase' }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 20, lineHeight: 1, letterSpacing: 2, textTransform: 'uppercase' }}>
                 <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
               </div>
               <div style={{ fontSize: 9, color: '#e8b84b', letterSpacing: '3px', fontWeight: 700, lineHeight: 1, marginTop: 2 }}>— NEWS —</div>
             </div>
           </Link>
+        </div>
 
-          <nav className="hide-mobile" style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        {/* ── Barra inferior: categorias + redes ── */}
+        <div className="hide-mobile" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 40 }}>
+          {/* Categorias à esquerda */}
+          <nav style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             {CATS.map(c => (
-              <Link key={c.slug} href={`/categoria/${c.slug}`} style={N.link}>{c.name}</Link>
+              <Link key={c.slug} href={`/categoria/${c.slug}`}
+                style={{ fontSize: 11, color: '#71717a', padding: '4px 9px', borderRadius: 6, textDecoration: 'none', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                {c.name}
+              </Link>
             ))}
-            <Link href="/torneios" style={{ ...N.link, marginLeft: 6, color: '#e8b84b', background: 'rgba(232,184,75,0.08)', border: '1px solid rgba(232,184,75,0.15)', borderRadius: 7 }}>
+            <Link href="/torneios" style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, background: 'rgba(232,184,75,0.08)', color: '#e8b84b', border: '1px solid rgba(232,184,75,0.18)', padding: '4px 10px', borderRadius: 6, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               🏆 Torneios
             </Link>
-            <Link href="/coop" style={{ ...N.link, marginLeft: 2, color: '#4f7ef8', background: 'rgba(79,126,248,0.08)', border: '1px solid rgba(79,126,248,0.15)', borderRadius: 7 }}>
+            <Link href="/coop" style={{ fontSize: 11, fontWeight: 700, background: 'rgba(79,126,248,0.08)', color: '#4f7ef8', border: '1px solid rgba(79,126,248,0.18)', padding: '4px 10px', borderRadius: 6, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               🎮 Co-op
             </Link>
-            <div style={{ position: 'relative', marginLeft: 4 }}>
-              <button onClick={() => setRedesOpen(!redesOpen)}
-                style={{ ...N.link, background: redesOpen ? '#18181c' : 'none', border: redesOpen ? '1px solid #1d1d20' : '1px solid transparent', cursor: 'pointer', fontFamily: "'Barlow',sans-serif", display: 'flex', alignItems: 'center', gap: 5 }}>
-                Redes <span style={{ fontSize: 9, display: 'inline-block', transform: redesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
-              </button>
-              {redesOpen && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#111115', border: '1px solid #1d1d20', borderRadius: 10, padding: 6, minWidth: 190, zIndex: 200, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
-                  {REDES.map(r => (
-                    <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setRedesOpen(false)}
-                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, textDecoration: 'none', color: '#a1a1aa', fontSize: 13 }}>
-                      <span style={{ width: 15, height: 15, color: r.color, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: r.svg }} />
-                      {r.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
           </nav>
 
-          <button className="hide-desktop" onClick={() => setMenuOpen(!menuOpen)}
+          {/* Redes à direita — abre para a ESQUERDA */}
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setRedesOpen(!redesOpen)}
+              style={{ fontSize: 11, color: '#71717a', padding: '4px 10px', borderRadius: 6, background: redesOpen ? '#18181c' : 'none', border: redesOpen ? '1px solid #1d1d20' : '1px solid transparent', cursor: 'pointer', fontFamily: "'Barlow',sans-serif", fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 5 }}>
+              Redes <span style={{ fontSize: 9, display: 'inline-block', transform: redesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+            </button>
+            {redesOpen && (
+              <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 6, background: '#111115', border: '1px solid #1d1d20', borderRadius: 10, padding: 6, minWidth: 190, zIndex: 200, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+                {REDES.map(r => (
+                  <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setRedesOpen(false)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, textDecoration: 'none', color: '#a1a1aa', fontSize: 13 }}>
+                    <span style={{ width: 15, height: 15, color: r.color, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: r.svg }} />
+                    {r.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile hamburger */}
+        <div className="hide-desktop" style={{ position: 'absolute', top: 0, right: '1rem', height: 52, display: 'flex', alignItems: 'center' }}>
+          <button onClick={() => setMenuOpen(!menuOpen)}
             style={{ background: menuOpen ? '#18181c' : 'none', border: menuOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18 }}>
             {menuOpen ? '✕' : '☰'}
           </button>
         </div>
 
+        {/* Mobile menu */}
         {menuOpen && (
           <div className="hide-desktop" style={{ background: '#09090b', borderTop: '1px solid #1d1d20', padding: '8px 1rem 1rem' }}>
             {CATS.map(c => (
               <Link key={c.slug} href={`/categoria/${c.slug}`} onClick={() => setMenuOpen(false)}
-                style={{ display: 'block', fontSize: 15, color: '#71717a', padding: '10px 8px', textDecoration: 'none', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                style={{ display: 'block', fontSize: 14, color: '#71717a', padding: '10px 8px', textDecoration: 'none', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
                 {c.name}
               </Link>
             ))}
-            <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'block', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 15, color: '#e8b84b', padding: '10px 8px', textDecoration: 'none', marginTop: 4 }}>🏆 Torneios</Link>
-            <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'block', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 15, color: '#4f7ef8', padding: '10px 8px', textDecoration: 'none' }}>🎮 Co-op 3x3 ao vivo</Link>
+            <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'block', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#e8b84b', padding: '10px 8px', textDecoration: 'none', marginTop: 4 }}>🏆 Torneios</Link>
+            <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'block', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#4f7ef8', padding: '10px 8px', textDecoration: 'none' }}>🎮 Co-op 3x3</Link>
             <div style={{ height: 1, background: '#1d1d20', margin: '10px 0' }} />
             <p style={{ fontSize: 10, color: '#52525b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 8, padding: '0 8px' }}>Redes sociais</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
