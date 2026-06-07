@@ -267,7 +267,13 @@ export default function Admin() {
           <a href="/admin-fskate/youtube" style={{fontSize:10,color:G.gold,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',background:'rgba(232,184,75,0.08)',border:`1px solid rgba(232,184,75,0.2)`,padding:'5px 10px',borderRadius:6}}>
             ✍️ Radar IA
           </a>
-          <a href="/" target="_blank" style={{fontSize:10,color:G.dim,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>Ver site →</a>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <a href="/" target="_blank" style={{fontSize:10,color:G.dim,textDecoration:'none',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase'}}>Ver site →</a>
+            <button onClick={async()=>{await fetch('/api/admin-auth',{method:'DELETE'});window.location.href='/admin-login'}}
+              style={{fontSize:10,color:G.dim,background:'none',border:`1px solid ${G.border}`,borderRadius:6,padding:'5px 10px',cursor:'pointer',fontWeight:700,letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'}}>
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 
