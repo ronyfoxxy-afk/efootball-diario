@@ -189,11 +189,24 @@ export default function Admin() {
           <textarea style={{...S.inp,minHeight:64,resize:'vertical' as const}} value={editPost.summary||''} onChange={e=>setEditPost({...editPost,summary:e.target.value})} />
           <label style={S.lbl}>Conteúdo</label>
           <textarea style={{...S.inp,minHeight:220,resize:'vertical' as const,fontFamily:'monospace',fontSize:13,lineHeight:1.6}} value={editPost.content||''} onChange={e=>setEditPost({...editPost,content:e.target.value})} />
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <div><label style={S.lbl}>Imagem URL</label><input style={S.inp} placeholder="https://..." value={editPost.cover_image||''} onChange={e=>setEditPost({...editPost,cover_image:e.target.value})} /></div>
-            <div><label style={S.lbl}>Fonte URL</label><input style={S.inp} placeholder="https://..." value={editPost.source_url||''} onChange={e=>setEditPost({...editPost,source_url:e.target.value})} /></div>
+          <label style={S.lbl}>Imagem de capa</label>
+          <div style={{display:'flex',gap:6,marginBottom:8}}>
+            <span style={{fontSize:11,color:G.dim}}>Link:</span>
+            <input style={{...S.inp,marginBottom:0,flex:1}} placeholder="https://..." value={editPost.cover_image||''} onChange={e=>setEditPost({...editPost,cover_image:e.target.value})} />
           </div>
-          {editPost.cover_image && <div style={{borderRadius:8,overflow:'hidden',border:`1px solid ${G.border}`}}><img src={editPost.cover_image} alt="preview" style={{width:'100%',height:'auto',display:'block',maxHeight:220,objectFit:'contain',background:G.surface2}} /></div>}
+          <div style={{border:`2px dashed ${G.border2}`,borderRadius:8,padding:'12px',textAlign:'center',background:G.surface2,position:'relative' as const,marginBottom:10,cursor:'pointer'}}>
+            <input type="file" accept="image/*" style={{position:'absolute',inset:0,opacity:0,cursor:'pointer',width:'100%',height:'100%'}}
+              onChange={async e => {
+                const file = e.target.files?.[0]; if(!file) return
+                const reader = new FileReader()
+                reader.onload = ev => { if(ev.target?.result) setEditPost({...editPost,cover_image:ev.target.result as string}) }
+                reader.readAsDataURL(file)
+              }} />
+            <div style={{fontSize:20,marginBottom:2}}>🖼️</div>
+            <div style={{fontSize:11,color:G.muted,fontWeight:600}}>Upload de imagem — clique ou arraste</div>
+          </div>
+          {editPost.cover_image && <div style={{borderRadius:8,overflow:'hidden',border:`1px solid ${G.border}`,marginBottom:10}}><img src={editPost.cover_image} alt="preview" style={{width:'100%',height:'auto',display:'block',maxHeight:220,objectFit:'cover',background:G.surface2}} /></div>}
+          <div><label style={S.lbl}>Fonte URL</label><input style={S.inp} placeholder="https://..." value={editPost.source_url||''} onChange={e=>setEditPost({...editPost,source_url:e.target.value})} /></div>
         </div></div>
       </div>
     </div>

@@ -85,6 +85,7 @@ export default function RadarIA() {
 
   // YouTube
   const [ytUrl, setYtUrl] = useState('')
+  const [ytImagem, setYtImagem] = useState('')
   const [ytCat, setYtCat] = useState('noticias')
   const [ytStatus, setYtStatus] = useState<'published'|'draft'>('published')
   const [ytLoading, setYtLoading] = useState(false)
@@ -98,6 +99,7 @@ export default function RadarIA() {
 
   // Pesquisa
   const [pQuery, setPQuery] = useState('')
+  const [pImagem, setPImagem] = useState('')
   const [pCat, setPCat] = useState('noticias')
   const [pStatus, setPStatus] = useState<'published'|'draft'>('published')
   const [pLoading, setPLoading] = useState(false)
@@ -383,7 +385,7 @@ Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Má
     await supabase.from('posts').insert({
       title: ytTitulo, slug: slugify(ytTitulo), summary: ytResumo||null,
       content: ytConteudo + `\n\n━━━━━━━━━━━━━━━━\n📺 Fonte: YouTube\n🔗 ${ytUrl}\n\n_Reportagem: Ruud Gullit Jr. | eFOOTBALL NEWS_`,
-      cover_image: videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
+      cover_image: ytImagem || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null),
       category_id: cat?.id||null, tags:['efootball','youtube'], status: ytStatus,
       source_type:'youtube', source_url:ytUrl, auto_published:false,
       published_at: ytStatus==='published' ? new Date().toISOString() : null
@@ -396,7 +398,7 @@ Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Má
     if (!pQuery.trim()) { showToast('⚠️ Digite o tema'); return }
     if (!keyIA.trim()) { showToast('⚠️ Configure a chave de IA'); setConfigOpen(true); return }
     setPLoading(true); setPMsg('🔍 Agente de pesquisa + Ruud Gullit Jr. gerando...'); setPMsgType('info')
-    setPTitulo(''); setPResumo(''); setPConteudo(''); setPPublicado(false)
+    setPTitulo(''); setPResumo(''); setPConteudo(''); setPPublicado(false); setPImagem('')
     try {
       // Primeiro: agente pesquisa o tema
       const pesquisaPrompt = `Você é um agente de pesquisa especialista em eFootball da Konami. Pesquise e forneça todas as informações relevantes sobre o seguinte tema:
@@ -436,6 +438,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
     await supabase.from('posts').insert({
       title: pTitulo, slug: slugify(pTitulo), summary: pResumo||null,
       content: pConteudo + `\n\n_Reportagem: Ruud Gullit Jr. | eFOOTBALL NEWS_`,
+      cover_image: pImagem||null,
       category_id: cat?.id||null, tags:['efootball'], status: pStatus,
       source_type:'manual', auto_published:false,
       published_at: pStatus==='published' ? new Date().toISOString() : null
@@ -458,6 +461,71 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
     if (error) { showToast('❌ '+error.message); return }
     setMPublicado(true)
     setTimeout(() => { setMTitulo(''); setMResumo(''); setMConteudo(''); setMImagem(''); setMFonte(''); setMPublicado(false) }, 3000)
+  }
+
+  // ── Componente de imagem: upload + URL ──
+  const ImagePicker = ({ val, set, label = 'Imagem de capa' }: { val:string, set:(v:string)=>void, label?:string }) => {
+    const [tab, setTabImg] = useState<'url'|'upload'>('url')
+    const [uploading, setUploading] = useState(false)
+
+    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+      const file = e.target.files?.[0]
+      if (!file) return
+      setUploading(true)
+      try {
+        // Upload para Supabase Storage
+        const { createClient } = await import('@supabase/supabase-js')
+        const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+        const ext = file.name.split('.').pop()
+        const path = `covers/${Date.now()}.${ext}`
+        const { error } = await sb.storage.from('media').upload(path, file, { upsert: true })
+        if (error) throw error
+        const { data } = sb.storage.from('media').getPublicUrl(path)
+        set(data.publicUrl)
+      } catch(e: any) {
+        // Fallback: converter para base64 URL temporária
+        const reader = new FileReader()
+        reader.onload = (ev) => { if(ev.target?.result) set(ev.target.result as string) }
+        reader.readAsDataURL(file)
+      }
+      setUploading(false)
+    }
+
+    return (
+      <div style={{ marginBottom:12 }}>
+        <label style={S.lbl}>{label}</label>
+        <div style={{ display:'flex', gap:6, marginBottom:8 }}>
+          {(['url','upload'] as const).map(t => (
+            <button key={t} onClick={() => setTabImg(t)}
+              style={{ padding:'5px 12px', borderRadius:6, border:'none', cursor:'pointer', fontFamily:'inherit', fontSize:10, fontWeight:700, letterSpacing:'0.8px', textTransform:'uppercase' as const,
+                background: tab===t ? 'rgba(232,184,75,0.12)' : G.surface2,
+                color: tab===t ? G.gold : G.muted,
+                outline: tab===t ? `1px solid rgba(232,184,75,0.3)` : `1px solid ${G.border}` }}>
+              {t === 'url' ? '🔗 Link' : '📁 Upload'}
+            </button>
+          ))}
+          {val && <button onClick={() => set('')} style={{ padding:'5px 10px', borderRadius:6, border:'none', cursor:'pointer', background:'rgba(248,113,113,0.08)', color:G.red, fontSize:10, fontWeight:700, textTransform:'uppercase' as const }}>✕ Remover</button>}
+        </div>
+        {tab === 'url' ? (
+          <input style={S.inp} placeholder="https://..." value={val} onChange={e => set(e.target.value)} />
+        ) : (
+          <div style={{ border:`2px dashed ${G.border2}`, borderRadius:8, padding:'16px', textAlign:'center', cursor:'pointer', background:G.surface2, position:'relative' as const }}>
+            <input type="file" accept="image/*" onChange={handleUpload}
+              style={{ position:'absolute', inset:0, opacity:0, cursor:'pointer', width:'100%', height:'100%' }} />
+            <div style={{ fontSize:24, marginBottom:4 }}>🖼️</div>
+            <div style={{ fontSize:12, color:G.muted, fontWeight:600 }}>
+              {uploading ? 'Enviando...' : 'Clique ou arraste uma imagem'}
+            </div>
+            <div style={{ fontSize:10, color:G.dim, marginTop:3 }}>JPG, PNG, WebP — máx 5MB</div>
+          </div>
+        )}
+        {val && val.length > 10 && (
+          <div style={{ borderRadius:8, overflow:'hidden', border:`1px solid ${G.border}`, marginTop:8 }}>
+            <img src={val} alt="preview" style={{ width:'100%', height:'auto', display:'block', maxHeight:180, objectFit:'cover', background:G.surface2 }} />
+          </div>
+        )}
+      </div>
+    )
   }
 
   const CatBtns = ({ val, set }: { val:string, set:(v:string)=>void }) => (
@@ -622,6 +690,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
                   <input style={S.inp} value={ytResumo} onChange={e=>setYtResumo(e.target.value)} />
                   <label style={S.lbl}>Conteúdo</label>
                   <textarea style={{ ...S.inp, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }} value={ytConteudo} onChange={e=>setYtConteudo(e.target.value)} />
+                  <ImagePicker val={ytImagem} set={setYtImagem} label="Imagem de capa (padrão: thumbnail do YouTube)" />
                   <button onClick={publicarYt} disabled={ytPublicando} style={{ ...S.btnGld, width:'100%', opacity:ytPublicando?0.6:1 }}>
                     {ytPublicando ? 'Publicando...' : '✅ Publicar no site'}
                   </button>
@@ -659,6 +728,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
                   <input style={S.inp} value={pResumo} onChange={e=>setPResumo(e.target.value)} />
                   <label style={S.lbl}>Conteúdo</label>
                   <textarea style={{ ...S.inp, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }} value={pConteudo} onChange={e=>setPConteudo(e.target.value)} />
+                  <ImagePicker val={pImagem} set={setPImagem} />
                   <button onClick={publicarPesquisa} style={{ ...S.btnGld, width:'100%' }}>✅ Publicar no site</button>
                 </>
               )}
@@ -680,11 +750,8 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               <textarea style={{ ...S.inp, minHeight:60, resize:'vertical' }} placeholder="Resumo curto..." value={mResumo} onChange={e=>setMResumo(e.target.value)} />
               <label style={S.lbl}>Conteúdo</label>
               <textarea style={{ ...S.inp, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }} placeholder={'Texto completo...\n\nUse ## para título de seção'} value={mConteudo} onChange={e=>setMConteudo(e.target.value)} />
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                <div><label style={S.lbl}>URL da Imagem</label><input style={S.inp} placeholder="https://..." value={mImagem} onChange={e=>setMImagem(e.target.value)} /></div>
-                <div><label style={S.lbl}>Fonte</label><input style={S.inp} placeholder="https://..." value={mFonte} onChange={e=>setMFonte(e.target.value)} /></div>
-              </div>
-              {mImagem && <div style={{ borderRadius:8, overflow:'hidden', border:`1px solid ${G.border}`, marginBottom:12 }}><img src={mImagem} alt="preview" style={{ width:'100%', height:'auto', display:'block', maxHeight:200, objectFit:'contain', background:G.surface2 }} /></div>}
+              <ImagePicker val={mImagem} set={setMImagem} />
+              <div><label style={S.lbl}>Fonte / Link original</label><input style={S.inp} placeholder="https://..." value={mFonte} onChange={e=>setMFonte(e.target.value)} /></div>
               <StatusBtns val={mStatus} set={setMStatus} />
               {mPublicado
                 ? <div style={{ textAlign:'center', padding:'1rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, textTransform:'uppercase' }}>🎉 Publicado!</div>
