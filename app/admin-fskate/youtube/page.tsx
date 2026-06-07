@@ -172,22 +172,123 @@ export default function RadarIA() {
     throw new Error('API de transcrição não reconhecida')
   }
 
-  // ── Pesquisa web via IA (fallback quando transcrição falha) ──
-  async function pesquisarInfoVideo(tituloVideo: string, urlVideo: string): Promise<string> {
-    // Usa a própria IA para buscar contexto sobre o vídeo baseado no título
-    const prompt = `Você é um agente de pesquisa especialista em eFootball. Com base no título do vídeo abaixo, forneça tudo que você sabe sobre esse assunto no eFootball.
+  // ── Pesquisa REAL em fontes da comunidade ──
+  async function pesquisarFontesReais(tema: string): Promise<string> {
+    const resultados: string[] = []
+    const headers = { 'User-Agent': 'Mozilla/5.0 (compatible; efootballnews/1.0)' }
 
-TÍTULO DO VÍDEO: "${tituloVideo}"
-URL: ${urlVideo}
+    // 1. Reddit r/eFootball
+    try {
+      const q = encodeURIComponent(tema + ' efootball')
+      const res = await fetch(`https://www.reddit.com/r/eFootball/search.json?q=${q}&sort=new&limit=5&t=month`, { headers })
+      if (res.ok) {
+        const data = await res.json()
+        const posts = data?.data?.children || []
+        if (posts.length > 0) {
+          resultados.push('=== REDDIT r/eFootball ===')
+          posts.slice(0, 4).forEach((p: any) => {
+            const post = p.data
+            resultados.push(`• ${post.title}`)
+            if (post.selftext && post.selftext.length > 50) {
+              resultados.push(`  "${post.selftext.substring(0, 300)}"`)
+            }
+            resultados.push(`  👍 ${post.score} upvotes | 💬 ${post.num_comments} comentários`)
+          })
+        }
+      }
+    } catch(e) { resultados.push('Reddit: indisponível') }
 
-Forneça:
-1. Contexto sobre o assunto (patch, evento, jogador, campanha, etc.)
-2. Informações relevantes que provavelmente são abordadas no vídeo
-3. Dados oficiais ou amplamente conhecidos sobre esse tema no eFootball
+    // 2. Reddit r/pesmobile (comunidade BR)
+    try {
+      const q = encodeURIComponent(tema)
+      const res = await fetch(`https://www.reddit.com/r/pesmobile/search.json?q=${q}&sort=new&limit=3&t=month`, { headers })
+      if (res.ok) {
+        const data = await res.json()
+        const posts = data?.data?.children || []
+        if (posts.length > 0) {
+          resultados.push('
+=== REDDIT r/pesmobile ===')
+          posts.slice(0, 3).forEach((p: any) => {
+            const post = p.data
+            resultados.push(`• ${post.title}`)
+            if (post.selftext && post.selftext.length > 50) {
+              resultados.push(`  "${post.selftext.substring(0, 200)}"`)
+            }
+          })
+        }
+      }
+    } catch {}
 
-IMPORTANTE: Seja honesto sobre o que é confirmado vs especulação. Não invente dados específicos que não conhece.`
+    // 3. X/Twitter via Nitter (público, sem auth)
+    try {
+      const queries = [
+        `https://nitter.net/search?q=${encodeURIComponent(tema + ' efootball')}&f=tweets`,
+        `https://nitter.poast.org/search?q=${encodeURIComponent(tema + ' efootball')}&f=tweets`,
+      ]
+      for (const url of queries) {
+        const res = await fetch(url, { headers })
+        if (res.ok) {
+          const html = await res.text()
+          const tweets: string[] = []
+          const matches = html.matchAll(/<div class="tweet-content[^"]*"[^>]*>([\s\S]*?)<\/div>/gi)
+          for (const m of matches) {
+            const text = m[1].replace(/<[^>]+>/g, '').trim()
+            if (text.length > 20) tweets.push(`• ${text.substring(0, 200)}`)
+            if (tweets.length >= 5) break
+          }
+          if (tweets.length > 0) {
+            resultados.push('
+=== X/TWITTER (comunidade) ===')
+            resultados.push(...tweets)
+            break
+          }
+        }
+      }
+    } catch {}
 
-    return await chamarIA(prompt)
+    // 4. Google News RSS
+    try {
+      const q = encodeURIComponent(`${tema} efootball`)
+      const res = await fetch(`https://news.google.com/rss/search?q=${q}&hl=pt-BR&gl=BR&ceid=BR:pt`, { headers })
+      if (res.ok) {
+        const xml = await res.text()
+        const items = xml.match(/<item>([\s\S]*?)<\/item>/gi) || []
+        if (items.length > 0) {
+          resultados.push('
+=== GOOGLE NEWS ===')
+          items.slice(0, 4).forEach(item => {
+            const title = item.match(/<title><!\[CDATA\[(.*?)\]\]>/)?.[1] || item.match(/<title>(.*?)<\/title>/)?.[1] || ''
+            const desc  = item.match(/<description><!\[CDATA\[(.*?)\]\]>/)?.[1] || ''
+            if (title) resultados.push(`• ${title}`)
+            if (desc) resultados.push(`  ${desc.replace(/<[^>]+>/g,'').substring(0,150)}`)
+          })
+        }
+      }
+    } catch {}
+
+    // 5. Site oficial Konami (notícias)
+    try {
+      const res = await fetch('https://www.konami.com/efootball/pt-br/topic/news/list', { headers })
+      if (res.ok) {
+        const html = await res.text()
+        const titles = html.match(/class="title">([^<]+)</gi) || []
+        if (titles.length > 0) {
+          resultados.push('
+=== SITE OFICIAL KONAMI (últimas notícias) ===')
+          titles.slice(0, 5).forEach(t => {
+            const title = t.replace(/class="title">/, '').replace(/<$/, '').trim()
+            resultados.push(`• ${title}`)
+          })
+        }
+      }
+    } catch {}
+
+    if (resultados.length === 0) {
+      throw new Error('Nenhuma fonte retornou resultados. Tente um tema mais específico.')
+    }
+
+    return resultados.join('
+')
   }
 
   // ── Chamar IA (Ruud Gullit Jr. em TODAS) ──
@@ -339,8 +440,9 @@ Forneça:
 
 Seja preciso. Separe claramente o que é oficial do que é rumor.`
 
-      setPMsg('🔍 Pesquisando informações sobre o tema...')
-      const pesquisa = await chamarIA(pesquisaPrompt)
+      setPMsg('🔍 Varrendo Reddit, X/Twitter, Google News e Konami...')
+      const pesquisa = await pesquisarFontesReais(pQuery)
+      setPMsg('✅ Fontes coletadas! Ruud Gullit Jr. analisando...')
 
       // Segundo: Ruud Gullit Jr. escreve a notícia
       setPMsg('🤖 Ruud Gullit Jr. escrevendo a notícia...')
@@ -510,7 +612,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:'1rem' }}>
           {([
             { id:'youtube' as Mode,  icon:'▶',  label:'YouTube → Post',   desc:'Transcreve ou pesquisa + Ruud escreve' },
-            { id:'pesquisa' as Mode, icon:'🔍', label:'Tema + Pesquisa',  desc:'IA pesquisa o tema + Ruud escreve' },
+            { id:'pesquisa' as Mode, icon:'🔍', label:'Tema + Pesquisa',  desc:'Varre Reddit, Twitter, Google News e Konami' },
             { id:'manual' as Mode,   icon:'✏️', label:'Manual',           desc:'Você escreve tudo' },
           ]).map(m => (
             <button key={m.id} onClick={() => setMode(m.id)}
@@ -565,7 +667,10 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
             <div style={S.head}><span style={S.secTit}>🔍 Pesquisa + Ruud Gullit Jr.</span></div>
             <div style={S.body}>
               <label style={S.lbl}>Tema / Assunto</label>
-              <textarea style={{ ...S.inp, minHeight:80, resize:'vertical' }} placeholder={'Ex: Patch 5.4 do eFootball com novidades\nEx: Melhores épicos do momento no meta\nEx: Copa do Mundo eFootball 2026'} value={pQuery} onChange={e=>setPQuery(e.target.value)} />
+              <textarea style={{ ...S.inp, minHeight:80, resize:'vertical' }} placeholder={'Ex: melhores atacantes update 4.4\nEx: novidades patch eFootball\nEx: épicos mais usados no ranked'} value={pQuery} onChange={e=>setPQuery(e.target.value)} />
+              <div style={{ background:'rgba(79,126,248,0.06)', border:`1px solid rgba(79,126,248,0.15)`, borderRadius:8, padding:'9px 12px', marginBottom:12, fontSize:12, color:G.blue, lineHeight:1.5 }}>
+                🔍 Varre <strong>Reddit r/eFootball</strong>, <strong>X/Twitter</strong>, <strong>Google News</strong> e <strong>site Konami</strong> — Ruud escreve baseado no que a comunidade está falando de verdade.
+              </div>
               <label style={S.lbl}>Categoria</label>
               <CatBtns val={pCat} set={setPCat} />
               <StatusBtns val={pStatus} set={setPStatus} />
