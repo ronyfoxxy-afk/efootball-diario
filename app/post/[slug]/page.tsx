@@ -80,6 +80,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         {post.content && (
           <div style={{ marginBottom: '1.5rem' }}>
             {post.content.split('\n').map((line: string, i: number) => {
+              // Ignorar linhas de metadados do workflow
+              if (line.match(/^(TITULO|TÍTULO|RESUMO|TITL):\s*/i)) return null
               if (!line.trim()) return <div key={i} style={{ height: 16 }} />
 
               // Título (linha que começa com ##)
