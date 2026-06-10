@@ -25,7 +25,6 @@ const REDES = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [redesOpen, setRedesOpen] = useState(false)
   const [showTorneios, setShowTorneios] = useState(true)
   const [showCoop, setShowCoop] = useState(true)
 
@@ -45,70 +44,33 @@ export default function Navbar() {
     <>
       <header style={{ background: 'rgba(9,9,11,0.98)', backdropFilter: 'blur(16px)', borderBottom: '1px solid #1d1d20', position: 'sticky', top: 0, zIndex: 100 }}>
 
-        {/* ── Barra superior: logo centralizado + Redes à direita ── */}
-        <div style={{ borderBottom: '1px solid #1d1d20', padding: '0 1.25rem', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          {/* Logo centralizado */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <Image src="/logo.png" alt="eFootball News" width={36} height={36} style={{ borderRadius: 8 }} />
-            <div>
+        {/* ── Barra única: hambúrguer + nome centralizado + logo à direita ── */}
+        <div style={{ padding: '0 1.25rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', maxWidth: 1160, margin: '0 auto' }}>
+
+          {/* Hambúrguer — sempre à esquerda (desktop e mobile) */}
+          <button onClick={() => setMenuOpen(!menuOpen)}
+            style={{ background: menuOpen ? '#18181c' : 'none', border: menuOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18, flexShrink: 0, zIndex: 1 }}>
+            {menuOpen ? '✕' : '☰'}
+          </button>
+
+          {/* Nome centralizado, próximo da logo */}
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+            <div style={{ textAlign: 'right' }}>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 20, lineHeight: 1, letterSpacing: 2, textTransform: 'uppercase' }}>
                 <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
               </div>
-              <div style={{ fontSize: 9, color: '#e8b84b', letterSpacing: '3px', fontWeight: 700, lineHeight: 1, marginTop: 2 }}>— NEWS —</div>
+              <div style={{ fontSize: 9, color: '#e8b84b', letterSpacing: '3px', fontWeight: 700, lineHeight: 1, marginTop: 2, textAlign: 'center' }}>— NEWS —</div>
             </div>
+            <Image src="/logo-icon.png" alt="eFootball News" width={34} height={30} style={{ objectFit: 'contain' }} />
           </Link>
 
-          {/* Redes — canto superior esquerdo */}
-          <div className="hide-mobile" style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
-            <button onClick={() => setRedesOpen(!redesOpen)}
-              style={{ fontSize: 11, color: '#71717a', padding: '5px 11px', borderRadius: 6, background: redesOpen ? '#18181c' : 'none', border: redesOpen ? '1px solid #1d1d20' : '1px solid transparent', cursor: 'pointer', fontFamily: "'Barlow',sans-serif", fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 5 }}>
-              Redes <span style={{ fontSize: 9, display: 'inline-block', transform: redesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
-            </button>
-            {redesOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 6, background: '#111115', border: '1px solid #1d1d20', borderRadius: 10, padding: 6, minWidth: 190, zIndex: 200, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
-                {REDES.map(r => (
-                  <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setRedesOpen(false)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, textDecoration: 'none', color: '#a1a1aa', fontSize: 13, transition: 'background .15s' }}>
-                    <span style={{ width: 15, height: 15, color: r.color, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: r.svg }} />
-                    {r.label}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Mobile hamburger — esquerda */}
-          <button className="hide-desktop" onClick={() => setMenuOpen(!menuOpen)}
-            style={{ position: 'absolute', left: '1rem', background: menuOpen ? '#18181c' : 'none', border: menuOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18 }}>
-            {menuOpen ? '✕' : '☰'}
-          </button>
-        </div>
-
-        {/* ── Barra inferior: categorias ── */}
-        <div className="hide-mobile" style={{ maxWidth: 1160, margin: '0 auto', padding: '0 1rem', display: 'flex', alignItems: 'center', height: 38, gap: 2 }}>
-          {CATS.map(c => (
-            <Link key={c.slug} href={`/categoria/${c.slug}`}
-              style={{ fontSize: 11, color: '#71717a', padding: '4px 9px', borderRadius: 6, textDecoration: 'none', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-              {c.name}
-            </Link>
-          ))}
-          {showTorneios && (
-            <Link href="/torneios" style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, background: 'rgba(232,184,75,0.08)', color: '#e8b84b', border: '1px solid rgba(232,184,75,0.18)', padding: '4px 10px', borderRadius: 6, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
-              🏆 Torneios
-            </Link>
-          )}
-          {showCoop && (
-            <Link href="/coop" style={{ fontSize: 11, fontWeight: 700, background: 'rgba(79,126,248,0.08)', color: '#4f7ef8', border: '1px solid rgba(79,126,248,0.18)', padding: '4px 10px', borderRadius: 6, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}>
-              🎮 Co-op
-            </Link>
-          )}
+          {/* Espaço reservado à direita para balancear o hambúrguer */}
+          <div style={{ width: 34, flexShrink: 0 }} />
         </div>
 
       </header>
 
       {/* Overlays e drawer FORA do header para não ficar preso no stacking context */}
-      {redesOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />}
-
       {menuOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 299, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }} onClick={() => setMenuOpen(false)} />}
 
       {/* Mobile drawer — desliza da esquerda */}
