@@ -47,19 +47,22 @@ export default function Navbar() {
         {/* ── Barra única: hambúrguer + nome centralizado + logo à direita ── */}
         <div style={{ padding: '0 1.25rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', maxWidth: 1160, margin: '0 auto' }}>
 
-          {/* Hambúrguer + logo — juntos à esquerda */}
+          {/* Hambúrguer + logo-icon (desktop) — juntos à esquerda */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, zIndex: 1 }}>
             <button onClick={() => setMenuOpen(!menuOpen)}
               style={{ background: menuOpen ? '#18181c' : 'none', border: menuOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18 }}>
               {menuOpen ? '✕' : '☰'}
             </button>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+            <Link href="/" className="hide-mobile" style={{ alignItems: 'center' }}>
               <Image src="/logo-icon.png" alt="eFootball News" width={34} height={30} style={{ objectFit: 'contain' }} />
             </Link>
           </div>
 
-          {/* Nome centralizado */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+          {/* Nome centralizado (desktop: texto estilizado / mobile: logo completa) */}
+          <Link href="/" className="hide-desktop" style={{ alignItems: 'center', textDecoration: 'none', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+            <Image src="/logo-full.png" alt="eFootball News" width={170} height={113} style={{ objectFit: 'contain', height: 40, width: 'auto' }} />
+          </Link>
+          <Link href="/" className="hide-mobile" style={{ alignItems: 'center', textDecoration: 'none', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 20, lineHeight: 1, letterSpacing: 2, textTransform: 'uppercase' }}>
                 <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
@@ -67,7 +70,6 @@ export default function Navbar() {
               <div style={{ fontSize: 9, color: '#e8b84b', letterSpacing: '3px', fontWeight: 700, lineHeight: 1, marginTop: 2, textAlign: 'center' }}>— NEWS —</div>
             </div>
           </Link>
-
 
           {/* Espaço reservado à direita para balancear hambúrguer + logo */}
           <div style={{ width: 78, flexShrink: 0 }} />
