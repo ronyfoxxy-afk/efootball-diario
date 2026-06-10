@@ -21,7 +21,10 @@ async function getPosts() {
   const { data } = await supabase
     .from('posts').select('*, categories(*)')
     .eq('status', 'published')
+    .order('order_index', { ascending: true, nullsFirst: false })
     .order('published_at', { ascending: false })
+  // nullsFirst:false já garante que order_index definido (reordenado manualmente)
+  // tem prioridade; posts sem order_index seguem por published_at desc
     .limit(20)
   if (!data) return []
   // Prioriza post marcado como destaque (featured)

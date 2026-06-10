@@ -2,6 +2,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Image from 'next/image'
+import {
+  DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext, verticalListSortingStrategy, useSortable, arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const G = {
   bg: '#09090b', surface: '#111115', surface2: '#18181c',
@@ -56,6 +64,52 @@ const MENU_ITEMS = [
   { id:'site' as Tab,     icon:'👁', label:'Site'      },
 ]
 
+/* ── Card de post arrastável ── */
+function SortablePostCard({ p, featuredId, onToggleFeatured, onEdit, onPublish, onToggleHide, onDelete }: {
+  p: any, featuredId: string|null,
+  onToggleFeatured: (id:string)=>void, onEdit: (p:any)=>void,
+  onPublish: (id:string)=>void, onToggleHide: (p:any)=>void, onDelete: (id:string)=>void,
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: p.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 'auto',
+  }
+  return (
+    <div ref={setNodeRef} style={{
+      ...style,
+      background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, padding:'10px 12px', marginBottom:8,
+      display:'flex', alignItems:'center', gap:8,
+      boxShadow: isDragging ? '0 8px 24px rgba(0,0,0,0.5)' : 'none',
+      transition: `${transition}, box-shadow .15s, border-color .15s`,
+    }}
+    className="card-hover">
+      {/* Alça de arrastar */}
+      <div {...attributes} {...listeners}
+        style={{ cursor:'grab', color:G.dim, fontSize:16, padding:'4px 2px', flexShrink:0, touchAction:'none', display:'flex', alignItems:'center' }}>
+        ⠿
+      </div>
+      {p.cover_image && <div style={{ width:40, height:40, borderRadius:8, background:`url(${p.cover_image}) center/cover`, flexShrink:0, border:`1px solid ${G.border}` }} />}
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, color:G.text, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.title}</div>
+        <div style={{ fontSize:10, color:G.dim, marginTop:2, display:'flex', gap:8 }}>
+          {p.auto_published && <span style={{ color:G.green }}>AUTO</span>}
+          {featuredId===p.id && <span style={{ color:G.gold }}>⭐ DESTAQUE</span>}
+        </div>
+      </div>
+      <div style={{ display:'flex', gap:4, flexShrink:0 }}>
+        <button onClick={()=>onToggleFeatured(p.id)} style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'4px 8px', fontSize:13 }}>{featuredId===p.id?'⭐':'☆'}</button>
+        <button onClick={()=>onEdit(p)} style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
+        {p.status==='draft' && <button onClick={()=>onPublish(p.id)} style={S.btnSm(G.green,'rgba(34,211,160,0.08)')}>Pub.</button>}
+        <button onClick={()=>onToggleHide(p)} style={S.btnSm(p.status==='hidden'?G.green:G.gold,'rgba(255,255,255,0.04)')}>{p.status==='hidden'?'Mostrar':'Ocultar'}</button>
+        <button onClick={()=>onDelete(p.id)} style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
+      </div>
+    </div>
+  )
+}
+
 export default function Admin() {
   const [tab, setTab] = useState<Tab>('home')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -81,7 +135,7 @@ export default function Admin() {
       supabase.from('posts').select('*',{count:'exact',head:true}).gte('published_at',new Date().toISOString().split('T')[0]),
     ])
     setStats({ pub:pub||0, draft:draft||0, hoje:hoje||0 })
-    const { data } = await supabase.from('posts').select('id,title,summary,content,status,auto_published,cover_image,source_url,published_at,categories(name,color),featured').order('published_at',{ascending:false}).limit(50)
+    const { data } = await supabase.from('posts').select('id,title,summary,content,status,auto_published,cover_image,source_url,published_at,order_index,categories(name,color),featured').order('order_index',{ascending:true,nullsFirst:false}).limit(50)
     setPosts(data||[])
     setFeaturedId((data||[]).find((p:any)=>p.featured)?.id||null)
   }
@@ -131,6 +185,34 @@ export default function Admin() {
     if (!confirm('Apagar este post?')) return
     await supabase.from('posts').delete().eq('id',id)
     showToast('🗑️ Apagado'); loadAll()
+  }
+
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+  )
+
+  async function handlePostDragEnd(event: DragEndEvent, status: string) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const filtered = posts.filter(p=>p.status===status)
+    const oldIndex = filtered.findIndex(p=>p.id===active.id)
+    const newIndex = filtered.findIndex(p=>p.id===over.id)
+    if (oldIndex===-1 || newIndex===-1) return
+
+    const reordered = arrayMove(filtered, oldIndex, newIndex)
+
+    // Atualiza estado local imediatamente (otimista)
+    const otherPosts = posts.filter(p=>p.status!==status)
+    setPosts([...otherPosts, ...reordered].sort((a,b)=>(a.order_index??0)-(b.order_index??0)))
+
+    // Reatribui order_index sequencial dentro do grupo e persiste
+    const updates = reordered.map((p, i) => ({ id: p.id, order_index: i }))
+    for (const u of updates) {
+      await supabase.from('posts').update({ order_index: u.order_index }).eq('id', u.id)
+    }
+    loadAll()
   }
 
   async function salvarEdicaoPost() {
@@ -256,12 +338,13 @@ export default function Admin() {
       {/* ── HEADER ── */}
       <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', position:'sticky' as const, top:0, zIndex:100 }}>
 
-        {/* Esquerda: hamburguer + início */}
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        {/* Esquerda: hamburguer + logo + início */}
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
           <button onClick={()=>setMenuOpen(!menuOpen)}
             style={{ background:'none', border:`1px solid ${menuOpen?G.border:'transparent'}`, borderRadius:8, color:G.muted, cursor:'pointer', fontSize:18, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center' }}>
             {menuOpen ? '✕' : '☰'}
           </button>
+          <Image src="/logo.png" alt="logo" width={600} height={136} style={{ objectFit:'contain', height: 28, width: 'auto' }} />
           {tab !== 'home' && (
             <button onClick={()=>goTab('home')}
               style={{ background:'none', border:'none', color:G.dim, cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', fontFamily:'inherit', display:'flex', alignItems:'center', gap:4 }}>
@@ -270,14 +353,12 @@ export default function Admin() {
           )}
         </div>
 
-        {/* Centro: logo */}
-        <div style={{ position:'absolute', left:'50%', transform:'translateX(-50%)', display:'flex', alignItems:'center', gap:10 }}>
-          <Image src="/logo.png" alt="logo" width={600} height={149} style={{ objectFit:'contain', height: 30, width: 'auto' }} />
-          <div>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:12, color:G.dim, letterSpacing:2, textTransform:'uppercase', lineHeight:1 }}>ADMIN</div>
-            <div style={{ fontSize:8, color:G.dim, letterSpacing:'2px', fontWeight:700, textTransform:'uppercase' }}>FSKATE · PAINEL</div>
-          </div>
+        {/* Centro: título do painel */}
+        <div style={{ position:'absolute', left:'50%', transform:'translateX(-50%)', textAlign:'center' }}>
+          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:12, color:G.dim, letterSpacing:2, textTransform:'uppercase', lineHeight:1 }}>ADMIN</div>
+          <div style={{ fontSize:8, color:G.dim, letterSpacing:'2px', fontWeight:700, textTransform:'uppercase' }}>FSKATE · PAINEL</div>
         </div>
+
 
 
         {/* Direita: sair */}
@@ -383,29 +464,22 @@ export default function Admin() {
                   <div style={{ fontSize:10, color:colors[status], fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
                     <span style={{ width:6, height:6, borderRadius:'50%', background:colors[status], display:'inline-block' }}/>
                     {labels[status]} · {filtered.length}
+                    {status==='published' && <span style={{ marginLeft:'auto', color:G.dim, fontWeight:400, letterSpacing:0, textTransform:'none', fontSize:10 }}>arraste ⠿ para reordenar</span>}
                   </div>
-                  {filtered.map(p => (
-                    <div key={p.id} style={{ background:G.surface, border:`1px solid ${G.border}`, borderRadius:10, padding:'9px 12px', marginBottom:5, display:'flex', alignItems:'center', gap:8 }}>
-                      {p.cover_image && <div style={{ width:34, height:34, borderRadius:6, background:`url(${p.cover_image}) center/cover`, flexShrink:0 }} />}
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, color:G.text, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.title}</div>
-                        <div style={{ fontSize:10, color:G.dim, marginTop:1, display:'flex', gap:8 }}>
-                          {p.auto_published && <span style={{ color:G.green }}>AUTO</span>}
-                          {featuredId===p.id && <span style={{ color:G.gold }}>⭐ DESTAQUE</span>}
-                        </div>
-                      </div>
-                      <div style={{ display:'flex', gap:4, flexShrink:0 }}>
-                        <button onClick={()=>toggleFeatured(p.id)} style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'4px 8px', fontSize:13 }}>{featuredId===p.id?'⭐':'☆'}</button>
-                        <button onClick={()=>setEditPost(p)} style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
-                        {p.status==='draft' && <button onClick={()=>publicarDraft(p.id)} style={S.btnSm(G.green,'rgba(34,211,160,0.08)')}>Pub.</button>}
-                        <button onClick={()=>toggleHide(p)} style={S.btnSm(p.status==='hidden'?G.green:G.gold,'rgba(255,255,255,0.04)')}>{p.status==='hidden'?'Mostrar':'Ocultar'}</button>
-                        <button onClick={()=>apagarPost(p.id)} style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
-                      </div>
-                    </div>
-                  ))}
+                  <DndContext sensors={dndSensors} collisionDetection={closestCenter}
+                    onDragEnd={(e)=>handlePostDragEnd(e, status)}>
+                    <SortableContext items={filtered.map(p=>p.id)} strategy={verticalListSortingStrategy}>
+                      {filtered.map(p => (
+                        <SortablePostCard key={p.id} p={p} featuredId={featuredId}
+                          onToggleFeatured={toggleFeatured} onEdit={setEditPost}
+                          onPublish={publicarDraft} onToggleHide={toggleHide} onDelete={apagarPost} />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 </div>
               )
             })}
+
           </>
         )}
 
