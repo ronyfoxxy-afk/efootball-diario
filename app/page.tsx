@@ -129,7 +129,7 @@ export default async function Home() {
                 <Link key={post.id} href={`/post/${post.slug}`} style={{ textDecoration: 'none', flex: 1 }}>
                   <div className="card-hover" style={{ background: '#111115', border: '1px solid #1d1d20', borderRadius: 12, padding: 10, display: 'flex', gap: 10, cursor: 'pointer', height: '100%' }}>
                     {post.cover_image && (
-                      <div style={{ width: 58, height: 58, borderRadius: 8, background: `url(${post.cover_image}) center/cover`, flexShrink: 0 }} />
+                      <div style={{ width: 72, height: 72, borderRadius: 8, background: `url(${post.cover_image}) center/cover`, flexShrink: 0, border: '1px solid #1d1d20' }} />
                     )}
                     <div style={{ minWidth: 0 }}>
                       {post.categories && badge(post.categories.color, post.categories.name)}

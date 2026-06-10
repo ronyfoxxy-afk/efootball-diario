@@ -12,7 +12,7 @@ export default function PostCard({ post }: { post: Post }) {
         borderRadius: 12, overflow: 'hidden',
         height: '100%', display: 'flex', flexDirection: 'column',
       }}>
-        <div style={{ height: 130, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+        <div style={{ height: 140, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
           <div className="thumb-inner" style={{
             width: '100%', height: '100%',
             background: post.cover_image

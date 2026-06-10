@@ -77,9 +77,9 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger — esquerda */}
           <button className="hide-desktop" onClick={() => setMenuOpen(!menuOpen)}
-            style={{ position: 'absolute', right: '1rem', background: menuOpen ? '#18181c' : 'none', border: menuOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18 }}>
+            style={{ position: 'absolute', left: '1rem', background: menuOpen ? '#18181c' : 'none', border: menuOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18 }}>
             {menuOpen ? '✕' : '☰'}
           </button>
         </div>
@@ -104,19 +104,38 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="hide-desktop" style={{ background: '#09090b', borderTop: '1px solid #1d1d20', padding: '8px 1rem 1rem' }}>
+        {/* Mobile drawer — desliza da esquerda */}
+        <div className="hide-desktop" style={{
+          position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 300,
+          width: 272, background: '#0d0d10', borderRight: '1px solid #1d1d20',
+          transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
+          display: 'flex', flexDirection: 'column', overflowY: 'auto',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', height: 52, borderBottom: '1px solid #1d1d20', flexShrink: 0 }}>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 16, letterSpacing: 2, textTransform: 'uppercase' }}>
+              <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
+            </div>
+            <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#71717a', fontSize: 20, cursor: 'pointer', padding: '4px 8px' }}>✕</button>
+          </div>
+          <div style={{ padding: '8px 0' }}>
+            <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Categorias</p>
             {CATS.map(c => (
               <Link key={c.slug} href={`/categoria/${c.slug}`} onClick={() => setMenuOpen(false)}
-                style={{ display: 'block', fontSize: 14, color: '#71717a', padding: '10px 8px', textDecoration: 'none', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                style={{ display: 'flex', alignItems: 'center', fontSize: 14, color: '#a1a1aa', padding: '11px 1rem', textDecoration: 'none', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #18181c' }}>
                 {c.name}
               </Link>
             ))}
-            {showTorneios && <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'block', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#e8b84b', padding: '10px 8px', textDecoration: 'none' }}>🏆 Torneios</Link>}
-            {showCoop && <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'block', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#4f7ef8', padding: '10px 8px', textDecoration: 'none' }}>🎮 Co-op 3x3</Link>}
-            <div style={{ height: 1, background: '#1d1d20', margin: '10px 0' }} />
-            <p style={{ fontSize: 10, color: '#52525b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 8, padding: '0 8px' }}>Redes sociais</p>
+          </div>
+          {(showTorneios || showCoop) && (
+            <div style={{ padding: '8px 0' }}>
+              <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Comunidade</p>
+              {showTorneios && <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#e8b84b', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🏆 Torneios</Link>}
+              {showCoop && <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#4f7ef8', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🎮 Co-op 3x3</Link>}
+            </div>
+          )}
+          <div style={{ padding: '8px 1rem 1.5rem', marginTop: 'auto' }}>
+            <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 8, paddingTop: 8 }}>Redes sociais</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
               {REDES.map(r => (
                 <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}
@@ -127,9 +146,11 @@ export default function Navbar() {
               ))}
             </div>
           </div>
-        )}
+        </div>
       </header>
       {redesOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />}
+      {/* Overlay do drawer mobile */}
+      {menuOpen && <div className="hide-desktop" style={{ position: 'fixed', inset: 0, zIndex: 299, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }} onClick={() => setMenuOpen(false)} />}
     </>
   )
 }
