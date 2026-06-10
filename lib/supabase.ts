@@ -56,10 +56,27 @@ export type Participant = {
   tournament_id: string
   player_name: string
   contact: string | null
+  efootball_user: string | null
+  available_days: string[] | null
+  available_times: string[] | null
   payment_status: 'pending' | 'confirmed' | 'refunded'
   paid_at: string | null
+  livepix_ref: string | null
   notes: string | null
+  disqualified: boolean
+  disqualified_reason: string | null
   created_at: string
+}
+
+export type Round = {
+  id: string
+  tournament_id: string
+  round_number: number
+  name: string | null
+  scheduled_date: string | null
+  status: string | null
+  created_at: string
+  tournament_matches?: Match[]
 }
 
 export type Match = {
@@ -81,6 +98,7 @@ export type Standing = {
   tournament_id: string
   participant_id: string
   player_name: string
+  disqualified: boolean
   jogos: number
   vitorias: number
   empates: number
