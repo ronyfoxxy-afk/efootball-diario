@@ -45,16 +45,24 @@ export function cleanPostContent(raw: string): { body: string; signature: string
   // Remove linhas "**TÍTULO:** ..." / "TÍTULO: ..." / "**RESUMO:** ..." / "RESUMO: ..." no início
   text = text.replace(/^\s*\*{0,2}\s*(T[IÍ]TULO|TITL|RESUMO)\s*:\s*\*{0,2}\s*.*$/gim, '')
 
-  // Separa o bloco de assinatura/fonte (a partir da linha de separadores ━)
+  // Separa o bloco de assinatura/fonte (a partir da linha de separadores ━ OU da linha "_Reportagem: ...")
   let signature: string | null = null
   const sepIndex = text.search(/━{3,}/)
+  const sigIndex = text.search(/_Reportagem:.*$/im)
+
   if (sepIndex !== -1) {
     signature = text.slice(sepIndex).replace(/━{3,}/g, '').trim()
     text = text.slice(0, sepIndex)
+  } else if (sigIndex !== -1) {
+    signature = text.slice(sigIndex).trim()
+    text = text.slice(0, sigIndex)
   }
 
   // Limpa linhas vazias extras
   text = text.replace(/\n{3,}/g, '\n\n').trim()
+
+  // Remove bloco "## Fontes" / "## Referências" gerado pelo agente — o site já monta sua própria seção
+  text = text.replace(/\n{0,2}#{1,3}\s*(Fontes|Referências|Referencias)\s*\n[\s\S]*?(?=\n#{1,3}\s|\n_Reportagem|$)/i, '').trim()
 
   return { body: text, signature }
 }
