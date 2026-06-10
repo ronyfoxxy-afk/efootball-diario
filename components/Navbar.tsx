@@ -104,53 +104,56 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile drawer — desliza da esquerda */}
-        <div style={{
-          position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 300,
-          width: 272, background: '#0d0d10', borderRight: '1px solid #1d1d20',
-          transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
-          transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
-          display: 'flex', flexDirection: 'column', overflowY: 'auto',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', height: 52, borderBottom: '1px solid #1d1d20', flexShrink: 0 }}>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 16, letterSpacing: 2, textTransform: 'uppercase' }}>
-              <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
-            </div>
-            <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#71717a', fontSize: 20, cursor: 'pointer', padding: '4px 8px' }}>✕</button>
+      </header>
+
+      {/* Overlays e drawer FORA do header para não ficar preso no stacking context */}
+      {redesOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />}
+
+      {menuOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 299, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }} onClick={() => setMenuOpen(false)} />}
+
+      {/* Mobile drawer — desliza da esquerda */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 300,
+        width: 272, background: '#0d0d10', borderRight: '1px solid #1d1d20',
+        transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
+        transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
+        display: 'flex', flexDirection: 'column', overflowY: 'auto',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', height: 52, borderBottom: '1px solid #1d1d20', flexShrink: 0 }}>
+          <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 16, letterSpacing: 2, textTransform: 'uppercase' }}>
+            <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
           </div>
+          <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#71717a', fontSize: 20, cursor: 'pointer', padding: '4px 8px' }}>✕</button>
+        </div>
+        <div style={{ padding: '8px 0' }}>
+          <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Categorias</p>
+          {CATS.map(c => (
+            <Link key={c.slug} href={`/categoria/${c.slug}`} onClick={() => setMenuOpen(false)}
+              style={{ display: 'flex', alignItems: 'center', fontSize: 14, color: '#a1a1aa', padding: '11px 1rem', textDecoration: 'none', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #18181c' }}>
+              {c.name}
+            </Link>
+          ))}
+        </div>
+        {(showTorneios || showCoop) && (
           <div style={{ padding: '8px 0' }}>
-            <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Categorias</p>
-            {CATS.map(c => (
-              <Link key={c.slug} href={`/categoria/${c.slug}`} onClick={() => setMenuOpen(false)}
-                style={{ display: 'flex', alignItems: 'center', fontSize: 14, color: '#a1a1aa', padding: '11px 1rem', textDecoration: 'none', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #18181c' }}>
-                {c.name}
-              </Link>
+            <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Comunidade</p>
+            {showTorneios && <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#e8b84b', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🏆 Torneios</Link>}
+            {showCoop && <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#4f7ef8', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🎮 Co-op 3x3</Link>}
+          </div>
+        )}
+        <div style={{ padding: '8px 1rem 1.5rem', marginTop: 'auto' }}>
+          <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 8, paddingTop: 8 }}>Redes sociais</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+            {REDES.map(r => (
+              <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 10px', background: '#111115', borderRadius: 8, textDecoration: 'none', color: '#a1a1aa', fontSize: 13, border: '1px solid #1d1d20' }}>
+                <span style={{ width: 15, height: 15, color: r.color, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: r.svg }} />
+                {r.label}
+              </a>
             ))}
           </div>
-          {(showTorneios || showCoop) && (
-            <div style={{ padding: '8px 0' }}>
-              <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Comunidade</p>
-              {showTorneios && <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#e8b84b', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🏆 Torneios</Link>}
-              {showCoop && <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#4f7ef8', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🎮 Co-op 3x3</Link>}
-            </div>
-          )}
-          <div style={{ padding: '8px 1rem 1.5rem', marginTop: 'auto' }}>
-            <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: 8, paddingTop: 8 }}>Redes sociais</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-              {REDES.map(r => (
-                <a key={r.label} href={r.url} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 10px', background: '#111115', borderRadius: 8, textDecoration: 'none', color: '#a1a1aa', fontSize: 13, border: '1px solid #1d1d20' }}>
-                  <span style={{ width: 15, height: 15, color: r.color, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: r.svg }} />
-                  {r.label}
-                </a>
-              ))}
-            </div>
-          </div>
         </div>
-      </header>
-      {redesOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />}
-      {/* Overlay do drawer mobile */}
-      {menuOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 299, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }} onClick={() => setMenuOpen(false)} />}
+      </div>
     </>
   )
 }
