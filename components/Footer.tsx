@@ -8,16 +8,10 @@ export default function Footer() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 24, marginBottom: '1.5rem' }}>
 
           {/* Logo + slogan */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <Image src="/logo.png" alt="eFootball News" width={32} height={32} style={{ borderRadius: 6 }} />
-            <div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 16, lineHeight: 1, letterSpacing: 1, textTransform: 'uppercase' }}>
-                <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
-                <span style={{ color: '#e8b84b', marginLeft: 6 }}>NEWS</span>
-              </div>
-              <div style={{ fontSize: 10, color: '#52525b', marginTop: 3, letterSpacing: '0.3px' }}>
-                Notícias, vazamentos, eventos e atualizações do eFootball todos os dias.
-              </div>
+          <Link href="/" style={{ display: 'flex', flexDirection: 'column', gap: 8, textDecoration: 'none' }}>
+            <Image src="/logo.png" alt="eFootball News" width={600} height={149} style={{ objectFit: 'contain', height: 32, width: 'auto' }} />
+            <div style={{ fontSize: 10, color: '#52525b', letterSpacing: '0.3px' }}>
+              Notícias, vazamentos, eventos e atualizações do eFootball todos os dias.
             </div>
           </Link>
 

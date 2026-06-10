@@ -271,15 +271,14 @@ export default function Admin() {
         </div>
 
         {/* Centro: logo */}
-        <div style={{ position:'absolute', left:'50%', transform:'translateX(-50%)', display:'flex', alignItems:'center', gap:8 }}>
-          <Image src="/logo.png" alt="logo" width={28} height={28} style={{ borderRadius:6 }} />
+        <div style={{ position:'absolute', left:'50%', transform:'translateX(-50%)', display:'flex', alignItems:'center', gap:10 }}>
+          <Image src="/logo.png" alt="logo" width={600} height={149} style={{ objectFit:'contain', height: 30, width: 'auto' }} />
           <div>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, color:G.text, letterSpacing:1, textTransform:'uppercase', lineHeight:1 }}>
-              <span style={{ color:G.gold }}>e</span>FOOTBALL <span style={{ color:G.dim, fontSize:12 }}>ADMIN</span>
-            </div>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:12, color:G.dim, letterSpacing:2, textTransform:'uppercase', lineHeight:1 }}>ADMIN</div>
             <div style={{ fontSize:8, color:G.dim, letterSpacing:'2px', fontWeight:700, textTransform:'uppercase' }}>FSKATE · PAINEL</div>
           </div>
         </div>
+
 
         {/* Direita: sair */}
         <div style={{ marginLeft:'auto' }}>

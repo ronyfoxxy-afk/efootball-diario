@@ -40,9 +40,9 @@ function LoginForm() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
       <div style={{ width: '100%', maxWidth: 380 }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <Image src="/logo.png" alt="eFootball News" width={56} height={56} style={{ borderRadius: 12, marginBottom: 12 }} />
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 22, letterSpacing: 2, textTransform: 'uppercase', color: G.text }}>
-            <span style={{ color: G.gold }}>e</span>FOOTBALL <span style={{ color: G.dim, fontSize: 14 }}>ADMIN</span>
+          <Image src="/logo.png" alt="eFootball News" width={600} height={149} style={{ objectFit: 'contain', height: 44, width: 'auto', marginBottom: 12 }} />
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 16, letterSpacing: 2, textTransform: 'uppercase', color: G.dim }}>
+            ADMIN
           </div>
           <div style={{ fontSize: 12, color: G.dim, marginTop: 4, letterSpacing: '1px' }}>Acesso restrito — FSKATE</div>
         </div>

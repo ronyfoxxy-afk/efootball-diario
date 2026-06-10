@@ -54,13 +54,13 @@ export default function Navbar() {
               {menuOpen ? '✕' : '☰'}
             </button>
             <Link href="/" className="hide-mobile" style={{ alignItems: 'center' }}>
-              <Image src="/logo.png" alt="eFootball News" width={600} height={136} style={{ objectFit: 'contain', height: 36, width: 'auto' }} />
+              <Image src="/logo.png" alt="eFootball News" width={600} height={149} style={{ objectFit: 'contain', height: 36, width: 'auto' }} />
             </Link>
           </div>
 
           {/* Logo centralizada (mobile) */}
           <Link href="/" className="hide-desktop" style={{ alignItems: 'center', textDecoration: 'none', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-            <Image src="/logo.png" alt="eFootball News" width={600} height={136} style={{ objectFit: 'contain', height: 38, width: 'auto' }} />
+            <Image src="/logo.png" alt="eFootball News" width={600} height={149} style={{ objectFit: 'contain', height: 38, width: 'auto' }} />
           </Link>
 
 
@@ -81,10 +81,8 @@ export default function Navbar() {
         transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
         display: 'flex', flexDirection: 'column', overflowY: 'auto',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', height: 52, borderBottom: '1px solid #1d1d20', flexShrink: 0 }}>
-          <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: 16, letterSpacing: 2, textTransform: 'uppercase' }}>
-            <span style={{ color: '#e8b84b' }}>e</span><span style={{ color: '#fff' }}>FOOTBALL</span>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', height: 56, borderBottom: '1px solid #1d1d20', flexShrink: 0 }}>
+          <Image src="/logo.png" alt="eFootball News" width={600} height={149} style={{ objectFit: 'contain', height: 30, width: 'auto' }} />
           <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#71717a', fontSize: 20, cursor: 'pointer', padding: '4px 8px' }}>✕</button>
         </div>
         <div style={{ padding: '8px 0' }}>
