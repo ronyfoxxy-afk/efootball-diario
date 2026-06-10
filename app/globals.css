@@ -177,3 +177,18 @@ img { max-width: 100%; height: auto; }
   color: #e4e4e7;
   font-weight: 700;
 }
+
+/* Shimmer animado para o banner do LivePix */
+@keyframes livepix-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.livepix-shimmer {
+  background: linear-gradient(110deg, #0e1014 40%, #1c1f26 50%, #0e1014 60%);
+  background-size: 200% 100%;
+}
+
+@keyframes livepix-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251,233,0,0.0); }
+  50% { box-shadow: 0 0 0 4px rgba(251,233,0,0.06); }
+}
