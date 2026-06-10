@@ -9,8 +9,8 @@ export default function Privacidade() {
     <div style={{ minHeight:'100vh', background:'#09090b' }}>
       <Navbar />
       <main style={{ maxWidth:760, margin:'0 auto', padding:'2rem 1rem 4rem' }}>
-        <h1 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:36, color:'#e8b84b', textTransform:'uppercase', letterSpacing:1, marginBottom:'0.5rem' }}>Política de Privacidade</h1>
-        <div style={{ width:60, height:3, background:'#e8b84b', borderRadius:2, marginBottom:'0.5rem' }} />
+        <h1 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:36, color:'#fbe900', textTransform:'uppercase', letterSpacing:1, marginBottom:'0.5rem' }}>Política de Privacidade</h1>
+        <div style={{ width:60, height:3, background:'#fbe900', borderRadius:2, marginBottom:'0.5rem' }} />
         <p style={{ fontSize:13, color:'#52525b', marginBottom:'2rem' }}>Última atualização: junho de 2026</p>
 
         <div style={{ fontSize:15, color:'#a1a1aa', lineHeight:1.85 }}>

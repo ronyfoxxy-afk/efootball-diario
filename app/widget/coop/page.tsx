@@ -147,7 +147,7 @@ export default function CoopWidget() {
             {/* Jogadores */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
               {/* FSKATE sempre primeiro */}
-              <span style={{ background: 'rgba(232,184,75,0.15)', border: '1px solid rgba(232,184,75,0.35)', borderRadius: 14, padding: '4px 11px', fontSize: 11, color: '#e8b84b', fontWeight: 700 }}>
+              <span style={{ background: 'rgba(232,184,75,0.15)', border: '1px solid rgba(232,184,75,0.35)', borderRadius: 14, padding: '4px 11px', fontSize: 11, color: '#fbe900', fontWeight: 700 }}>
                 👑 FSKATE
               </span>
               {jogadores.map((j, idx) => (

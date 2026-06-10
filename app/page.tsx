@@ -94,7 +94,7 @@ export default async function Home() {
                       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '1.25rem', zIndex: 2 }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 0 }}>
                           {(hero as any).featured && (
-                            <span style={{ background: 'rgba(232,184,75,0.2)', color: '#e8b84b', border: '1px solid rgba(232,184,75,0.4)', fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>⭐ DESTAQUE</span>
+                            <span style={{ background: 'rgba(232,184,75,0.2)', color: '#fbe900', border: '1px solid rgba(232,184,75,0.4)', fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 4, letterSpacing: '1.2px', textTransform: 'uppercase' as const }}>⭐ DESTAQUE</span>
                           )}
                           {hero.categories && badge(hero.categories.color, hero.categories.name)}
                         </div>
@@ -164,8 +164,8 @@ export default async function Home() {
         <div style={{ display: 'grid', gridTemplateColumns: showTorneios && showCoop ? '1fr 1fr' : '1fr', gap: 10, marginBottom: 10 }}>
           {showTorneios && (
           <Link href="/torneios" style={{ textDecoration: 'none' }}>
-            <div className="card-hover" style={{ background: '#111115', border: '1px solid #1d1d20', borderLeft: '3px solid #e8b84b', borderRadius: '0 12px 12px 0', padding: '1rem', cursor: 'pointer', height: '100%' }}>
-              <p style={{ fontSize: 9, color: '#e8b84b', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 3 }}>Evento Principal</p>
+            <div className="card-hover" style={{ background: '#111115', border: '1px solid #1d1d20', borderLeft: '3px solid #fbe900', borderRadius: '0 12px 12px 0', padding: '1rem', cursor: 'pointer', height: '100%' }}>
+              <p style={{ fontSize: 9, color: '#fbe900', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 3 }}>Evento Principal</p>
               <h3 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 18, fontWeight: 900, color: '#fff', textTransform: 'uppercase', marginBottom: 2 }}>🏆 Liga eFootball</h3>
               <p style={{ fontSize: 12, color: '#52525b' }}>R$20 · Prêmio R$50</p>
             </div>

@@ -160,7 +160,7 @@ export default function TesteCampo() {
   return (
     <div style={{ minHeight:'100vh', background:'#09090b', color:'#e4e4e7', fontFamily:'sans-serif', padding:'2rem 1rem' }}>
       <div style={{ maxWidth:480, margin:'0 auto' }}>
-        <h1 style={{ fontWeight:900, fontSize:26, color:'#e8b84b', textTransform:'uppercase', marginBottom:'0.25rem', textAlign:'center', letterSpacing:2 }}>
+        <h1 style={{ fontWeight:900, fontSize:26, color:'#fbe900', textTransform:'uppercase', marginBottom:'0.25rem', textAlign:'center', letterSpacing:2 }}>
           ⚽ Painel de Formação
         </h1>
         <p style={{ textAlign:'center', color:'#52525b', marginBottom:'1.5rem', fontSize:13 }}>
@@ -172,7 +172,7 @@ export default function TesteCampo() {
           {Object.keys(FORMACOES).map(f => (
             <button key={f} onClick={() => setFormacao(f)}
               style={{ padding:'6px 14px', borderRadius:8, border:'none', cursor:'pointer', fontWeight:700, fontSize:12,
-                background: formacao===f ? '#e8b84b' : '#18181c',
+                background: formacao===f ? '#fbe900' : '#18181c',
                 color: formacao===f ? '#0a0800' : '#71717a',
                 outline: formacao===f ? 'none' : '1px solid #2d2d35'
               }}>
@@ -196,7 +196,7 @@ export default function TesteCampo() {
         {/* Campo */}
         <div style={{ background:'#111115', border:'1px solid #1d1d20', borderRadius:16, padding:'1.25rem', marginBottom:'1rem' }}>
           <div style={{ textAlign:'center', marginBottom:'0.75rem' }}>
-            <span style={{ fontWeight:900, fontSize:24, color:'#e8b84b', letterSpacing:3 }}>{formacao}</span>
+            <span style={{ fontWeight:900, fontSize:24, color:'#fbe900', letterSpacing:3 }}>{formacao}</span>
           </div>
           <CampoFormacao formacao={formacao} jogadores={useJogadores ? JOGADORES_EXEMPLO : []} />
           

@@ -6,7 +6,7 @@ import Image from 'next/image'
 const G = {
   bg: '#09090b', surface: '#111115', surface2: '#18181c',
   border: '#1d1d20', text: '#e4e4e7', dim: '#52525b',
-  gold: '#e8b84b', red: '#f87171',
+  gold: '#fbe900', red: '#f87171',
 }
 
 function LoginForm() {

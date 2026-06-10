@@ -13,7 +13,7 @@ const G = {
   bg: '#09090b', surface: '#111115', surface2: '#18181c',
   border: '#1d1d20', border2: '#2d2d35',
   text: '#e4e4e7', muted: '#71717a', dim: '#52525b',
-  blue: '#4f7ef8', gold: '#e8b84b', green: '#22d3a0',
+  blue: '#4f7ef8', gold: '#fbe900', green: '#22d3a0',
 }
 
 // 3x3 = 6 jogadores por sala. 5 vagas abertas + 1 do FSKATE

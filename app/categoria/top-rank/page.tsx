@@ -47,7 +47,7 @@ export default async function TopRankPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: '1.5rem' }}>
           {[
             { emoji: '⚽', title: 'Melhores Jogadores', desc: 'Os EPICs mais poderosos do meta atual', color: '#f97316' },
-            { emoji: '🛡️', title: 'Melhores Times',     desc: 'Formações e esquemas mais usados', color: '#e8b84b' },
+            { emoji: '🛡️', title: 'Melhores Times',     desc: 'Formações e esquemas mais usados', color: '#fbe900' },
             { emoji: '📊', title: 'Ranking Divisões',   desc: 'Como subir de divisão mais rápido', color: '#22d3a0' },
           ].map(item => (
             <div key={item.title} style={{ background: '#111115', border: `1px solid #1d1d20`, borderTop: `3px solid ${item.color}`, borderRadius: '0 0 12px 12px', padding: '1rem' }}>

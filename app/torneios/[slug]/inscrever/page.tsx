@@ -138,13 +138,13 @@ export default function InscreverPage() {
 
         {/* Box Pix */}
         {torneio.pix_key && (
-          <div style={{ background: '#0e1014', border: '1px solid #e8b84b44', borderRadius: 12, padding: '1.25rem', marginBottom: 20, textAlign: 'left' }}>
-            <p style={{ fontSize: 11, color: '#e8b84b', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 8 }}>
+          <div style={{ background: '#0e1014', border: '1px solid #fbe90044', borderRadius: 12, padding: '1.25rem', marginBottom: 20, textAlign: 'left' }}>
+            <p style={{ fontSize: 11, color: '#fbe900', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 8 }}>
               💰 Pagamento via Pix
             </p>
             <p style={{ fontSize: 13, color: '#8b909e', marginBottom: 6 }}>Valor: <strong style={{ color: '#fff' }}>R$ {Number(torneio.entry_fee).toFixed(2)}</strong></p>
             <p style={{ fontSize: 13, color: '#8b909e', marginBottom: 4 }}>Chave Pix:</p>
-            <div style={{ background: '#14161b', borderRadius: 8, padding: '10px 12px', fontSize: 15, color: '#e8b84b', fontWeight: 600, wordBreak: 'break-all' }}>
+            <div style={{ background: '#14161b', borderRadius: 8, padding: '10px 12px', fontSize: 15, color: '#fbe900', fontWeight: 600, wordBreak: 'break-all' }}>
               {torneio.pix_key}
             </div>
             <p style={{ fontSize: 12, color: '#4b5060', marginTop: 8 }}>
@@ -194,8 +194,8 @@ export default function InscreverPage() {
       <main style={{ maxWidth: 500, margin: '0 auto', padding: '1.5rem 1.25rem 3rem' }}>
 
         {/* Header */}
-        <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #e8b84b', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: 11, color: '#e8b84b', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 4 }}>Inscrição</p>
+        <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderLeft: '3px solid #fbe900', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: 11, color: '#fbe900', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 4 }}>Inscrição</p>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>
             {torneio.name}
           </h1>
@@ -232,7 +232,7 @@ export default function InscreverPage() {
         {/* Info pagamento */}
         {torneio.pix_key && (
           <div style={{ background: '#0e1014', border: '1px solid #1c1f26', borderRadius: 10, padding: '12px', marginBottom: 20, fontSize: 13, color: '#8b909e', lineHeight: 1.6 }}>
-            ℹ️ Após se inscrever, você receberá a chave Pix para pagar a inscrição de <strong style={{ color: '#e8b84b' }}>R$ {Number(torneio.entry_fee).toFixed(2)}</strong> e o link do grupo do WhatsApp.
+            ℹ️ Após se inscrever, você receberá a chave Pix para pagar a inscrição de <strong style={{ color: '#fbe900' }}>R$ {Number(torneio.entry_fee).toFixed(2)}</strong> e o link do grupo do WhatsApp.
           </div>
         )}
 

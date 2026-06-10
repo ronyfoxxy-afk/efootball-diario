@@ -14,7 +14,7 @@ export default function LivePixBanner() {
       <div style={{
         background: '#0e1014',
         border: '1px solid #1c1f26',
-        borderLeft: '3px solid #e8b84b',
+        borderLeft: '3px solid #fbe900',
         borderRadius: 12, cursor: 'pointer',
         padding: '12px 16px',
         display: 'flex', alignItems: 'center',
@@ -25,8 +25,8 @@ export default function LivePixBanner() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
           {/* Indicador ao vivo */}
           <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#e8b84b', opacity: pulse ? 1 : 0.3, transition: 'opacity 0.4s' }} />
-            <span style={{ fontSize: 10, fontWeight: 700, color: '#e8b84b', letterSpacing: '1.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Ao vivo</span>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fbe900', opacity: pulse ? 1 : 0.3, transition: 'opacity 0.4s' }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#fbe900', letterSpacing: '1.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Ao vivo</span>
           </div>
 
           <div style={{ width: 1, height: 24, background: '#1c1f26', flexShrink: 0 }} />
@@ -42,7 +42,7 @@ export default function LivePixBanner() {
         </div>
 
         {/* Direita */}
-        <div style={{ flexShrink: 0, background: '#e8b84b', color: '#000', fontWeight: 700, fontSize: 12, padding: '6px 14px', borderRadius: 7, whiteSpace: 'nowrap' }}>
+        <div style={{ flexShrink: 0, background: '#fbe900', color: '#000', fontWeight: 700, fontSize: 12, padding: '6px 14px', borderRadius: 7, whiteSpace: 'nowrap' }}>
           Doe →
         </div>
       </div>

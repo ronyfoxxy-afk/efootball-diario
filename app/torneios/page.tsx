@@ -29,7 +29,7 @@ export default async function TorneiosPage() {
       <Navbar />
       <main style={{ maxWidth: 1160, margin: '0 auto', padding: '1.5rem 1rem 3rem' }}>
         <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #1d1d20' }}>
-          <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 36, fontWeight: 900, color: '#e8b84b', textTransform: 'uppercase', letterSpacing: 1 }}>
+          <h1 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 36, fontWeight: 900, color: '#fbe900', textTransform: 'uppercase', letterSpacing: 1 }}>
             🏆 Torneios
           </h1>
           <p style={{ color: '#52525b', marginTop: 4, fontSize: 13 }}>
@@ -60,7 +60,7 @@ export default async function TorneiosPage() {
                       <p style={{ fontSize: 13, color: '#71717a', margin: '0 0 12px', lineHeight: 1.5 }}>{t.description}</p>
                     )}
                     <div style={{ display: 'flex', gap: 14, fontSize: 12, flexWrap: 'wrap' }}>
-                      {t.entry_fee > 0 && <span style={{ color: '#e8b84b', fontWeight: 700 }}>💰 R${Number(t.entry_fee).toFixed(2)}</span>}
+                      {t.entry_fee > 0 && <span style={{ color: '#fbe900', fontWeight: 700 }}>💰 R${Number(t.entry_fee).toFixed(2)}</span>}
                       {t.prize > 0 && <span style={{ color: '#22d3a0', fontWeight: 700 }}>🎁 R${Number(t.prize).toFixed(2)}</span>}
                       {t.start_date && <span style={{ color: '#52525b' }}>📅 {formatDate(t.start_date)}</span>}
                     </div>

@@ -6,7 +6,7 @@ const G = {
   bg: '#09090b', surface: '#111115', surface2: '#18181c',
   border: '#1d1d20', border2: '#2d2d35',
   text: '#e4e4e7', muted: '#71717a', dim: '#52525b',
-  gold: '#e8b84b', green: '#22d3a0', red: '#f87171', blue: '#4f7ef8',
+  gold: '#fbe900', green: '#22d3a0', red: '#f87171', blue: '#4f7ef8',
 }
 
 const APIS_TRANS = [

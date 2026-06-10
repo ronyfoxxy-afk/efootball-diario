@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 const G = {
   green: '#00e56e', bg: '#060a0f', surface: '#0d1520', surface2: '#131e2e',
   border: 'rgba(255,255,255,0.07)', borderActive: 'rgba(0,229,110,0.4)',
-  text: '#f0f4f8', muted: '#5a7190', gold: '#e8b84b', red: '#f87171', blue: '#0ea5e9'
+  text: '#f0f4f8', muted: '#5a7190', gold: '#fbe900', red: '#f87171', blue: '#0ea5e9'
 }
 
 type Entry = { id: string; player_name: string; sala_id: string; sala_senha: string; status: string; position: number; created_at: string }
@@ -129,7 +129,7 @@ export default function AdminCoop() {
       ctx.fillText('SALA #' + salaId, PAD + 12, y + 10)
 
       // Senha
-      ctx.fillStyle = '#e8b84b'
+      ctx.fillStyle = '#fbe900'
       ctx.font = 'bold 18px Arial'
       const senhaWidth = ctx.measureText('🔑 ' + jogadores[0]?.sala_senha).width
       ctx.fillText('🔑 ' + jogadores[0]?.sala_senha, W - PAD - 12 - senhaWidth, y + 11)
