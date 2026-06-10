@@ -254,7 +254,7 @@ export default function Admin() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap'); input:focus,textarea:focus{border-color:${G.gold}!important;outline:none}`}</style>
 
       {/* ── HEADER ── */}
-      <header style={{ background:'#000000', borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', position:'sticky' as const, top:0, zIndex:100 }}>
+      <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', position:'sticky' as const, top:0, zIndex:100 }}>
 
         {/* Esquerda: hamburguer + início */}
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
