@@ -1,9 +1,11 @@
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { formatDate } from '@/lib/utils'
+import { formatDate, cleanPostContent, readingTime, extractSources } from '@/lib/utils'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export const revalidate = 60
 
@@ -14,6 +16,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     .eq('slug', slug).eq('status', 'published').single()
 
   if (!post) notFound()
+
+  const { body, signature } = cleanPostContent(post.content || '')
+  const minutes = readingTime(body)
+  const sources = extractSources(body)
 
   return (
     <div style={{ minHeight: '100vh', background: '#09090b' }}>
@@ -45,95 +51,99 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </h1>
 
         {/* Meta */}
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid #1d1d20' }}>
-          <span style={{ fontSize: 12, color: '#52525b' }}>📅 {formatDate(post.published_at || post.created_at)}</span>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid #1d1d20' }}>
+          <span style={{ fontSize: 12, color: '#52525b', display: 'flex', alignItems: 'center', gap: 5 }}>
+            📅 {formatDate(post.published_at || post.created_at)}
+          </span>
+          <span style={{ fontSize: 12, color: '#52525b', display: 'flex', alignItems: 'center', gap: 5 }}>
+            ⏱️ {minutes} min de leitura
+          </span>
           {post.auto_published && (
             <span style={{ fontSize: 10, color: '#22d3a0', background: 'rgba(34,211,160,0.08)', padding: '2px 8px', borderRadius: 4, fontWeight: 700, letterSpacing: '0.8px' }}>AUTO</span>
           )}
         </div>
 
-        {/* Imagem INTEIRA — sem corte */}
+        {/* Imagem de capa */}
         {post.cover_image && (
-          <div style={{ borderRadius: 12, overflow: 'hidden', marginBottom: '1.5rem', border: '1px solid #1d1d20', background: '#111115' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={post.cover_image}
-              alt={post.title}
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-            />
-          </div>
-        )}
-
-        {/* Resumo destacado */}
-        {post.summary && (
-          <div style={{
-            background: '#111115', borderLeft: '3px solid #4f7ef8',
-            borderRadius: '0 10px 10px 0', padding: '1rem 1rem 1rem 1.25rem', marginBottom: '1.5rem',
-          }}>
-            <p style={{ fontSize: 15, color: '#a1a1aa', lineHeight: 1.75, margin: 0, fontFamily: "'Barlow',sans-serif" }}>
-              {post.summary}
-            </p>
-          </div>
-        )}
-
-        {/* Conteúdo formatado */}
-        {post.content && (
-          <div style={{ marginBottom: '1.5rem' }}>
-            {post.content.split('\n').map((line: string, i: number) => {
-              // Ignorar linhas de metadados do workflow
-              if (line.match(/^(TITULO|TÍTULO|RESUMO|TITL):\s*/i)) return null
-              if (!line.trim()) return <div key={i} style={{ height: 16 }} />
-
-              // Título (linha que começa com ##)
-              if (line.startsWith('## ')) {
-                return (
-                  <h2 key={i} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 20, fontWeight: 900, color: '#e4e4e7', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '1.5rem 0 0.5rem', lineHeight: 1.2 }}>
-                    {line.replace('## ', '')}
-                  </h2>
-                )
-              }
-
-              // Subtítulo (linha que começa com #)
-              if (line.startsWith('# ')) {
-                return (
-                  <h3 key={i} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 17, fontWeight: 700, color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '1.25rem 0 0.4rem', lineHeight: 1.2 }}>
-                    {line.replace('# ', '')}
-                  </h3>
-                )
-              }
-
-              // URL clicável
-              const urlRegex = /(https?:\/\/[^\s]+)/g
-              const parts = line.split(urlRegex)
-
-              return (
-                <p key={i} style={{ fontSize: 15, color: '#c4c4cc', lineHeight: 1.85, marginBottom: 12, fontFamily: "'Barlow',sans-serif" }}>
-                  {parts.map((part, j) =>
-                    urlRegex.test(part) ? (
-                      <a key={j} href={part} target="_blank" rel="noopener noreferrer"
-                        style={{ color: '#4f7ef8', wordBreak: 'break-all', textDecoration: 'underline' }}>
-                        {part}
-                      </a>
-                    ) : part
-                  )}
-                </p>
-              )
-            })}
-          </div>
-        )}
-
-        {/* Fonte original */}
-        {post.source_url && (
-          <a href={post.source_url} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#111115', border: '1px solid #1d1d20', borderRadius: 12, padding: '14px 18px', textDecoration: 'none', marginBottom: '1.5rem' }}>
-            <div>
-              <div style={{ fontSize: 10, color: '#52525b', marginBottom: 2, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase' }}>Fonte original</div>
-              <div style={{ fontSize: 13, color: '#4f7ef8', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 480 }}>
-                🔗 {post.source_url}
-              </div>
+          <figure style={{ margin: '0 0 1.5rem' }}>
+            <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #1d1d20', background: '#111115' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={post.cover_image}
+                alt={post.title}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
+              />
             </div>
-            <span style={{ color: '#4f7ef8', fontSize: 18, flexShrink: 0 }}>→</span>
-          </a>
+          </figure>
+        )}
+
+        {/* Resumo / lead destacado */}
+        {post.summary && (
+          <div style={{ marginBottom: '1.75rem' }}>
+            <p style={{ fontSize: 10, color: '#52525b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 6px' }}>
+              Resumo
+            </p>
+            <div style={{
+              background: '#111115', borderRadius: 10,
+              padding: '1rem 1.25rem',
+            }}>
+              <p style={{
+                fontSize: 16, color: '#e4e4e7', lineHeight: 1.7, margin: 0,
+                fontFamily: "Georgia, 'Times New Roman', serif", fontStyle: 'italic',
+              }}>
+                {post.summary.replace(/^\*+\s*/, '').replace(/\*+$/, '')}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Corpo do artigo — markdown renderizado */}
+        {body && (
+          <div className="article-body" style={{ marginBottom: '1.5rem' }}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {body}
+            </ReactMarkdown>
+          </div>
+        )}
+
+        {/* Fontes e referências */}
+        {sources.length > 0 && (
+          <div style={{ borderTop: '1px solid #1d1d20', paddingTop: '1rem', marginBottom: '1rem' }}>
+            <p style={{ fontSize: 10, color: '#52525b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 10px' }}>
+              Fontes e referências
+            </p>
+            <ul style={{ margin: 0, padding: '0 0 0 18px', listStyle: 'none' }}>
+              {sources.map((url, i) => {
+                let label = url
+                try { label = new URL(url).hostname.replace('www.', '') } catch {}
+                return (
+                  <li key={i} style={{ marginBottom: 6, fontSize: 13, lineHeight: 1.6 }}>
+                    <a href={url} target="_blank" rel="noopener noreferrer"
+                      style={{ color: '#4f7ef8', textDecoration: 'none' }}>
+                      🔗 {label}
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
+
+        {/* Fonte original + assinatura */}
+        {(post.source_url || signature) && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, background: '#111115', border: '1px solid #1d1d20', borderRadius: 12, padding: '14px 18px', marginBottom: '1.5rem' }}>
+            {post.source_url ? (
+              <a href={post.source_url} target="_blank" rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#4f7ef8', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 480 }}>
+                🔗 Fonte original
+              </a>
+            ) : <span />}
+            {signature && (
+              <span style={{ fontSize: 11, color: '#52525b', whiteSpace: 'nowrap' }}>
+                {signature.replace(/^_+|_+$/g, '')}
+              </span>
+            )}
+          </div>
         )}
 
         {/* Tags */}

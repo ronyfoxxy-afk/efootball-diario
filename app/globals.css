@@ -75,3 +75,105 @@ img { max-width: 100%; height: auto; }
 .card-hover:hover .thumb-inner {
   transform: scale(1.04);
 }
+
+/* ── Corpo do artigo (markdown renderizado) ── */
+.article-body {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #c4c4cc;
+}
+.article-body p {
+  margin: 0 0 14px;
+}
+.article-body strong {
+  color: #f4f4f5;
+  font-weight: 700;
+}
+.article-body em {
+  color: #d4d4d8;
+}
+.article-body h1,
+.article-body h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: #e4e4e7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 1.75rem 0 0.6rem;
+  line-height: 1.2;
+}
+.article-body h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 1.25rem 0 0.4rem;
+  line-height: 1.2;
+}
+.article-body ul,
+.article-body ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+.article-body li {
+  margin-bottom: 6px;
+}
+.article-body li::marker {
+  color: #e8b84b;
+}
+.article-body a {
+  color: #4f7ef8;
+  text-decoration: underline;
+  word-break: break-word;
+}
+.article-body blockquote {
+  border-left: 3px solid #4f7ef8;
+  margin: 0 0 16px;
+  padding: 6px 0 6px 16px;
+}
+.article-body blockquote p {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  color: #d4d4d8;
+  margin: 0;
+}
+.article-body img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 1rem auto;
+  display: block;
+  border: 1px solid #1d1d20;
+}
+.article-body hr {
+  border: none;
+  border-top: 1px solid #1d1d20;
+  margin: 1.5rem 0;
+}
+.article-body code {
+  background: #18181c;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #e8b84b;
+}
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 16px;
+  font-size: 13px;
+}
+.article-body th,
+.article-body td {
+  border: 1px solid #1d1d20;
+  padding: 8px 10px;
+  text-align: left;
+}
+.article-body th {
+  background: #111115;
+  color: #e4e4e7;
+  font-weight: 700;
+}
