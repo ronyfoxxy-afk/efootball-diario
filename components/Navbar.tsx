@@ -105,7 +105,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile drawer — desliza da esquerda */}
-        <div className="hide-desktop" style={{
+        <div style={{
           position: 'fixed', top: 0, left: 0, bottom: 0, zIndex: 300,
           width: 272, background: '#0d0d10', borderRight: '1px solid #1d1d20',
           transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
@@ -150,7 +150,7 @@ export default function Navbar() {
       </header>
       {redesOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setRedesOpen(false)} />}
       {/* Overlay do drawer mobile */}
-      {menuOpen && <div className="hide-desktop" style={{ position: 'fixed', inset: 0, zIndex: 299, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }} onClick={() => setMenuOpen(false)} />}
+      {menuOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 299, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(2px)' }} onClick={() => setMenuOpen(false)} />}
     </>
   )
 }
