@@ -107,6 +107,90 @@ function SortablePostCard({ p, featuredId, onToggleFeatured, onEdit, onPublish, 
   )
 }
 
+/* ── Card de preview da home — mesmo visual do site, arrastável ── */
+function HomePreviewCard({ p, variant, featuredId, onToggleFeatured, onEdit }: {
+  p: any, variant: 'hero' | 'side' | 'grid', featuredId: string|null,
+  onToggleFeatured: (id:string)=>void, onEdit: (p:any)=>void,
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: p.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : 'auto',
+  }
+
+  const dragHandle = (
+    <div {...attributes} {...listeners} className="drag-handle-anim"
+      style={{ position:'absolute', top:8, left:8, zIndex:3, cursor:'grab', color:'#fff', fontSize:16, background:'rgba(0,0,0,0.5)', borderRadius:6, padding:'4px 7px', touchAction:'none', display:'flex', alignItems:'center', backdropFilter:'blur(4px)' }}>
+      ⠿
+    </div>
+  )
+
+  const actions = (
+    <div style={{ position:'absolute', top:8, right:8, zIndex:3, display:'flex', gap:4 }}>
+      <button onClick={(e)=>{e.preventDefault();onToggleFeatured(p.id)}} className="btn-anim"
+        style={{ ...S.btnSm(G.gold,'rgba(0,0,0,0.5)'), padding:'4px 7px', fontSize:13, backdropFilter:'blur(4px)' }}>
+        {featuredId===p.id?'⭐':'☆'}
+      </button>
+      <button onClick={(e)=>{e.preventDefault();onEdit(p)}} className="btn-anim"
+        style={{ ...S.btnSm(G.text,'rgba(0,0,0,0.5)'), backdropFilter:'blur(4px)' }}>
+        Editar
+      </button>
+    </div>
+  )
+
+  if (variant === 'hero') {
+    return (
+      <div ref={setNodeRef} style={{ ...style, position:'relative', borderRadius:14, overflow:'hidden', border:`1px solid ${G.border}`, transition:`${transition}, box-shadow .15s` }} className="card-hover">
+        {dragHandle}
+        {actions}
+        {p.cover_image ? (
+          <div style={{ position:'relative', width:'100%' }}>
+            <div style={{ width:'100%', height:200, background:`url(${p.cover_image}) center/cover` }} />
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(9,9,11,0.97) 0%, rgba(9,9,11,0.45) 50%, rgba(9,9,11,0.1) 100%)' }} />
+            <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'1rem', zIndex:2 }}>
+              {p.categories && <span style={{ background:`${p.categories.color}22`, color:p.categories.color, border:`1px solid ${p.categories.color}55`, fontSize:9, fontWeight:700, padding:'2px 8px', borderRadius:4, letterSpacing:'1px', textTransform:'uppercase' }}>{p.categories.name}</span>}
+              <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:20, fontWeight:900, color:'#fff', textTransform:'uppercase', marginTop:6, lineHeight:1.1 }}>{p.title}</h2>
+            </div>
+          </div>
+        ) : (
+          <div style={{ background:'linear-gradient(135deg,#0d0820 0%,#091428 50%,#0a1a0d 100%)', minHeight:200, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'1rem' }}>
+            {p.categories && <span style={{ background:`${p.categories.color}22`, color:p.categories.color, border:`1px solid ${p.categories.color}55`, fontSize:9, fontWeight:700, padding:'2px 8px', borderRadius:4, letterSpacing:'1px', textTransform:'uppercase' }}>{p.categories.name}</span>}
+            <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:20, fontWeight:900, color:'#fff', textTransform:'uppercase', marginTop:6, lineHeight:1.1 }}>{p.title}</h2>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  if (variant === 'side') {
+    return (
+      <div ref={setNodeRef} style={{ ...style, position:'relative', background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, padding:10, display:'flex', gap:10, transition:`${transition}, box-shadow .15s` }} className="card-hover">
+        {dragHandle}
+        {actions}
+        {p.cover_image && <div style={{ width:54, height:54, borderRadius:8, background:`url(${p.cover_image}) center/cover`, flexShrink:0, border:`1px solid ${G.border}` }} />}
+        <div style={{ minWidth:0, paddingTop:2, paddingLeft: p.cover_image ? 0 : 24 }}>
+          {p.categories && <span style={{ fontSize:9, color:p.categories.color, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{p.categories.name}</span>}
+          <p style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, color:G.text, margin:'2px 0 0', lineHeight:1.2, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as const }}>{p.title}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // grid (compacto)
+  return (
+    <div ref={setNodeRef} style={{ ...style, position:'relative', background:G.surface, border:`1px solid ${G.border}`, borderRadius:10, padding:8, display:'flex', alignItems:'center', gap:8, transition:`${transition}, box-shadow .15s` }} className="card-hover">
+      <div {...attributes} {...listeners} className="drag-handle-anim" style={{ cursor:'grab', color:G.dim, fontSize:14, flexShrink:0, touchAction:'none', display:'flex', alignItems:'center' }}>⠿</div>
+      {p.cover_image && <div style={{ width:36, height:36, borderRadius:6, background:`url(${p.cover_image}) center/cover`, flexShrink:0, border:`1px solid ${G.border}` }} />}
+      <div style={{ flex:1, minWidth:0 }}>
+        <p style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:G.text, margin:0, lineHeight:1.2, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.title}</p>
+      </div>
+      <button onClick={()=>onEdit(p)} className="btn-anim" style={{ ...S.btnSm(G.text,'rgba(255,255,255,0.05)'), flexShrink:0 }}>Editar</button>
+    </div>
+  )
+}
+
 export default function Admin() {
   const [tab, setTab] = useState<Tab>('home')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -272,7 +356,10 @@ export default function Admin() {
             style={{ background:'none', border:`1px solid ${menuOpen?G.border:'transparent'}`, borderRadius:8, color:G.muted, cursor:'pointer', fontSize:18, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center' }}>
             {menuOpen ? '✕' : '☰'}
           </button>
-          <Image src="/logo.png" alt="logo" width={600} height={136} style={{ objectFit:'contain', height: 28, width: 'auto' }} />
+          <button onClick={()=>goTab('home')} className="btn-anim"
+            style={{ background:'none', border:'none', padding:0, cursor:'pointer', display:'flex', alignItems:'center' }}>
+            <Image src="/logo.png" alt="logo" width={600} height={136} style={{ objectFit:'contain', height: 28, width: 'auto' }} />
+          </button>
           {tab !== 'home' && (
             <button onClick={()=>goTab('home')}
               style={{ background:'none', border:'none', color:G.dim, cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', fontFamily:'inherit', display:'flex', alignItems:'center', gap:4 }}>
@@ -357,22 +444,49 @@ export default function Admin() {
               </div>
             </a>
 
-            {/* Destaque */}
-            <div style={{ fontSize:10, color:G.dim, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:10 }}>
-              ⭐ Destaque na home — clique para trocar
+            {/* Preview editável da Home */}
+            <div style={{ fontSize:10, color:G.dim, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', marginBottom:10, display:'flex', alignItems:'center', gap:6 }}>
+              👁 Pré-visualização da Home — arraste ⠿ para reordenar, ⭐ para destacar
             </div>
-            <div style={{ background:G.surface, border:`1px solid ${G.border}`, borderRadius:12, overflow:'hidden' }}>
-              {posts.filter(p=>p.status==='published').slice(0,8).map((p,i) => (
-                <div key={p.id} onClick={()=>toggleFeatured(p.id)}
-                  style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', cursor:'pointer',
-                    background:featuredId===p.id?'rgba(232,184,75,0.06)':'transparent',
-                    borderBottom:i<7?`1px solid ${G.border}`:'none', transition:'background .15s' }}>
-                  {p.cover_image && <div style={{ width:34, height:34, borderRadius:6, background:`url(${p.cover_image}) center/cover`, flexShrink:0 }} />}
-                  <div style={{ flex:1, minWidth:0, fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, color:featuredId===p.id?G.gold:G.text, textTransform:'uppercase', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.title}</div>
-                  <span style={{ fontSize:14, flexShrink:0, color:featuredId===p.id?G.gold:G.dim }}>{featuredId===p.id?'⭐':'☆'}</span>
-                </div>
-              ))}
-            </div>
+            {(() => {
+              const published = posts.filter(p=>p.status==='published')
+              const hero = published[0]
+              const sideItems = published.slice(1,4)
+              const gridItems = published.slice(4,10)
+              if (!published.length) return <p style={{ color:G.dim, fontSize:14 }}>Nenhum post publicado ainda.</p>
+              return (
+                <DndContext sensors={dndSensors} collisionDetection={closestCenter}
+                  onDragEnd={(e)=>handlePostDragEnd(e,'published')}>
+                  <SortableContext items={published.map(p=>p.id)} strategy={verticalListSortingStrategy}>
+                    {/* Hero + side items, lado a lado no desktop */}
+                    <div style={{ display:'grid', gridTemplateColumns: sideItems.length ? '1.6fr 1fr' : '1fr', gap:10, marginBottom:10 }}>
+                      {hero && <HomePreviewCard p={hero} variant="hero" featuredId={featuredId} onToggleFeatured={toggleFeatured} onEdit={setEditPost} />}
+                      {sideItems.length > 0 && (
+                        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                          {sideItems.map(p => (
+                            <HomePreviewCard key={p.id} p={p} variant="side" featuredId={featuredId} onToggleFeatured={toggleFeatured} onEdit={setEditPost} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {/* Grid das próximas notícias */}
+                    {gridItems.length > 0 && (
+                      <>
+                        <div style={{ fontSize:9, color:G.dim, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', margin:'4px 0 8px' }}>
+                          Próximas notícias
+                        </div>
+                        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                          {gridItems.map(p => (
+                            <HomePreviewCard key={p.id} p={p} variant="grid" featuredId={featuredId} onToggleFeatured={toggleFeatured} onEdit={setEditPost} />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </SortableContext>
+                </DndContext>
+              )
+            })()}
+
           </>
         )}
 
