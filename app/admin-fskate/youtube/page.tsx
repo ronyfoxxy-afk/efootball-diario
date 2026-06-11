@@ -442,13 +442,15 @@ Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Má
         usouPesquisa = true
       }
 
-      // Se transcrição falhou — PARA. Não inventa.
+      // Se transcrição falhou — usa pesquisa real sobre o tema do vídeo
       if (usouPesquisa) {
-        throw new Error(
-          keyTrans.trim()
-            ? `❌ Transcrição falhou para este vídeo. Possíveis causas:\n• O vídeo não tem legendas/closed captions ativadas\n• O vídeo é privado ou com restrição de idade\n• Tente outro vídeo que tenha CC ativado`
-            : `⚠️ Nenhuma chave de transcrição configurada.\nVá em ⚙️ APIs e configure a chave do Supadata.`
-        )
+        try {
+          setYtMsg('🔎 Pesquisando informações sobre o tema do vídeo...'); setYtMsgType('info')
+          const pesquisa = await pesquisarFontesReais(tituloVideo)
+          contexto = `PESQUISA SOBRE O TEMA DO VÍDEO ("${tituloVideo}"):\n${pesquisa}`
+        } catch (e: any) {
+          throw new Error(`❌ Transcrição falhou e a pesquisa também não encontrou informações suficientes (${e.message}).`)
+        }
       }
 
       setYtMsg(`🤖 Ruud Gullit Jr. escrevendo a notícia com ${APIS_IA.find(a=>a.id===apiIA)?.nome}...`); setYtMsgType('info')
