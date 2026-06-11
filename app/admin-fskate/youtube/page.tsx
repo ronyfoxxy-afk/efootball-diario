@@ -35,10 +35,17 @@ const PROMPT_RUUD = (contexto: string, titulo = '') => `Você é Ruud Gullit Jr.
 
 ## Estilo obrigatório
 - Tom profissional, dinâmico e envolvente, típico de portal esportivo digital
-- Use manchetes chamativas com emojis como 🔥 🚨 💣 quando pertinente
 - Escreva SEMPRE em português do Brasil, claro e direto
 - Abra com lead jornalístico forte: O quê? Quem? Quando? Onde? Por quê?
-- Mínimo 4 parágrafos bem desenvolvidos, texto corrido sem markdown
+- Escreva o CONTEUDO em MARKDOWN:
+  - Use **negrito** para nomes de jogadores, times e termos importantes
+  - Use ## para subtítulos que dividem o texto em seções (pelo menos 2 subtítulos)
+  - Quando citar uma informação de uma fonte específica, use citação em bloco markdown:
+    > Texto da informação citada.
+    (cite a fonte na linha seguinte, ex: "— pesdb.net")
+  - Use listas com "-" quando fizer sentido (ex: características de um jogador, lista de novidades)
+  - Use 🔥 🚨 💣 com moderação, apenas quando pertinente
+- Mínimo 4 parágrafos bem desenvolvidos, estruturado como artigo de revista esportiva
 
 ## Regras de veracidade — CRÍTICAS
 - Use APENAS as informações presentes no contexto fornecido abaixo
@@ -50,9 +57,11 @@ const PROMPT_RUUD = (contexto: string, titulo = '') => `Você é Ruud Gullit Jr.
 ${titulo ? `TÍTULO/TEMA: ${titulo}\n` : ''}${contexto}
 
 ## Formato de resposta OBRIGATÓRIO
-TITULO: [manchete atrativa até 70 caracteres]
-RESUMO: [uma linha de impacto, máximo 150 caracteres]
-CONTEUDO: [texto completo, mínimo 4 parágrafos, sem markdown, sem títulos internos]`
+Responda EXATAMENTE assim (apenas estas linhas de cabeçalho SEM markdown nelas, depois o conteúdo COM markdown):
+TITULO: [manchete atrativa até 70 caracteres, sem markdown]
+RESUMO: [uma linha de impacto, máximo 150 caracteres, sem markdown]
+CONTEUDO:
+[texto completo em markdown, mínimo 4 parágrafos, com pelo menos 2 subtítulos ##]`
 
 type Mode = 'youtube' | 'manual' | 'pesquisa'
 
@@ -184,7 +193,7 @@ export default function RadarIA() {
 
     // 1. Reddit r/eFootball via RSS2JSON (proxy público, funciona no browser)
     try {
-      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/eFootball/search.rss?q=${temaEnc}&sort=top&t=month`)
+      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/eFootball/search.rss?q=${temaEnc}&sort=relevance&t=all`)
       const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=6`)
       if (res.ok) {
         const data = await res.json()
@@ -204,7 +213,7 @@ export default function RadarIA() {
 
     // 2. Reddit r/pesmobile (comunidade mobile/BR)
     try {
-      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/pesmobile/search.rss?q=${temaEnc}&sort=top&t=month`)
+      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/pesmobile/search.rss?q=${temaEnc}&sort=relevance&t=all`)
       const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=4`)
       if (res.ok) {
         const data = await res.json()
@@ -244,7 +253,7 @@ export default function RadarIA() {
 
     // 4. Reddit r/PES (comunidade clássica PES/eFootball)
     try {
-      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/PES/search.rss?q=${temaEnc}&sort=top&t=month`)
+      const rssUrl = encodeURIComponent(`https://www.reddit.com/r/PES/search.rss?q=${temaEnc}&sort=relevance&t=all`)
       const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=4`)
       if (res.ok) {
         const data = await res.json()
@@ -350,11 +359,50 @@ Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Má
       resultados.push(iaContexto)
     } catch {}
 
-    if (resultados.filter(r => r.length > 30).length < 2) {
+    const fontesExternas = resultados.filter(r => r.length > 30).length
+    const analiseIA = resultados.find(r => r.startsWith('=== ANÁLISE ESPECIALIZADA ==='))
+    const temAnaliseSubstancial = !!analiseIA && resultados[resultados.indexOf(analiseIA) + 1]?.length > 200
+
+    if (fontesExternas < 2 && !temAnaliseSubstancial) {
       throw new Error('Não encontrei informações suficientes. Tente um tema mais específico, ex: "melhores atacantes épicos meta atual"')
     }
 
     return resultados.join('\n')
+  }
+
+  // ── Buscar imagem de capa via Tavily (mesmo padrão do n8n: geral + Steam + Epic) ──
+  async function buscarImagemTavily(tema: string): Promise<string | null> {
+    const TAVILY_KEY = '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'
+    const query = tema + ' eFootball 2026'
+
+    async function tavilySearch(q: string, depth: 'basic'|'advanced', max: number) {
+      try {
+        const r = await fetch('https://api.tavily.com/search', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ api_key: TAVILY_KEY, query: q, search_depth: depth, max_results: max, include_images: true, include_answer: false })
+        })
+        if (!r.ok) return { images: [] }
+        return await r.json()
+      } catch { return { images: [] } }
+    }
+
+    const [geral, steam, epic] = await Promise.all([
+      tavilySearch(query, 'advanced', 5),
+      tavilySearch(query + ' site:store.steampowered.com OR site:steamcommunity.com', 'basic', 3),
+      tavilySearch(query + ' site:store.epicgames.com', 'basic', 3),
+    ])
+
+    const todasImagens = [...(geral.images||[]), ...(steam.images||[]), ...(epic.images||[])]
+
+    const imagensFiltradas = todasImagens.filter((img: string) =>
+      img && img.startsWith('http') &&
+      !img.includes('logo') && !img.includes('icon') && !img.includes('favicon') &&
+      !img.includes('avatar') && !img.includes('profile') &&
+      (img.includes('.jpg') || img.includes('.jpeg') || img.includes('.png') || img.includes('.webp'))
+    )
+
+    if (imagensFiltradas.length === 0) return null
+    return imagensFiltradas[Math.floor(Math.random() * imagensFiltradas.length)]
   }
 
   async function chamarIA(prompt: string): Promise<string> {
@@ -394,10 +442,12 @@ Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Má
   }
 
   function parsear(text: string) {
+    const conteudoBruto = text.match(/CONTEUDO:\s*([\s\S]+)/i)?.[1]?.trim() || text
+    const conteudo = conteudoBruto.split('\n').filter(l => !l.match(/^(TITULO|TÍTULO|RESUMO):/i)).join('\n').trim()
     return {
-      titulo:   text.match(/TITULO:\s*(.+)/i)?.[1]?.trim() || '',
-      resumo:   text.match(/RESUMO:\s*(.+)/i)?.[1]?.trim() || '',
-      conteudo: text.match(/CONTEUDO:\s*([\s\S]+)/i)?.[1]?.trim() || text,
+      titulo:   text.match(/TITULO:\s*(.+)/i)?.[1]?.trim().replace(/\*\*/g,'') || '',
+      resumo:   text.match(/RESUMO:\s*(.+)/i)?.[1]?.trim().replace(/\*\*/g,'') || '',
+      conteudo,
     }
   }
 
@@ -461,6 +511,14 @@ Use nomes REAIS de jogadores e mecânicas. Seja específico, não genérico. Má
       setYtResumo(p.resumo)
       setYtConteudo(p.conteudo)
 
+      // Se usou pesquisa (sem transcrição), tentar achar uma imagem de capa via Tavily
+      if (usouPesquisa) {
+        try {
+          const img = await buscarImagemTavily(tituloVideo)
+          if (img) setYtImagem(img)
+        } catch {}
+      }
+
       const aviso = usouPesquisa ? ' (via pesquisa — sem transcrição)' : ' (via transcrição)'
       setYtMsg(`✅ Notícia gerada pelo Ruud Gullit Jr.${aviso}`)
       setYtMsgType('ok')
@@ -507,7 +565,7 @@ Forneça:
 
 Seja preciso. Separe claramente o que é oficial do que é rumor.`
 
-      setPMsg('🔍 Varrendo Reddit, X/Twitter, Google News e Konami...')
+      setPMsg('🔍 Varrendo Reddit, Konami, Steam, Google News e YouTube...')
       const pesquisa = await pesquisarFontesReais(pQuery)
       setPMsg('✅ Fontes coletadas! Ruud Gullit Jr. analisando...')
 
@@ -521,6 +579,13 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
       setPTitulo(p.titulo || pQuery)
       setPResumo(p.resumo)
       setPConteudo(p.conteudo)
+
+      // Buscar imagem de capa via Tavily
+      try {
+        const img = await buscarImagemTavily(pQuery)
+        if (img) setPImagem(img)
+      } catch {}
+
       setPMsg('✅ Notícia gerada pelo Ruud Gullit Jr.!')
       setPMsgType('ok')
     } catch(e: any) { setPMsg('❌ ' + e.message); setPMsgType('err') }
@@ -750,7 +815,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
         <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:'1rem' }}>
           {([
             { id:'youtube' as Mode,  icon:'▶',  label:'YouTube → Post',   desc:'Transcreve ou pesquisa + Ruud escreve' },
-            { id:'pesquisa' as Mode, icon:'🔍', label:'Tema + Pesquisa',  desc:'Varre Reddit, Twitter, Google News e Konami' },
+            { id:'pesquisa' as Mode, icon:'🔍', label:'Tema + Pesquisa',  desc:'Varre Reddit, Konami, Steam e Google News' },
             { id:'manual' as Mode,   icon:'✏️', label:'Manual',           desc:'Você escreve tudo' },
           ]).map(m => (
             <button key={m.id} onClick={() => setMode(m.id)}
@@ -823,7 +888,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               <label style={S.lbl}>Tema / Assunto</label>
               <textarea style={{ ...S.inp, minHeight:80, resize:'vertical' }} placeholder={'Ex: melhores atacantes update 4.4\nEx: novidades patch eFootball\nEx: épicos mais usados no ranked'} value={pQuery} onChange={e=>setPQuery(e.target.value)} />
               <div style={{ background:'rgba(79,126,248,0.06)', border:`1px solid rgba(79,126,248,0.15)`, borderRadius:8, padding:'9px 12px', marginBottom:12, fontSize:12, color:G.blue, lineHeight:1.5 }}>
-                🔍 Varre <strong>Reddit r/eFootball</strong>, <strong>X/Twitter</strong>, <strong>Google News</strong> e <strong>site Konami</strong> — Ruud escreve baseado no que a comunidade está falando de verdade.
+                🔍 Varre <strong>Reddit</strong> (r/eFootball, r/pesmobile, r/PES), <strong>Konami oficial</strong>, <strong>Steam News</strong>, <strong>Google News</strong> e <strong>YouTube</strong> — Ruud escreve baseado no que a comunidade está falando de verdade.
               </div>
               <label style={S.lbl}>Categoria</label>
               <CatBtns val={pCat} set={setPCat} />
