@@ -14,7 +14,7 @@ export default function Termos() {
         <p style={{ fontSize:13, color:'#52525b', marginBottom:'2rem' }}>Última atualização: junho de 2026</p>
 
         <div style={{ fontSize:15, color:'#a1a1aa', lineHeight:1.85 }}>
-          <p style={S.p}>Ao acessar o eFootball News (efootball-diario.vercel.app), você concorda com os seguintes termos.</p>
+          <p style={S.p}>Ao acessar o eFootball News (efootball-news.vercel.app), você concorda com os seguintes termos.</p>
 
           <h2 style={S.h2}>1. Uso do Site</h2>
           <p style={S.p}>O conteúdo deste site é destinado exclusivamente para fins informativos e de entretenimento relacionados ao jogo eFootball da Konami. É proibido reproduzir, distribuir ou modificar o conteúdo sem autorização prévia.</p>

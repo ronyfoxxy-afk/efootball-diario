@@ -14,7 +14,7 @@ export default function Privacidade() {
         <p style={{ fontSize:13, color:'#52525b', marginBottom:'2rem' }}>Última atualização: junho de 2026</p>
 
         <div style={{ fontSize:15, color:'#a1a1aa', lineHeight:1.85 }}>
-          <p style={S.p}>O eFootball News (efootball-diario.vercel.app), operado por FSKATE GAMES, respeita a privacidade dos seus visitantes. Esta política descreve como coletamos, usamos e protegemos suas informações.</p>
+          <p style={S.p}>O eFootball News (efootball-news.vercel.app), operado por FSKATE GAMES, respeita a privacidade dos seus visitantes. Esta política descreve como coletamos, usamos e protegemos suas informações.</p>
 
           <h2 style={S.h2}>1. Dados Coletados</h2>
           <p style={S.p}>Não coletamos dados pessoais identificáveis sem o seu consentimento. Ao participar da fila de Co-op, coletamos apenas o nome/nick informado por você voluntariamente.</p>

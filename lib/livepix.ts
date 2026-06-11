@@ -1,6 +1,6 @@
 const LIVEPIX_CLIENT_ID = process.env.LIVEPIX_CLIENT_ID!
 const LIVEPIX_CLIENT_SECRET = process.env.LIVEPIX_CLIENT_SECRET!
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://efootball-diario.vercel.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://efootball-news.vercel.app'
 
 let cachedToken: { token: string; expires: number } | null = null
 

@@ -21,7 +21,7 @@ export default function AdminCoop() {
   const [linkCopiado, setLinkCopiado] = useState(false)
   const filaRef = useRef<Entry[]>([])
 
-  const encerrarLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://efootball-diario.vercel.app'}/api/coop/encerrar?token=${COOP_SECRET}`
+  const encerrarLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://efootball-news.vercel.app'}/api/coop/encerrar?token=${COOP_SECRET}`
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 2500) }
 
@@ -201,7 +201,7 @@ export default function AdminCoop() {
   }
 
   // URL do widget para OBS
-  const widgetUrl = 'https://efootball-diario.vercel.app/widget/coop'
+  const widgetUrl = 'https://efootball-news.vercel.app/widget/coop'
 
   return (
     <div className="admin-zone" style={{ minHeight: '100vh', background: G.bg, color: G.text, fontFamily: "'Barlow', 'Inter', sans-serif" }}>

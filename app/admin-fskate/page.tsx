@@ -542,8 +542,8 @@ export default function Admin() {
             <div style={{ background:'rgba(232,184,75,0.05)', border:'1px solid rgba(232,184,75,0.2)', borderRadius:10, padding:'10px 14px', marginBottom:'1rem' }}>
               <div style={{ fontSize:10, color:G.gold, fontWeight:700, letterSpacing:'1px', textTransform:'uppercase', marginBottom:6 }}>URL — OBS / TikTok Studio</div>
               <div style={{ display:'flex', alignItems:'center', gap:8, background:G.surface2, borderRadius:7, padding:'8px 12px' }}>
-                <code style={{ fontSize:12, color:G.text, flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>https://efootball-diario.vercel.app/widget/coop</code>
-                <button onClick={()=>{navigator.clipboard.writeText('https://efootball-diario.vercel.app/widget/coop');showToast('✅ Copiado!')}}
+                <code style={{ fontSize:12, color:G.text, flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>https://efootball-news.vercel.app/widget/coop</code>
+                <button onClick={()=>{navigator.clipboard.writeText('https://efootball-news.vercel.app/widget/coop');showToast('✅ Copiado!')}}
                   className="btn-anim" style={{ ...S.btnSm(G.muted,'rgba(255,255,255,0.05)'), flexShrink:0 }}>Copiar</button>
               </div>
             </div>
