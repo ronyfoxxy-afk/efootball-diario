@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { REDES } from '@/lib/social'
 
@@ -16,8 +17,24 @@ const CATS = [
 ]
 
 export default function Navbar() {
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [showCoop, setShowCoop] = useState(true)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus()
+  }, [searchOpen])
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const termo = searchQuery.trim()
+    if (termo.length < 2) return
+    router.push(`/busca?q=${encodeURIComponent(termo)}`)
+    setSearchOpen(false)
+  }
 
   useEffect(() => {
     supabase.from('site_settings').select('key,value')
@@ -54,9 +71,53 @@ export default function Navbar() {
           </Link>
 
 
-          {/* Espaço reservado à direita para balancear hambúrguer + logo */}
-          <div style={{ width: 78, flexShrink: 0 }} />
+          {/* Busca — desktop: barra fixa à direita | mobile: lupa que expande */}
+          <div style={{ flexShrink: 0, zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            {/* Desktop: barra de busca sempre visível */}
+            <form onSubmit={handleSearchSubmit} className="hide-mobile" style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <span style={{ position: 'absolute', left: 11, color: '#52525b', fontSize: 14, pointerEvents: 'none' }}>🔍</span>
+                <input
+                  type="text" placeholder="Buscar..." value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="input-anim"
+                  style={{
+                    width: 180, background: '#18181c', border: '1px solid #1d1d20', borderRadius: 8,
+                    padding: '8px 12px 8px 32px', color: '#e4e4e7', fontSize: 13, fontFamily: 'inherit', outline: 'none',
+                  }}
+                />
+              </div>
+            </form>
+
+            {/* Mobile: ícone de lupa */}
+            <button onClick={() => setSearchOpen(o => !o)} className="hide-desktop"
+              style={{ background: searchOpen ? '#18181c' : 'none', border: searchOpen ? '1px solid #1d1d20' : '1px solid transparent', color: '#a1a1aa', cursor: 'pointer', padding: '6px 10px', borderRadius: 8, fontSize: 18, position: 'relative', zIndex: 1 }}>
+              {searchOpen ? '✕' : '🔍'}
+            </button>
+          </div>
+
         </div>
+
+        {/* Mobile: campo de busca expansível abaixo da navbar */}
+        {searchOpen && (
+          <div className="hide-desktop" style={{ padding: '0 1rem 0.75rem', borderTop: '1px solid #1d1d20' }}>
+            <form onSubmit={handleSearchSubmit} style={{ paddingTop: '0.75rem' }}>
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <span style={{ position: 'absolute', left: 11, color: '#52525b', fontSize: 14, pointerEvents: 'none' }}>🔍</span>
+                <input
+                  ref={searchInputRef}
+                  type="text" placeholder="Buscar notícias..." value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="input-anim"
+                  style={{
+                    width: '100%', background: '#18181c', border: '1px solid #1d1d20', borderRadius: 8,
+                    padding: '10px 12px 10px 32px', color: '#e4e4e7', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+            </form>
+          </div>
+        )}
 
       </header>
 
