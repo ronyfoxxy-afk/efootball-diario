@@ -17,23 +17,51 @@ async function getSiteSettings() {
   } catch { return {} }
 }
 
+// Extrai um "ID" base da imagem para detectar duplicatas (ex: variações
+// de tamanho do mesmo vídeo do YouTube: hq720, sddefault, maxresdefault, etc.)
+function imageKey(url?: string | null): string | null {
+  if (!url) return null
+  // YouTube thumbnails: /vi/<ID>/<variant>.jpg
+  const yt = url.match(/\/vi\/([\w-]+)\//)
+  if (yt) return `yt:${yt[1]}`
+  // Demais URLs: usa a própria URL como chave (ignorando querystring)
+  return url.split('?')[0]
+}
+
+// Remove cover_image de posts cuja imagem (mesma origem/ID) já apareceu
+// num post anterior na lista, evitando repetição visual na home.
+function dedupeCoverImages(posts: Post[]): Post[] {
+  const seen = new Set<string>()
+  return posts.map((p: any) => {
+    const key = imageKey(p.cover_image)
+    if (key) {
+      if (seen.has(key)) {
+        return { ...p, cover_image: null }
+      }
+      seen.add(key)
+    }
+    return p
+  })
+}
+
 async function getPosts() {
   const { data } = await supabase
     .from('posts').select('*, categories(*)')
     .eq('status', 'published')
-    .order('order_index', { ascending: true, nullsFirst: false })
-    .order('published_at', { ascending: false })
-  // nullsFirst:false já garante que order_index definido (reordenado manualmente)
-  // tem prioridade; posts sem order_index seguem por published_at desc
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
     .limit(20)
   if (!data) return []
   // Prioriza post marcado como destaque (featured)
   const featured = data.find((p: any) => p.featured)
+  let ordered: Post[]
   if (featured) {
     const resto = data.filter((p: any) => !p.featured)
-    return [featured, ...resto].slice(0, 13) as Post[]
+    ordered = [featured, ...resto].slice(0, 13) as Post[]
+  } else {
+    ordered = data.slice(0, 13) as Post[]
   }
-  return data.slice(0, 13) as Post[]
+  return dedupeCoverImages(ordered)
 }
 
 const badge = (color: string, name: string) => (
