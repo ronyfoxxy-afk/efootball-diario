@@ -63,6 +63,32 @@ RESUMO: [uma linha de impacto, máximo 150 caracteres, sem markdown]
 CONTEUDO:
 [texto completo em markdown, mínimo 4 parágrafos, com pelo menos 2 subtítulos ##]`
 
+const PROMPT_REVISAO = (titulo: string, resumo: string, conteudo: string) => `Você é Ruud Gullit Jr., jornalista experiente e especialista exclusivamente no jogo eFootball da Konami. Você escreve para o portal "eFOOTBALL NEWS".
+
+Abaixo está um rascunho de notícia escrito por outra pessoa. Sua tarefa é REVISAR e MELHORAR esse rascunho, mantendo as informações e fatos exatamente como estão (não invente, não adicione dados novos), mas:
+- Corrigindo erros de português, ortografia e gramática
+- Melhorando a fluidez e o tom, deixando profissional, dinâmico e envolvente, típico de portal esportivo digital
+- Reorganizando e formatando o CONTEUDO em MARKDOWN:
+  - Use **negrito** para nomes de jogadores, times e termos importantes
+  - Use ## para subtítulos que dividem o texto em seções (pelo menos 2, se o texto permitir)
+  - Use listas com "-" quando fizer sentido
+  - Use 🔥 🚨 💣 com moderação, apenas quando pertinente
+- Melhorando o título e o resumo se necessário (mas mantendo a ideia original)
+- NÃO invente jogadores, datas, eventos ou detalhes que não estejam no rascunho original
+
+## Rascunho original
+TITULO: ${titulo}
+RESUMO: ${resumo}
+CONTEUDO:
+${conteudo}
+
+## Formato de resposta OBRIGATÓRIO
+Responda EXATAMENTE assim (apenas estas linhas de cabeçalho SEM markdown nelas, depois o conteúdo COM markdown):
+TITULO: [título revisado/melhorado, até 70 caracteres, sem markdown]
+RESUMO: [resumo revisado/melhorado, máximo 150 caracteres, sem markdown]
+CONTEUDO:
+[texto revisado em markdown, com pelo menos 2 subtítulos ## se o conteúdo permitir]`
+
 type Mode = 'youtube' | 'manual' | 'pesquisa'
 
 function slugify(t: string) {
@@ -129,6 +155,7 @@ export default function RadarIA() {
   const [mCat, setMCat] = useState('noticias')
   const [mStatus, setMStatus] = useState<'published'|'draft'>('published')
   const [mLoading, setMLoading] = useState(false)
+  const [mRevisando, setMRevisando] = useState(false)
   const [mPublicado, setMPublicado] = useState(false)
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(''), 3000) }
@@ -606,6 +633,23 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
   }
 
   // ── MODO MANUAL ──
+  async function revisarComRuud() {
+    if (!mConteudo.trim()) { showToast('⚠️ Escreva o conteúdo antes de revisar'); return }
+    if (!keyIA.trim()) { showToast('⚠️ Configure a chave de IA'); setConfigOpen(true); return }
+    setMRevisando(true)
+    try {
+      const raw = await chamarIA(PROMPT_REVISAO(mTitulo, mResumo, mConteudo))
+      const p = parsear(raw)
+      if (p.titulo) setMTitulo(p.titulo)
+      if (p.resumo) setMResumo(p.resumo)
+      if (p.conteudo) setMConteudo(p.conteudo)
+      showToast('✅ Texto revisado pelo Ruud Gullit Jr.!')
+    } catch (e: any) {
+      showToast('❌ ' + e.message)
+    }
+    setMRevisando(false)
+  }
+
   async function publicarManual() {
     if (!mTitulo.trim()) { showToast('⚠️ Título obrigatório'); return }
     setMLoading(true)
@@ -947,6 +991,9 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               <ImagePicker val={mImagem} set={setMImagem} />
               <div><label style={S.lbl}>Fonte / Link original</label><input className="input-anim" style={S.inp} placeholder="https://..." value={mFonte} onChange={e=>setMFonte(e.target.value)} /></div>
               <StatusBtns val={mStatus} set={setMStatus} />
+              <button onClick={revisarComRuud} disabled={mRevisando || mLoading} style={{ ...S.btnGrn, width:'100%', marginBottom:10, opacity:(mRevisando||mLoading)?0.6:1 }}>
+                {mRevisando ? '🤖 Revisando...' : '🤖 Corrigir e melhorar com Ruud Gullit Jr.'}
+              </button>
               {mPublicado
                 ? <div style={{ textAlign:'center', padding:'1rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, textTransform:'uppercase' }}>🎉 Publicado!</div>
                 : <button onClick={publicarManual} disabled={mLoading} style={{ ...S.btnGld, width:'100%', opacity:mLoading?0.6:1 }}>
