@@ -43,7 +43,7 @@ export default function LivePixBanner() {
         </div>
 
         {/* Direita */}
-        <div style={{ flexShrink: 0, background: '#fbe900', color: '#000', fontWeight: 700, fontSize: 12, padding: '8px 18px', borderRadius: 7, whiteSpace: 'nowrap', marginLeft: 'auto' }}>
+        <div className="livepix-doe-btn" style={{ flexShrink: 0, background: '#fbe900', color: '#000', fontWeight: 700, fontSize: 12, padding: '8px 18px', borderRadius: 7, whiteSpace: 'nowrap', marginLeft: 'auto' }}>
           Doe →
         </div>
       </div>
