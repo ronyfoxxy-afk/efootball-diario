@@ -221,3 +221,130 @@ img { max-width: 100%; height: auto; }
 .livepix-banner:active .livepix-doe-btn {
   transform: scale(0.95);
 }
+
+/* ── Interações globais do admin ── */
+
+/* Botões pequenos (S.btnSm) — leve escala + brilho no hover/click */
+.btn-anim {
+  transition: transform 0.12s, filter 0.12s, opacity 0.12s, background-color 0.12s, border-color 0.12s;
+}
+.btn-anim:hover {
+  filter: brightness(1.25);
+  transform: translateY(-1px);
+}
+.btn-anim:active {
+  transform: translateY(0) scale(0.95);
+  filter: brightness(0.95);
+}
+
+/* Botões primários (gold) — pulso sutil de destaque */
+.btn-primary-anim {
+  transition: transform 0.12s, box-shadow 0.15s, filter 0.12s;
+}
+.btn-primary-anim:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(251,233,0,0.18);
+  filter: brightness(1.08);
+}
+.btn-primary-anim:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+/* Abas (tabs) do admin */
+.tab-anim {
+  transition: color 0.15s, background-color 0.15s, transform 0.12s;
+}
+.tab-anim:hover {
+  color: #e4e4e7 !important;
+  transform: translateY(-1px);
+}
+.tab-anim:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* Inputs e selects — destaque suave no foco */
+.input-anim {
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-anim:focus {
+  border-color: #fbe900 !important;
+  box-shadow: 0 0 0 3px rgba(251,233,0,0.12);
+  outline: none;
+}
+
+/* Drag handle — feedback ao segurar */
+.drag-handle-anim {
+  transition: color 0.15s, transform 0.1s;
+}
+.drag-handle-anim:hover {
+  color: #fbe900 !important;
+}
+.drag-handle-anim:active {
+  cursor: grabbing;
+  transform: scale(1.2);
+}
+
+/* Toast de feedback — entrada suave */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.toast-anim {
+  animation: toast-in 0.25s ease-out;
+}
+
+/* Switches/toggles */
+.toggle-anim {
+  transition: background-color 0.2s, transform 0.15s;
+}
+.toggle-anim:active {
+  transform: scale(0.95);
+}
+
+/* Linha de tabela — destaque ao hover */
+.row-hover {
+  transition: background-color 0.12s;
+}
+.row-hover:hover {
+  background-color: rgba(255,255,255,0.025) !important;
+}
+
+/* ── Interação genérica para toda a área admin ── */
+.admin-zone button:not(:disabled) {
+  transition: transform 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
+}
+.admin-zone button:not(:disabled):hover {
+  filter: brightness(1.15);
+}
+.admin-zone button:not(:disabled):active {
+  transform: scale(0.96);
+  filter: brightness(0.92);
+}
+.admin-zone input, .admin-zone textarea, .admin-zone select {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.admin-zone input:focus, .admin-zone textarea:focus, .admin-zone select:focus {
+  border-color: #fbe900 !important;
+  box-shadow: 0 0 0 3px rgba(251,233,0,0.10);
+  outline: none;
+}
+/* Links estilo botão dentro do admin */
+.admin-zone a[style*="border-radius"] {
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.admin-zone a[style*="border-radius"]:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+.admin-zone a[style*="border-radius"]:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Cards/itens de lista — leve resposta ao toque */
+.admin-zone details {
+  transition: border-color 0.15s ease;
+}
+.admin-zone details:hover {
+  border-color: #2d2d35;
+}

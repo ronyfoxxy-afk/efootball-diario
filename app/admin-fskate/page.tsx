@@ -87,7 +87,7 @@ function SortablePostCard({ p, featuredId, onToggleFeatured, onEdit, onPublish, 
     }}
     className="card-hover">
       {/* Alça de arrastar */}
-      <div {...attributes} {...listeners}
+      <div {...attributes} {...listeners} className="drag-handle-anim"
         style={{ cursor:'grab', color:G.dim, fontSize:16, padding:'4px 2px', flexShrink:0, touchAction:'none', display:'flex', alignItems:'center' }}>
         ⠿
       </div>
@@ -100,11 +100,11 @@ function SortablePostCard({ p, featuredId, onToggleFeatured, onEdit, onPublish, 
         </div>
       </div>
       <div style={{ display:'flex', gap:4, flexShrink:0 }}>
-        <button onClick={()=>onToggleFeatured(p.id)} style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'4px 8px', fontSize:13 }}>{featuredId===p.id?'⭐':'☆'}</button>
-        <button onClick={()=>onEdit(p)} style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
-        {p.status==='draft' && <button onClick={()=>onPublish(p.id)} style={S.btnSm(G.green,'rgba(34,211,160,0.08)')}>Pub.</button>}
-        <button onClick={()=>onToggleHide(p)} style={S.btnSm(p.status==='hidden'?G.green:G.gold,'rgba(255,255,255,0.04)')}>{p.status==='hidden'?'Mostrar':'Ocultar'}</button>
-        <button onClick={()=>onDelete(p.id)} style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
+        <button onClick={()=>onToggleFeatured(p.id)} className="btn-anim" style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'4px 8px', fontSize:13 }}>{featuredId===p.id?'⭐':'☆'}</button>
+        <button onClick={()=>onEdit(p)} className="btn-anim" style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
+        {p.status==='draft' && <button onClick={()=>onPublish(p.id)} className="btn-anim" style={S.btnSm(G.green,'rgba(34,211,160,0.08)')}>Pub.</button>}
+        <button onClick={()=>onToggleHide(p)} className="btn-anim" style={S.btnSm(p.status==='hidden'?G.green:G.gold,'rgba(255,255,255,0.04)')}>{p.status==='hidden'?'Mostrar':'Ocultar'}</button>
+        <button onClick={()=>onDelete(p.id)} className="btn-anim" style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
       </div>
     </div>
   )
@@ -257,25 +257,25 @@ export default function Admin() {
 
   // ── EDITAR POST ──
   if (editPost) return (
-    <div style={S.page}>
+    <div className="admin-zone" style={S.page}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
       <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 }}>
         <button onClick={()=>setEditPost(null)} style={{ background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20 }}>←</button>
         <span style={S.secTit}>Editar Post</span>
         <button onClick={salvarEdicaoPost} style={S.btnGrn}>Salvar</button>
       </header>
-      {toast && <div style={S.toast}>{toast}</div>}
+      {toast && <div className="toast-anim" style={S.toast}>{toast}</div>}
       <div style={S.main}>
         <div style={S.card}><div style={S.cBody}>
           <label style={S.lbl}>Título</label>
-          <input style={S.inp} value={editPost.title} onChange={e=>setEditPost({...editPost,title:e.target.value})} />
+          <input className="input-anim" style={S.inp} value={editPost.title} onChange={e=>setEditPost({...editPost,title:e.target.value})} />
           <label style={S.lbl}>Resumo</label>
-          <textarea style={{...S.inp,minHeight:64,resize:'vertical' as const}} value={editPost.summary||''} onChange={e=>setEditPost({...editPost,summary:e.target.value})} />
+          <textarea className="input-anim" style={{...S.inp,minHeight:64,resize:'vertical' as const}} value={editPost.summary||''} onChange={e=>setEditPost({...editPost,summary:e.target.value})} />
           <label style={S.lbl}>Conteúdo</label>
-          <textarea style={{...S.inp,minHeight:220,resize:'vertical' as const,fontFamily:'monospace',fontSize:13,lineHeight:1.6}} value={editPost.content||''} onChange={e=>setEditPost({...editPost,content:e.target.value})} />
+          <textarea className="input-anim" style={{...S.inp,minHeight:220,resize:'vertical' as const,fontFamily:'monospace',fontSize:13,lineHeight:1.6}} value={editPost.content||''} onChange={e=>setEditPost({...editPost,content:e.target.value})} />
           <label style={S.lbl}>Imagem de capa</label>
           <div style={{display:'flex',gap:6,marginBottom:8}}>
-            <input style={{...S.inp,marginBottom:0,flex:1}} placeholder="https://..." value={editPost.cover_image||''} onChange={e=>setEditPost({...editPost,cover_image:e.target.value})} />
+            <input className="input-anim" style={{...S.inp,marginBottom:0,flex:1}} placeholder="https://..." value={editPost.cover_image||''} onChange={e=>setEditPost({...editPost,cover_image:e.target.value})} />
           </div>
           <div style={{border:`2px dashed ${G.border2}`,borderRadius:8,padding:'12px',textAlign:'center',background:G.surface2,position:'relative' as const,marginBottom:10,cursor:'pointer'}}>
             <input type="file" accept="image/*" style={{position:'absolute',inset:0,opacity:0,cursor:'pointer',width:'100%',height:'100%'}}
@@ -289,7 +289,7 @@ export default function Admin() {
             <div style={{fontSize:11,color:G.muted,fontWeight:600}}>Upload — clique ou arraste</div>
           </div>
           {editPost.cover_image && <div style={{borderRadius:8,overflow:'hidden',border:`1px solid ${G.border}`,marginBottom:10}}><img src={editPost.cover_image} alt="preview" style={{width:'100%',height:'auto',display:'block',maxHeight:200,objectFit:'cover',background:G.surface2}} /></div>}
-          <div><label style={S.lbl}>Fonte URL</label><input style={S.inp} placeholder="https://..." value={editPost.source_url||''} onChange={e=>setEditPost({...editPost,source_url:e.target.value})} /></div>
+          <div><label style={S.lbl}>Fonte URL</label><input className="input-anim" style={S.inp} placeholder="https://..." value={editPost.source_url||''} onChange={e=>setEditPost({...editPost,source_url:e.target.value})} /></div>
         </div></div>
       </div>
     </div>
@@ -297,18 +297,18 @@ export default function Admin() {
 
   // ── EDITAR TORNEIO ──
   if (editTorneio) return (
-    <div style={S.page}>
+    <div className="admin-zone" style={S.page}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
       <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 }}>
         <button onClick={()=>setEditTorneio(null)} style={{ background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20 }}>←</button>
         <span style={S.secTit}>Editar Torneio</span>
         <button onClick={salvarTorneio} style={S.btnGrn}>Salvar</button>
       </header>
-      {toast && <div style={S.toast}>{toast}</div>}
+      {toast && <div className="toast-anim" style={S.toast}>{toast}</div>}
       <div style={S.main}>
         <div style={S.card}><div style={S.cBody}>
           <label style={S.lbl}>Nome</label>
-          <input style={S.inp} value={editTorneio.name} onChange={e=>setEditTorneio({...editTorneio,name:e.target.value})} />
+          <input className="input-anim" style={S.inp} value={editTorneio.name} onChange={e=>setEditTorneio({...editTorneio,name:e.target.value})} />
           <label style={S.lbl}>Status</label>
           <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
             {['open','in_progress','finished','draft','cancelled'].map(s=>(
@@ -319,20 +319,20 @@ export default function Admin() {
             ))}
           </div>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <div><label style={S.lbl}>Inscrição R$</label><input style={S.inp} type="number" value={editTorneio.entry_fee} onChange={e=>setEditTorneio({...editTorneio,entry_fee:e.target.value})} /></div>
-            <div><label style={S.lbl}>Prêmio R$</label><input style={S.inp} type="number" value={editTorneio.prize} onChange={e=>setEditTorneio({...editTorneio,prize:e.target.value})} /></div>
+            <div><label style={S.lbl}>Inscrição R$</label><input className="input-anim" style={S.inp} type="number" value={editTorneio.entry_fee} onChange={e=>setEditTorneio({...editTorneio,entry_fee:e.target.value})} /></div>
+            <div><label style={S.lbl}>Prêmio R$</label><input className="input-anim" style={S.inp} type="number" value={editTorneio.prize} onChange={e=>setEditTorneio({...editTorneio,prize:e.target.value})} /></div>
           </div>
           <label style={S.lbl}>Descrição</label>
-          <textarea style={{...S.inp,minHeight:60,resize:'vertical' as const}} value={editTorneio.description||''} onChange={e=>setEditTorneio({...editTorneio,description:e.target.value})} />
+          <textarea className="input-anim" style={{...S.inp,minHeight:60,resize:'vertical' as const}} value={editTorneio.description||''} onChange={e=>setEditTorneio({...editTorneio,description:e.target.value})} />
           <label style={S.lbl}>Regras</label>
-          <textarea style={{...S.inp,minHeight:60,resize:'vertical' as const}} value={editTorneio.rules||''} onChange={e=>setEditTorneio({...editTorneio,rules:e.target.value})} />
+          <textarea className="input-anim" style={{...S.inp,minHeight:60,resize:'vertical' as const}} value={editTorneio.rules||''} onChange={e=>setEditTorneio({...editTorneio,rules:e.target.value})} />
         </div></div>
       </div>
     </div>
   )
 
   return (
-    <div style={S.page}>
+    <div className="admin-zone" style={S.page}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap'); input:focus,textarea:focus{border-color:${G.gold}!important;outline:none}`}</style>
 
       {/* ── HEADER ── */}
@@ -377,14 +377,14 @@ export default function Admin() {
           <div style={{ position:'fixed', top:56, left:0, bottom:0, width:240, background:G.surface, borderRight:`1px solid ${G.border}`, zIndex:200, padding:'1rem 0' }}>
             <div style={{ padding:'0 1rem', marginBottom:'1rem', fontSize:9, color:G.dim, fontWeight:700, letterSpacing:'2px', textTransform:'uppercase' }}>Menu</div>
             {MENU_ITEMS.map(item => (
-              <button key={item.id} onClick={()=>goTab(item.id)}
+              <button key={item.id} onClick={()=>goTab(item.id)} className="tab-anim"
                 style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 1rem', background:tab===item.id?'rgba(232,184,75,0.08)':'none', border:'none', borderLeft:tab===item.id?`3px solid ${G.gold}`:'3px solid transparent', cursor:'pointer', textAlign:'left', color:tab===item.id?G.gold:G.muted, fontFamily:'inherit', transition:'all .15s' }}>
                 <span style={{ fontSize:18 }}>{item.icon}</span>
                 <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:15, textTransform:'uppercase', letterSpacing:'0.5px' }}>{item.label}</span>
               </button>
             ))}
             <div style={{ height:1, background:G.border, margin:'1rem 0' }} />
-            <a href="/admin-fskate/youtube"
+            <a href="/admin-fskate/youtube" className="tab-anim"
               style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 1rem', background:'rgba(232,184,75,0.05)', border:'none', borderLeft:`3px solid ${G.gold}`, cursor:'pointer', textAlign:'left', color:G.gold, fontFamily:'inherit', textDecoration:'none' }}>
               <span style={{ fontSize:18 }}>✍️</span>
               <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:15, textTransform:'uppercase', letterSpacing:'0.5px' }}>Radar IA</span>
@@ -398,7 +398,7 @@ export default function Admin() {
         </>
       )}
 
-      {toast && <div style={S.toast}>{toast}</div>}
+      {toast && <div className="toast-anim" style={S.toast}>{toast}</div>}
 
       <div style={S.main}>
 
@@ -505,10 +505,10 @@ export default function Admin() {
                     </div>
                     <div style={{ display:'flex', flexDirection:'column', gap:5, alignItems:'flex-end', flexShrink:0 }}>
                       <div style={{ display:'flex', gap:4 }}>
-                        <button onClick={()=>setEditTorneio(t)} style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
-                        <button onClick={()=>apagarTorneio(t.id)} style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
+                        <button onClick={()=>setEditTorneio(t)} className="btn-anim" style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
+                        <button onClick={()=>apagarTorneio(t.id)} className="btn-anim" style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
                       </div>
-                      {pend && <button onClick={()=>verificarLivePix(t)} style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>🔄 Verificar LivePix</button>}
+                      {pend && <button onClick={()=>verificarLivePix(t)} className="btn-anim" style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>🔄 Verificar LivePix</button>}
                     </div>
                   </div>
                 </div>
@@ -525,8 +525,8 @@ export default function Admin() {
                 Co-op <span style={{ color:G.dim, fontSize:14 }}>{coopFila.length} aguardando</span>
               </h2>
               <div style={{ display:'flex', gap:8 }}>
-                <button onClick={loadCoop} style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), padding:'7px 12px', fontSize:11 }}>🔄 Atualizar</button>
-                <a href="/widget/coop" target="_blank" style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'7px 12px', fontSize:11, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:4 }}>
+                <button onClick={loadCoop} className="btn-anim" style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), padding:'7px 12px', fontSize:11 }}>🔄 Atualizar</button>
+                <a href="/widget/coop" target="_blank" className="btn-anim" style={{ ...S.btnSm(G.gold,'rgba(232,184,75,0.08)'), padding:'7px 12px', fontSize:11, textDecoration:'none', display:'inline-flex', alignItems:'center', gap:4 }}>
                   📺 Widget OBS →
                 </a>
               </div>
@@ -536,7 +536,7 @@ export default function Admin() {
               <div style={{ display:'flex', alignItems:'center', gap:8, background:G.surface2, borderRadius:7, padding:'8px 12px' }}>
                 <code style={{ fontSize:12, color:G.text, flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>https://efootball-diario.vercel.app/widget/coop</code>
                 <button onClick={()=>{navigator.clipboard.writeText('https://efootball-diario.vercel.app/widget/coop');showToast('✅ Copiado!')}}
-                  style={{ ...S.btnSm(G.muted,'rgba(255,255,255,0.05)'), flexShrink:0 }}>Copiar</button>
+                  className="btn-anim" style={{ ...S.btnSm(G.muted,'rgba(255,255,255,0.05)'), flexShrink:0 }}>Copiar</button>
               </div>
             </div>
             {coopFila.length===0
@@ -554,7 +554,7 @@ export default function Admin() {
                         <div style={{ display:'flex', gap:6, alignItems:'center' }}>
                           <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, color:G.gold }}>🔑 {jogadores[0]?.sala_senha}</span>
                           <button onClick={async()=>{if(!confirm('Chamar sala #'+salaId+'?'))return;await supabase.from('coop_queue').update({status:'called'}).eq('sala_id',salaId).eq('status','waiting');showToast('✅ Sala chamada!');loadCoop()}}
-                            style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>Chamar →</button>
+                            className="btn-anim" style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>Chamar →</button>
                         </div>
                       </div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
@@ -576,7 +576,7 @@ export default function Admin() {
             }
             {coopFila.length>0 && (
               <button onClick={async()=>{if(!confirm('Limpar toda a fila?'))return;await supabase.from('coop_queue').update({status:'done'}).eq('status','waiting');showToast('🗑️ Fila limpa!');loadCoop()}}
-                style={{ ...S.btnSm(G.red,'rgba(248,113,113,0.06)'), padding:'8px 16px', fontSize:11, width:'100%', marginTop:4 }}>
+                className="btn-anim" style={{ ...S.btnSm(G.red,'rgba(248,113,113,0.06)'), padding:'8px 16px', fontSize:11, width:'100%', marginTop:4 }}>
                 🗑️ Limpar toda a fila
               </button>
             )}

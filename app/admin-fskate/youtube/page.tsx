@@ -509,7 +509,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
           {val && <button onClick={() => set('')} style={{ padding:'5px 10px', borderRadius:6, border:'none', cursor:'pointer', background:'rgba(248,113,113,0.08)', color:G.red, fontSize:10, fontWeight:700, textTransform:'uppercase' as const }}>✕ Remover</button>}
         </div>
         {tab === 'url' ? (
-          <input style={S.inp} placeholder="https://..." value={val} onChange={e => set(e.target.value)} />
+          <input className="input-anim" style={S.inp} placeholder="https://..." value={val} onChange={e => set(e.target.value)} />
         ) : (
           <div style={{ border:`2px dashed ${G.border2}`, borderRadius:8, padding:'16px', textAlign:'center', cursor:'pointer', background:G.surface2, position:'relative' as const }}>
             <input type="file" accept="image/*" onChange={handleUpload}
@@ -566,7 +566,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
   )
 
   return (
-    <div style={{ minHeight:'100vh', background:G.bg, color:G.text, fontFamily:"'Barlow',sans-serif", paddingBottom:40 }}>
+    <div className="admin-zone" style={{ minHeight:'100vh', background:G.bg, color:G.text, fontFamily:"'Barlow',sans-serif", paddingBottom:40 }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap'); input:focus,textarea:focus{border-color:${G.gold}!important;outline:none} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
 
       {toast && <div style={S.toast}>{toast}</div>}
@@ -679,7 +679,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
                 Se a transcrição falhar ou não tiver chave configurada, o agente de pesquisa busca informações sobre o tema do vídeo e o Ruud escreve com base nisso — sem inventar.
               </div>
               <label style={S.lbl}>Link do YouTube</label>
-              <input style={S.inp} placeholder="https://www.youtube.com/watch?v=..." value={ytUrl} onChange={e=>setYtUrl(e.target.value)} onKeyDown={e=>e.key==='Enter'&&gerarDoYoutube()} />
+              <input className="input-anim" style={S.inp} placeholder="https://www.youtube.com/watch?v=..." value={ytUrl} onChange={e=>setYtUrl(e.target.value)} onKeyDown={e=>e.key==='Enter'&&gerarDoYoutube()} />
               <label style={S.lbl}>Categoria</label>
               <CatBtns val={ytCat} set={setYtCat} />
               <StatusBtns val={ytStatus} set={setYtStatus} />
@@ -702,7 +702,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
             </div>
             <div style={S.body}>
               <label style={S.lbl}>Título</label>
-              <input style={S.inp} value={ytTitulo} onChange={e=>setYtTitulo(e.target.value)} />
+              <input className="input-anim" style={S.inp} value={ytTitulo} onChange={e=>setYtTitulo(e.target.value)} />
               <label style={S.lbl}>Resumo</label>
               <textarea style={{ ...S.inp, minHeight:60, resize:'vertical' as const }} value={ytResumo} onChange={e=>setYtResumo(e.target.value)} />
               <label style={S.lbl}>Categoria</label>
@@ -755,7 +755,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
             </div>
             <div style={S.body}>
               <label style={S.lbl}>Título</label>
-              <input style={S.inp} value={pTitulo} onChange={e=>setPTitulo(e.target.value)} />
+              <input className="input-anim" style={S.inp} value={pTitulo} onChange={e=>setPTitulo(e.target.value)} />
               <label style={S.lbl}>Resumo</label>
               <textarea style={{ ...S.inp, minHeight:60, resize:'vertical' as const }} value={pResumo} onChange={e=>setPResumo(e.target.value)} />
               <label style={S.lbl}>Categoria</label>
@@ -780,7 +780,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
             <div style={S.head}><span style={S.secTit}>✏️ Post Manual</span></div>
             <div style={S.body}>
               <label style={S.lbl}>Título *</label>
-              <input style={S.inp} placeholder="Título da notícia..." value={mTitulo} onChange={e=>setMTitulo(e.target.value)} />
+              <input className="input-anim" style={S.inp} placeholder="Título da notícia..." value={mTitulo} onChange={e=>setMTitulo(e.target.value)} />
               <label style={S.lbl}>Categoria</label>
               <CatBtns val={mCat} set={setMCat} />
               <label style={S.lbl}>Resumo</label>
@@ -788,7 +788,7 @@ Seja preciso. Separe claramente o que é oficial do que é rumor.`
               <label style={S.lbl}>Conteúdo</label>
               <textarea style={{ ...S.inp, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }} placeholder={'Texto completo...\n\nUse ## para título de seção'} value={mConteudo} onChange={e=>setMConteudo(e.target.value)} />
               <ImagePicker val={mImagem} set={setMImagem} />
-              <div><label style={S.lbl}>Fonte / Link original</label><input style={S.inp} placeholder="https://..." value={mFonte} onChange={e=>setMFonte(e.target.value)} /></div>
+              <div><label style={S.lbl}>Fonte / Link original</label><input className="input-anim" style={S.inp} placeholder="https://..." value={mFonte} onChange={e=>setMFonte(e.target.value)} /></div>
               <StatusBtns val={mStatus} set={setMStatus} />
               {mPublicado
                 ? <div style={{ textAlign:'center', padding:'1rem', color:G.green, fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:16, textTransform:'uppercase' }}>🎉 Publicado!</div>

@@ -204,7 +204,7 @@ export default function AdminCoop() {
   const widgetUrl = 'https://efootball-diario.vercel.app/widget/coop'
 
   return (
-    <div style={{ minHeight: '100vh', background: G.bg, color: G.text, fontFamily: "'Barlow', 'Inter', sans-serif" }}>
+    <div className="admin-zone" style={{ minHeight: '100vh', background: G.bg, color: G.text, fontFamily: "'Barlow', 'Inter', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap')`}</style>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 

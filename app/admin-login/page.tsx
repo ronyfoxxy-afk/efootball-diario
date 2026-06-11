@@ -36,7 +36,7 @@ function LoginForm() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: G.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', fontFamily: "'Barlow', sans-serif" }}>
+    <div className="admin-zone" style={{ minHeight: '100vh', background: G.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', fontFamily: "'Barlow', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
       <div style={{ width: '100%', maxWidth: 380 }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
