@@ -28,7 +28,7 @@ const CATS = [
   { slug: 'top-rank',           name: 'Top Rank',     color: '#f97316' },
 ]
 
-type Tab = 'home' | 'posts' | 'torneios' | 'coop' | 'site'
+type Tab = 'home' | 'posts' | 'coop' | 'site'
 
 function slugify(t: string) {
   return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').substring(0,80)+'-'+Date.now()
@@ -50,16 +50,13 @@ const S: any = {
 }
 
 const SITE_SECTIONS = [
-  { key:'show_torneios',       label:'🏆 Torneios',      desc:'Banner torneios na home' },
   { key:'show_coop',           label:'🎮 Co-op',          desc:'Banner co-op na home' },
-  { key:'show_criar_torneio',  label:'➕ Criar Torneio',  desc:'Link criar torneio' },
   { key:'show_livepix_banner', label:'💰 Banner LivePix', desc:'Faixa doe no topo' },
 ]
 
 const MENU_ITEMS = [
   { id:'home' as Tab,     icon:'⊞', label:'Início'    },
   { id:'posts' as Tab,    icon:'≡',  label:'Posts'     },
-  { id:'torneios' as Tab, icon:'🏆', label:'Torneios'  },
   { id:'coop' as Tab,     icon:'🎮', label:'Co-op'     },
   { id:'site' as Tab,     icon:'👁', label:'Site'      },
 ]
@@ -115,16 +112,14 @@ export default function Admin() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [stats, setStats] = useState({ pub:0, draft:0, hoje:0 })
   const [posts, setPosts] = useState<any[]>([])
-  const [torneios, setTorneios] = useState<any[]>([])
   const [coopFila, setCoopFila] = useState<any[]>([])
   const [featuredId, setFeaturedId] = useState<string|null>(null)
-  const [siteVis, setSiteVis] = useState<Record<string,boolean>>({ show_torneios:true, show_coop:true, show_criar_torneio:true, show_livepix_banner:true })
+  const [siteVis, setSiteVis] = useState<Record<string,boolean>>({ show_coop:true, show_livepix_banner:true })
   const [toast, setToast] = useState('')
   const [editPost, setEditPost] = useState<any>(null)
-  const [editTorneio, setEditTorneio] = useState<any>(null)
 
   function showToast(m:string) { setToast(m); setTimeout(()=>setToast(''),2800) }
-  function goTab(t:Tab) { setTab(t); setMenuOpen(false); if(t==='torneios') loadTorneios(); if(t==='coop') loadCoop() }
+  function goTab(t:Tab) { setTab(t); setMenuOpen(false); if(t==='coop') loadCoop() }
 
   useEffect(() => { loadAll(); loadVis() }, [])
 
@@ -145,11 +140,6 @@ export default function Admin() {
       const { data } = await supabase.from('site_settings').select('key,value')
       if (data) { const m:Record<string,boolean>={}; data.forEach((r:any)=>{ m[r.key]=r.value!=='false' }); setSiteVis(prev=>({...prev,...m})) }
     } catch {}
-  }
-
-  async function loadTorneios() {
-    const { data } = await supabase.from('tournaments').select('id,name,status,model,entry_fee,prize,is_user_created,creation_payment_status,pix_key').order('created_at',{ascending:false})
-    setTorneios(data||[])
   }
 
   async function loadCoop() {
@@ -224,32 +214,6 @@ export default function Admin() {
     showToast('✅ Salvo!'); setEditPost(null); loadAll()
   }
 
-  async function apagarTorneio(id:string) {
-    if (!confirm('Apagar torneio?')) return
-    await supabase.from('tournaments').delete().eq('id',id)
-    showToast('🗑️ Apagado'); loadTorneios()
-  }
-
-  async function salvarTorneio() {
-    const { error } = await supabase.from('tournaments').update({
-      name:editTorneio.name, status:editTorneio.status,
-      entry_fee:parseFloat(editTorneio.entry_fee)||0, prize:parseFloat(editTorneio.prize)||0,
-      description:editTorneio.description||null, rules:editTorneio.rules||null,
-    }).eq('id',editTorneio.id)
-    if (error) { showToast('❌ '+error.message); return }
-    showToast('✅ Salvo!'); setEditTorneio(null); loadTorneios()
-  }
-
-  async function verificarLivePix(t:any) {
-    showToast('🔄 Verificando...')
-    try {
-      const res = await fetch(`/api/livepix/verificar?reference=${t.id}`)
-      const data = await res.json()
-      if (data.status==='paid') { showToast('✅ Pago! Torneio ativado.'); loadTorneios() }
-      else showToast(`⏳ ${data.status||'pendente'}`)
-    } catch { showToast('❌ Erro') }
-  }
-
   async function sair() {
     await fetch('/api/admin-auth', { method:'DELETE' })
     window.location.href = '/admin-login'
@@ -290,42 +254,6 @@ export default function Admin() {
           </div>
           {editPost.cover_image && <div style={{borderRadius:8,overflow:'hidden',border:`1px solid ${G.border}`,marginBottom:10}}><img src={editPost.cover_image} alt="preview" style={{width:'100%',height:'auto',display:'block',maxHeight:200,objectFit:'cover',background:G.surface2}} /></div>}
           <div><label style={S.lbl}>Fonte URL</label><input className="input-anim" style={S.inp} placeholder="https://..." value={editPost.source_url||''} onChange={e=>setEditPost({...editPost,source_url:e.target.value})} /></div>
-        </div></div>
-      </div>
-    </div>
-  )
-
-  // ── EDITAR TORNEIO ──
-  if (editTorneio) return (
-    <div className="admin-zone" style={S.page}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;500&display=swap');`}</style>
-      <header style={{ background:G.surface, borderBottom:`1px solid ${G.border}`, padding:'0 1.25rem', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky' as const, top:0, zIndex:50 }}>
-        <button onClick={()=>setEditTorneio(null)} style={{ background:'none',border:'none',color:G.muted,cursor:'pointer',fontSize:20 }}>←</button>
-        <span style={S.secTit}>Editar Torneio</span>
-        <button onClick={salvarTorneio} style={S.btnGrn}>Salvar</button>
-      </header>
-      {toast && <div className="toast-anim" style={S.toast}>{toast}</div>}
-      <div style={S.main}>
-        <div style={S.card}><div style={S.cBody}>
-          <label style={S.lbl}>Nome</label>
-          <input className="input-anim" style={S.inp} value={editTorneio.name} onChange={e=>setEditTorneio({...editTorneio,name:e.target.value})} />
-          <label style={S.lbl}>Status</label>
-          <div style={{display:'flex',gap:6,marginBottom:12,flexWrap:'wrap'}}>
-            {['open','in_progress','finished','draft','cancelled'].map(s=>(
-              <button key={s} onClick={()=>setEditTorneio({...editTorneio,status:s})}
-                style={{padding:'6px 12px',borderRadius:6,border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:10,fontWeight:700,letterSpacing:'0.8px',textTransform:'uppercase',
-                  background:editTorneio.status===s?G.green+'22':G.surface2,color:editTorneio.status===s?G.green:G.muted,
-                  outline:editTorneio.status===s?`1px solid ${G.green}55`:`1px solid ${G.border}`}}>{s}</button>
-            ))}
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <div><label style={S.lbl}>Inscrição R$</label><input className="input-anim" style={S.inp} type="number" value={editTorneio.entry_fee} onChange={e=>setEditTorneio({...editTorneio,entry_fee:e.target.value})} /></div>
-            <div><label style={S.lbl}>Prêmio R$</label><input className="input-anim" style={S.inp} type="number" value={editTorneio.prize} onChange={e=>setEditTorneio({...editTorneio,prize:e.target.value})} /></div>
-          </div>
-          <label style={S.lbl}>Descrição</label>
-          <textarea className="input-anim" style={{...S.inp,minHeight:60,resize:'vertical' as const}} value={editTorneio.description||''} onChange={e=>setEditTorneio({...editTorneio,description:e.target.value})} />
-          <label style={S.lbl}>Regras</label>
-          <textarea className="input-anim" style={{...S.inp,minHeight:60,resize:'vertical' as const}} value={editTorneio.rules||''} onChange={e=>setEditTorneio({...editTorneio,rules:e.target.value})} />
         </div></div>
       </div>
     </div>
@@ -480,40 +408,6 @@ export default function Admin() {
               )
             })}
 
-          </>
-        )}
-
-        {/* ── TORNEIOS ── */}
-        {tab==='torneios' && !editTorneio && (
-          <>
-            <h2 style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:22, color:G.text, textTransform:'uppercase', letterSpacing:1, marginBottom:'1.25rem' }}>Torneios</h2>
-            {torneios.length===0 && <p style={{ color:G.dim, fontSize:14 }}>Nenhum torneio ainda.</p>}
-            {torneios.map(t => {
-              const pend = t.status==='draft'||t.creation_payment_status==='pending'
-              return (
-                <div key={t.id} style={{ background:G.surface, border:`1px solid ${pend?'rgba(248,113,113,0.25)':G.border}`, borderRadius:10, padding:'12px 14px', marginBottom:8 }}>
-                  <div style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:15, fontWeight:900, color:G.text, textTransform:'uppercase', marginBottom:4 }}>{t.name}</div>
-                      <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
-                        <span style={{ fontSize:9, fontWeight:700, padding:'2px 7px', borderRadius:4, letterSpacing:'0.8px', textTransform:'uppercase', background:t.status==='open'?'rgba(34,211,160,0.1)':'rgba(82,82,91,0.15)', color:t.status==='open'?G.green:G.muted }}>
-                          {t.status==='open'?'Aberto':t.status==='draft'?'Aguard. pgto':t.status}
-                        </span>
-                        <span style={{ fontSize:11, color:G.gold, fontWeight:700 }}>R${Number(t.entry_fee).toFixed(2)}</span>
-                        <span style={{ fontSize:11, color:G.green, fontWeight:700 }}>🎁 R${Number(t.prize).toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <div style={{ display:'flex', flexDirection:'column', gap:5, alignItems:'flex-end', flexShrink:0 }}>
-                      <div style={{ display:'flex', gap:4 }}>
-                        <button onClick={()=>setEditTorneio(t)} className="btn-anim" style={S.btnSm(G.text,'rgba(255,255,255,0.05)')}>Editar</button>
-                        <button onClick={()=>apagarTorneio(t.id)} className="btn-anim" style={S.btnSm(G.red,'rgba(248,113,113,0.06)')}>✕</button>
-                      </div>
-                      {pend && <button onClick={()=>verificarLivePix(t)} className="btn-anim" style={{ ...S.btnSm(G.green,'rgba(34,211,160,0.08)'), fontSize:10 }}>🔄 Verificar LivePix</button>}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
           </>
         )}
 

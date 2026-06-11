@@ -17,7 +17,7 @@ export default function Privacidade() {
           <p style={S.p}>O eFootball News (efootball-diario.vercel.app), operado por FSKATE GAMES, respeita a privacidade dos seus visitantes. Esta política descreve como coletamos, usamos e protegemos suas informações.</p>
 
           <h2 style={S.h2}>1. Dados Coletados</h2>
-          <p style={S.p}>Não coletamos dados pessoais identificáveis sem o seu consentimento. Ao participar da fila de Co-op ou criar um torneio, coletamos apenas o nome/nick informado por você voluntariamente e dados de pagamento processados pelo LivePix.</p>
+          <p style={S.p}>Não coletamos dados pessoais identificáveis sem o seu consentimento. Ao participar da fila de Co-op, coletamos apenas o nome/nick informado por você voluntariamente.</p>
 
           <h2 style={S.h2}>2. Cookies e Rastreamento</h2>
           <p style={S.p}>Utilizamos o Google AdSense para exibição de anúncios. O Google pode usar cookies para personalizar anúncios com base nas suas visitas. Você pode desativar essa personalização nas configurações do Google. Também utilizamos cookies de sessão para manter você autenticado em áreas restritas do site.</p>
@@ -26,7 +26,7 @@ export default function Privacidade() {
           <p style={S.p}>Este site utiliza o Google AdSense, um serviço de publicidade do Google LLC. O Google pode usar cookies DART para exibir anúncios com base em visitas anteriores a este e outros sites. Você pode desativar o cookie DART em <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" style={{ color:'#4f7ef8' }}>políticas de privacidade de anúncios do Google</a>.</p>
 
           <h2 style={S.h2}>4. Dados de Pagamento</h2>
-          <p style={S.p}>Pagamentos de inscrições em torneios e criação de torneios são processados pelo LivePix. Não armazenamos dados de cartão de crédito ou informações bancárias completas.</p>
+          <p style={S.p}>Doações via LivePix são processadas diretamente pela plataforma LivePix. Não armazenamos dados de cartão de crédito ou informações bancárias completas.</p>
 
           <h2 style={S.h2}>5. Compartilhamento de Dados</h2>
           <p style={S.p}>Não vendemos, trocamos ou transferimos suas informações pessoais para terceiros, exceto quando necessário para operar o site (provedores de hospedagem, processadores de pagamento) ou quando exigido por lei.</p>

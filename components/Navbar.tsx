@@ -17,16 +17,14 @@ const CATS = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [showTorneios, setShowTorneios] = useState(true)
   const [showCoop, setShowCoop] = useState(true)
 
   useEffect(() => {
     supabase.from('site_settings').select('key,value')
-      .in('key', ['show_torneios', 'show_coop'])
+      .in('key', ['show_coop'])
       .then(({ data }) => {
         if (!data) return
         data.forEach((r: any) => {
-          if (r.key === 'show_torneios') setShowTorneios(r.value !== 'false')
           if (r.key === 'show_coop') setShowCoop(r.value !== 'false')
         })
       })
@@ -86,10 +84,9 @@ export default function Navbar() {
             </Link>
           ))}
         </div>
-        {(showTorneios || showCoop) && (
+        {showCoop && (
           <div style={{ padding: '8px 0' }}>
             <p style={{ fontSize: 9, color: '#3f3f46', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', padding: '8px 1rem 4px' }}>Comunidade</p>
-            {showTorneios && <Link href="/torneios" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#fbe900', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🏆 Torneios</Link>}
             {showCoop && <Link href="/coop" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, fontSize: 14, color: '#4f7ef8', padding: '11px 1rem', textDecoration: 'none', borderBottom: '1px solid #18181c' }}>🎮 Co-op 3x3</Link>}
           </div>
         )}

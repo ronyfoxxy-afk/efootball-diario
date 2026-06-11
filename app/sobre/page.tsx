@@ -22,7 +22,7 @@ export default function Sobre() {
             O canal é operado pelo criador de conteúdo <strong style={{ color:'#e4e4e7' }}>FSKATE</strong>, presente no TikTok, YouTube, Twitch, Discord e Spotify com o canal <strong style={{ color:'#e4e4e7' }}>FSKATE GAMES</strong>. Com anos de experiência na comunidade de eFootball, o FSKATE traz análises, rankings, guias e as últimas novidades do jogo diretamente para você.
           </p>
           <p style={{ marginBottom:'1.25rem' }}>
-            Além das notícias, o eFootball News oferece uma <strong style={{ color:'#e4e4e7' }}>fila de Co-op ao vivo</strong> para os fãs jogarem junto ao FSKATE durante as lives, e um sistema de <strong style={{ color:'#e4e4e7' }}>torneios online</strong> com premiação em dinheiro via Pix.
+            Além das notícias, o eFootball News oferece uma <strong style={{ color:'#e4e4e7' }}>fila de Co-op ao vivo</strong> para os fãs jogarem junto ao FSKATE durante as lives.
           </p>
           <p style={{ marginBottom:'2.5rem' }}>
             Nosso conteúdo é gerado de forma automatizada e manual, sempre com curadoria humana, garantindo relevância e qualidade para o leitor.

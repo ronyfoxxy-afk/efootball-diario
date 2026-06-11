@@ -3,8 +3,8 @@ import './globals.css'
 import WhatsAppButton from '@/components/WhatsAppButton'
 
 export const metadata: Metadata = {
-  title: 'eFootball News — Notícias, Torneios e Co-op ao vivo',
-  description: 'O portal de notícias em português sobre eFootball. Atualizações, eventos, campanhas, guias, torneios e fila Co-op ao vivo. FSKATE GAMES.',
+  title: 'eFootball News — Notícias e Co-op ao vivo',
+  description: 'O portal de notícias em português sobre eFootball. Atualizações, eventos, campanhas, guias e fila Co-op ao vivo. FSKATE GAMES.',
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',

@@ -19,22 +19,19 @@ export default function Termos() {
           <h2 style={S.h2}>1. Uso do Site</h2>
           <p style={S.p}>O conteúdo deste site é destinado exclusivamente para fins informativos e de entretenimento relacionados ao jogo eFootball da Konami. É proibido reproduzir, distribuir ou modificar o conteúdo sem autorização prévia.</p>
 
-          <h2 style={S.h2}>2. Torneios e Pagamentos</h2>
-          <p style={S.p}>Os torneios organizados pelo eFootball News são eventos online independentes, não afiliados à Konami. Ao se inscrever em um torneio, você concorda com as regras específicas daquele evento. Pagamentos são processados pelo LivePix e não são reembolsáveis, exceto em caso de cancelamento do torneio pelo organizador.</p>
-
-          <h2 style={S.h2}>3. Co-op ao Vivo</h2>
+          <h2 style={S.h2}>2. Co-op ao Vivo</h2>
           <p style={S.p}>A fila de Co-op é um recurso gratuito para interação com o FSKATE durante lives. A participação está sujeita à disponibilidade e o FSKATE reserva o direito de encerrar a fila a qualquer momento.</p>
 
-          <h2 style={S.h2}>4. Conteúdo de Terceiros</h2>
+          <h2 style={S.h2}>3. Conteúdo de Terceiros</h2>
           <p style={S.p}>Algumas notícias podem ser geradas com auxílio de inteligência artificial com base em fontes públicas. Nos esforçamos para garantir a precisão, mas não nos responsabilizamos por erros ou desatualizações. eFootball® é marca registrada da Konami Holdings Corporation.</p>
 
-          <h2 style={S.h2}>5. Conduta do Usuário</h2>
+          <h2 style={S.h2}>4. Conduta do Usuário</h2>
           <p style={S.p}>É proibido usar o site para fins ilegais, spam, ou qualquer atividade que prejudique outros usuários ou o funcionamento do site.</p>
 
-          <h2 style={S.h2}>6. Modificações</h2>
+          <h2 style={S.h2}>5. Modificações</h2>
           <p style={S.p}>Reservamo-nos o direito de modificar estes termos a qualquer momento. O uso continuado do site após alterações constitui aceitação dos novos termos.</p>
 
-          <h2 style={S.h2}>7. Contato</h2>
+          <h2 style={S.h2}>6. Contato</h2>
           <p style={S.p}>Dúvidas sobre estes termos? Entre em contato pelo <a href="https://discord.gg/FjW6eJpcXA" target="_blank" rel="noopener noreferrer" style={{ color:'#4f7ef8' }}>Discord</a>.</p>
         </div>
       </main>
