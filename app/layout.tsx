@@ -3,6 +3,7 @@ import './globals.css'
 import WhatsAppButton from '@/components/WhatsAppButton'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://efootball-news.vercel.app'),
   title: 'eFootball News — Notícias e Co-op ao vivo',
   description: 'O portal de notícias em português sobre eFootball. Atualizações, eventos, campanhas, guias e fila Co-op ao vivo. FSKATE GAMES.',
   icons: {
