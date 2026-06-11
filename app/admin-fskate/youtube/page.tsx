@@ -315,7 +315,24 @@ export default function RadarIA() {
       }
     } catch {}
 
-    // 8. IA especialista complementa com conhecimento próprio e específico
+    // 8. YouTube — vídeos recentes sobre o tema
+    try {
+      const rssUrl = encodeURIComponent(`https://www.youtube.com/feeds/videos.xml?search_query=${temaEnc}`)
+      const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=5`)
+      if (res.ok) {
+        const data = await res.json()
+        const items = data?.items || []
+        if (items.length > 0) {
+          resultados.push('\n=== YOUTUBE (vídeos recentes) ===')
+          items.slice(0, 5).forEach((item: any) => {
+            resultados.push(`• ${item.title}`)
+            if (item.pubDate) resultados.push(`  data: ${item.pubDate}`)
+          })
+        }
+      }
+    } catch {}
+
+    // 9. IA especialista complementa com conhecimento próprio e específico
     try {
       const iaContexto = await chamarIA(
         `Você é especialista em eFootball da Konami. Responda de forma ESPECÍFICA sobre: "${tema}"
