@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { formatDate, cleanPostContent, readingTime, extractSources, detectFormation } from '@/lib/utils'
+import { formatDate, cleanPostContent, readingTime, extractSources, detectFormations } from '@/lib/utils'
 import FormationDiagram from '@/components/FormationDiagram'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -22,10 +22,16 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const minutes = readingTime(body)
   const sources = extractSources(body)
 
-  // Detecta formação tática citada (ex: 4-3-3) para inserir o diagrama após o parágrafo
-  const formationInfo = detectFormation(body)
-  const bodyPart1 = formationInfo ? body.slice(0, formationInfo.splitAt) : body
-  const bodyPart2 = formationInfo ? body.slice(formationInfo.splitAt) : ''
+  // Detecta TODAS as formações táticas citadas (ex: 4-3-3, 4-2-3-1)
+  // e divide o corpo em segmentos, inserindo um diagrama após o parágrafo de cada menção
+  const formations = detectFormations(body)
+  const segments: { text: string; formation: string | null }[] = []
+  let cursor = 0
+  for (const f of formations) {
+    segments.push({ text: body.slice(cursor, f.splitAt), formation: f.formation })
+    cursor = f.splitAt
+  }
+  segments.push({ text: body.slice(cursor), formation: null })
 
   return (
     <div style={{ minHeight: '100vh', background: '#09090b' }}>
@@ -103,18 +109,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </div>
         )}
 
-        {/* Corpo do artigo — markdown renderizado (com diagrama de formação se citada) */}
+        {/* Corpo do artigo — markdown renderizado, com diagrama após cada formação citada */}
         {body && (
           <div className="article-body" style={{ marginBottom: '1.5rem' }}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {bodyPart1}
-            </ReactMarkdown>
-            {formationInfo && <FormationDiagram formation={formationInfo.formation} />}
-            {bodyPart2 && (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {bodyPart2}
-              </ReactMarkdown>
-            )}
+            {segments.map((seg, i) => (
+              <div key={i}>
+                {seg.text && (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {seg.text}
+                  </ReactMarkdown>
+                )}
+                {seg.formation && <FormationDiagram formation={seg.formation} />}
+              </div>
+            ))}
           </div>
         )}
 

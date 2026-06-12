@@ -3,8 +3,28 @@
  * Meio campo visto de cima (gol embaixo), cards dourados com sigla da posição.
  */
 
+// Layouts fiéis ao eFootball para as formações mais comuns (defesa -> ataque)
+const LAYOUTS: Record<string, string[][]> = {
+  '4-3-3':     [['LE','ZC','ZC','LD'], ['MC','VOL','MC'], ['PE','CA','PD']],
+  '4-2-1-3':   [['LE','ZC','ZC','LD'], ['VOL','VOL'], ['MAT'], ['PE','CA','PD']],
+  '4-1-2-3':   [['LE','ZC','ZC','LD'], ['VOL'], ['MC','MC'], ['PE','CA','PD']],
+  '4-2-3-1':   [['LE','ZC','ZC','LD'], ['VOL','VOL'], ['MLG','MAT','MLD'], ['CA']],
+  '4-4-2':     [['LE','ZC','ZC','LD'], ['MLG','MC','MC','MLD'], ['CA','CA']],
+  '4-1-4-1':   [['LE','ZC','ZC','LD'], ['VOL'], ['MLG','MC','MC','MLD'], ['CA']],
+  '4-2-2-2':   [['LE','ZC','ZC','LD'], ['VOL','VOL'], ['MAT','MAT'], ['CA','CA']],
+  '4-3-1-2':   [['LE','ZC','ZC','LD'], ['MC','VOL','MC'], ['MAT'], ['CA','CA']],
+  '4-1-2-1-2': [['LE','ZC','ZC','LD'], ['VOL'], ['MC','MC'], ['MAT'], ['CA','CA']],
+  '4-5-1':     [['LE','ZC','ZC','LD'], ['MLG','MC','VOL','MC','MLD'], ['CA']],
+  '3-5-2':     [['ZC','ZC','ZC'], ['MLG','MC','VOL','MC','MLD'], ['CA','CA']],
+  '3-4-3':     [['ZC','ZC','ZC'], ['MLG','MC','MC','MLD'], ['PE','CA','PD']],
+  '3-1-4-2':   [['ZC','ZC','ZC'], ['VOL'], ['MLG','MC','MC','MLD'], ['CA','CA']],
+  '3-4-1-2':   [['ZC','ZC','ZC'], ['MLG','MC','MC','MLD'], ['MAT'], ['CA','CA']],
+  '5-3-2':     [['LE','ZC','ZC','ZC','LD'], ['MC','VOL','MC'], ['CA','CA']],
+  '5-2-1-2':   [['LE','ZC','ZC','ZC','LD'], ['MC','MC'], ['MAT'], ['CA','CA']],
+  '5-4-1':     [['LE','ZC','ZC','ZC','LD'], ['MLG','MC','MC','MLD'], ['CA']],
+}
+
 function positionsForLine(count: number, lineIndex: number, totalLines: number): string[] {
-  // Última linha = ataque
   const isAttack = lineIndex === totalLines - 1
   const isDefense = lineIndex === 0
   const isFirstMid = lineIndex === 1 && totalLines > 2
@@ -17,7 +37,7 @@ function positionsForLine(count: number, lineIndex: number, totalLines: number):
   if (isAttack) {
     if (count === 1) return ['CA']
     if (count === 2) return ['CA', 'CA']
-    if (count === 3) return ['CA', 'SA', 'CA']
+    if (count === 3) return ['PE', 'CA', 'PD']
     const mids = Array(count - 2).fill('CA')
     return ['PE', ...mids, 'PD']
   }
@@ -27,7 +47,6 @@ function positionsForLine(count: number, lineIndex: number, totalLines: number):
     const mids = Array(count - 2).fill('VOL')
     return ['MLG', ...mids, 'MLD']
   }
-  // Demais linhas de meio
   if (count === 1) return ['MAT']
   if (count === 2) return ['MC', 'MC']
   const mids = Array(count - 2).fill('MAT')
@@ -56,10 +75,13 @@ export default function FormationDiagram({ formation }: { formation: string }) {
 
   const players: { x: number; y: number; pos: string }[] = []
 
+  const layout = LAYOUTS[formation]
   lines.forEach((count, i) => {
     const y = H - PAD_BOTTOM - rowGap * i - rowGap / 2
     const gap = (W - PAD_X * 2) / (count + 1)
-    const posList = positionsForLine(count, i, rows)
+    const posList = (layout && layout[i] && layout[i].length === count)
+      ? layout[i]
+      : positionsForLine(count, i, rows)
     for (let j = 1; j <= count; j++) {
       players.push({ x: PAD_X + gap * j, y, pos: posList[j - 1] })
     }

@@ -85,22 +85,24 @@ export function extractSources(text: string): string[] {
   return Array.from(new Set(urls))
 }
 
-/** Detecta a primeira formação tática citada no texto (ex: 4-3-3, 4-2-3-1).
- *  Retorna a formação e a posição (índice) do fim do parágrafo onde ela aparece. */
-export function detectFormation(text: string): { formation: string; splitAt: number } | null {
-  if (!text) return null
-  // 2 a 4 grupos de dígitos 1-6 separados por hífen, cercados por limites de palavra
+/** Detecta TODAS as formações táticas distintas citadas no texto (ex: 4-3-3, 4-2-3-1).
+ *  Para cada formação única, retorna a posição (índice) do fim do parágrafo da primeira menção. */
+export function detectFormations(text: string): { formation: string; splitAt: number }[] {
+  if (!text) return []
   const re = /\b([1-6](?:-[1-6]){1,4})\b/g
+  const found: { formation: string; splitAt: number }[] = []
+  const seen = new Set<string>()
   let m: RegExpExecArray | null
   while ((m = re.exec(text)) !== null) {
     const nums = m[1].split('-').map(Number)
     const total = nums.reduce((a, b) => a + b, 0)
-    if (total === 10 && nums.length >= 2 && nums.length <= 5) {
-      // fim do parágrafo da menção
+    if (total === 10 && nums.length >= 2 && nums.length <= 5 && !seen.has(m[1])) {
+      seen.add(m[1])
       let splitAt = text.indexOf('\n\n', m.index)
       if (splitAt === -1) splitAt = text.length
-      return { formation: m[1], splitAt }
+      found.push({ formation: m[1], splitAt })
     }
   }
-  return null
+  // ordenar por posição no texto
+  return found.sort((a, b) => a.splitAt - b.splitAt)
 }
