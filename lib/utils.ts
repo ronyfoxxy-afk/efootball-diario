@@ -84,3 +84,23 @@ export function extractSources(text: string): string[] {
   const urls = text.match(/https?:\/\/[^\s)]+/g) || []
   return Array.from(new Set(urls))
 }
+
+/** Detecta a primeira formação tática citada no texto (ex: 4-3-3, 4-2-3-1).
+ *  Retorna a formação e a posição (índice) do fim do parágrafo onde ela aparece. */
+export function detectFormation(text: string): { formation: string; splitAt: number } | null {
+  if (!text) return null
+  // 2 a 4 grupos de dígitos 1-6 separados por hífen, cercados por limites de palavra
+  const re = /\b([1-6](?:-[1-6]){1,3})\b/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(text)) !== null) {
+    const nums = m[1].split('-').map(Number)
+    const total = nums.reduce((a, b) => a + b, 0)
+    if (total === 10 && nums.length >= 2 && nums.length <= 4) {
+      // fim do parágrafo da menção
+      let splitAt = text.indexOf('\n\n', m.index)
+      if (splitAt === -1) splitAt = text.length
+      return { formation: m[1], splitAt }
+    }
+  }
+  return null
+}

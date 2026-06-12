@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import { formatDate, cleanPostContent, readingTime, extractSources } from '@/lib/utils'
+import { formatDate, cleanPostContent, readingTime, extractSources, detectFormation } from '@/lib/utils'
+import FormationDiagram from '@/components/FormationDiagram'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
@@ -20,6 +21,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const { body, signature } = cleanPostContent(post.content || '')
   const minutes = readingTime(body)
   const sources = extractSources(body)
+
+  // Detecta formação tática citada (ex: 4-3-3) para inserir o diagrama após o parágrafo
+  const formationInfo = detectFormation(body)
+  const bodyPart1 = formationInfo ? body.slice(0, formationInfo.splitAt) : body
+  const bodyPart2 = formationInfo ? body.slice(formationInfo.splitAt) : ''
 
   return (
     <div style={{ minHeight: '100vh', background: '#09090b' }}>
@@ -97,12 +103,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </div>
         )}
 
-        {/* Corpo do artigo — markdown renderizado */}
+        {/* Corpo do artigo — markdown renderizado (com diagrama de formação se citada) */}
         {body && (
           <div className="article-body" style={{ marginBottom: '1.5rem' }}>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {body}
+              {bodyPart1}
             </ReactMarkdown>
+            {formationInfo && <FormationDiagram formation={formationInfo.formation} />}
+            {bodyPart2 && (
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {bodyPart2}
+              </ReactMarkdown>
+            )}
           </div>
         )}
 
