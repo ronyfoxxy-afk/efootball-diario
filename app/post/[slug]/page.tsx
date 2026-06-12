@@ -106,43 +106,58 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           </div>
         )}
 
-        {/* Fontes e referências */}
-        {sources.length > 0 && (
-          <div style={{ borderTop: '1px solid #1d1d20', paddingTop: '1rem', marginBottom: '1rem' }}>
+        {/* Fontes e referências — cards */}
+        {(sources.length > 0 || post.source_url) && (
+          <div style={{ borderTop: '1px solid #1d1d20', paddingTop: '1.2rem', marginBottom: '1.5rem' }}>
             <p style={{ fontSize: 10, color: '#52525b', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 10px' }}>
               Fontes e referências
             </p>
-            <ul style={{ margin: 0, padding: '0 0 0 18px', listStyle: 'none' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {sources.map((url, i) => {
                 let label = url
                 try { label = new URL(url).hostname.replace('www.', '') } catch {}
                 return (
-                  <li key={i} style={{ marginBottom: 6, fontSize: 13, lineHeight: 1.6 }}>
-                    <a href={url} target="_blank" rel="noopener noreferrer"
-                      style={{ color: '#4f7ef8', textDecoration: 'none' }}>
-                      🔗 {label}
-                    </a>
-                  </li>
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: '#111115', border: '1px solid #1d1d20', borderRadius: 10,
+                      padding: '10px 14px', textDecoration: 'none', color: '#e4e4e7',
+                      fontSize: 13, fontWeight: 600, transition: 'border-color 0.15s',
+                    }}>
+                    <span style={{ fontSize: 14 }}>🔗</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+                  </a>
                 )
               })}
-            </ul>
+              {post.source_url && (
+                <a href={post.source_url} target="_blank" rel="noopener noreferrer"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap',
+                    background: '#111115', border: '1px solid #1d1d20', borderRadius: 10,
+                    padding: '10px 14px', textDecoration: 'none', color: '#4f7ef8',
+                    fontSize: 13, fontWeight: 600,
+                  }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 14 }}>🔗</span>
+                    Fonte original
+                  </span>
+                  {signature && (
+                    <span style={{ fontSize: 11, color: '#52525b', fontWeight: 400, whiteSpace: 'nowrap' }}>
+                      {signature.replace(/^_+|_+$/g, '')}
+                    </span>
+                  )}
+                </a>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Fonte original + assinatura */}
-        {(post.source_url || signature) && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, background: '#111115', border: '1px solid #1d1d20', borderRadius: 12, padding: '14px 18px', marginBottom: '1.5rem' }}>
-            {post.source_url ? (
-              <a href={post.source_url} target="_blank" rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: '#4f7ef8', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 480 }}>
-                🔗 Fonte original
-              </a>
-            ) : <span />}
-            {signature && (
-              <span style={{ fontSize: 11, color: '#52525b', whiteSpace: 'nowrap' }}>
-                {signature.replace(/^_+|_+$/g, '')}
-              </span>
-            )}
+        {/* Assinatura (caso não haja source_url mas exista signature) */}
+        {!post.source_url && signature && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+            <span style={{ fontSize: 11, color: '#52525b' }}>
+              {signature.replace(/^_+|_+$/g, '')}
+            </span>
           </div>
         )}
 

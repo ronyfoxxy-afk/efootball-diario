@@ -61,6 +61,10 @@ export function cleanPostContent(raw: string): { body: string; signature: string
   // Limpa linhas vazias extras
   text = text.replace(/\n{3,}/g, '\n\n').trim()
 
+  // Remove sequências de 2+ emojis seguidos (decoração exagerada da IA, ex: 🔥🚨💣)
+  // Mantém um único emoji isolado (uso natural), remove apenas "rajadas"
+  text = text.replace(/(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s*){2,}/gu, '')
+
   // Remove bloco "## Fontes" / "## Referências" gerado pelo agente — o site já monta sua própria seção
   text = text.replace(/\n{0,2}#{1,3}\s*(Fontes|Referências|Referencias)\s*\n[\s\S]*?(?=\n#{1,3}\s|\n_Reportagem|$)/i, '').trim()
 
