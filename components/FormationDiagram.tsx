@@ -9,9 +9,9 @@ export default function FormationDiagram({ formation }: { formation: string }) {
     .map((n) => parseInt(n, 10))
     .filter((n) => !isNaN(n) && n > 0 && n <= 6)
 
-  // Formação válida: 2 a 4 linhas, somando 10 jogadores de linha
+  // Formação válida: 2 a 5 linhas, somando 10 jogadores de linha
   const total = lines.reduce((a, b) => a + b, 0)
-  if (lines.length < 2 || lines.length > 4 || total !== 10) return null
+  if (lines.length < 2 || lines.length > 5 || total !== 10) return null
 
   const W = 340
   const H = 440
