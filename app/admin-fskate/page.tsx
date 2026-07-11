@@ -214,7 +214,7 @@ export default function Admin() {
       supabase.from('posts').select('*',{count:'exact',head:true}).gte('published_at',new Date().toISOString().split('T')[0]),
     ])
     setStats({ pub:pub||0, draft:draft||0, hoje:hoje||0 })
-    const { data } = await supabase.from('posts').select('id,title,summary,content,status,auto_published,cover_image,source_url,published_at,order_index,categories(name,color),featured').order('order_index',{ascending:true,nullsFirst:false}).limit(50)
+    const { data } = await supabase.from('posts').select('id,title,summary,content,status,auto_published,cover_image,source_url,published_at,order_index,categories(name,color),featured').order('published_at',{ascending:false,nullsFirst:false}).limit(150)
     setPosts(data||[])
     setFeaturedId((data||[]).find((p:any)=>p.featured)?.id||null)
   }
